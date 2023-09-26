@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { StopwatchModel } from '../stopwatch/StopwatchModel';
+import { StopwatchState } from '../stopwatch/StopwatchState';
 
-interface StopwatchButtonsProps {}
+interface StopwatchButtonsProps {
+	model: StopwatchModel;
+}
 
 export const StopwatchButtons = (props: StopwatchButtonsProps) => {
-	const [someText, setSomeText] = useState('someDefaultText');
+	const startOrStopStopwatch = () => {
+		props.model.getState() == StopwatchState.STARTED ? props.model.stop() : props.model.start();
+	};
 
-	const handleClick = (): void => {};
+	const resetStopwatch = () => {
+		props.model.reset();
+	};
 
 	return (
 		<div>
-			<button onClick={handleClick} className={'start-stop'}>
-				Start-Stop-Test-Stuff
+			<button className={'start-stop'} onClick={startOrStopStopwatch}>
+				Start-Stop
+			</button>
+			<button className={'reset'} onClick={resetStopwatch}>
+				Reset
 			</button>
 		</div>
 	);

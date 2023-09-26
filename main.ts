@@ -18,7 +18,6 @@ export default class EditorStopwatch extends Plugin {
 		await this.loadSettings();
 
 		this.registerView('stopwatch-button-sidebar', (leaf: WorkspaceLeaf) => {
-			// const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
 			return new SidebarView(leaf);
 		});
 
@@ -28,8 +27,9 @@ export default class EditorStopwatch extends Plugin {
 			id: 'timestamp-insert',
 			name: 'Insert timestamp based on current stopwatch',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// const sidebarView = this.getView();
-				editor.replaceSelection('sidebarView!.test()');
+				const sidebarView = this.getView();
+				const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
+				currentStopwatchTime && editor.replaceSelection(`${currentStopwatchTime}: `);
 				return;
 			},
 		});
