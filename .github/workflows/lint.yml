@@ -1,0 +1,23 @@
+name: Lint
+
+on: push
+
+jobs:
+  run-linters:
+    name: Run linter
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: checkout git repository
+        uses: actions/checkout@v4
+
+      - name: setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: install dependencies
+        run: npm install
+
+      - name: run eslint
+        run: npm run lint
