@@ -14,7 +14,7 @@
 	"author": "Nils Dammenhayn",
 	"license": "MIT",
 	"devDependencies": {
-		"@types/node": "^20.5.6",
+		"@types/node": "^20.7.0",
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.17.3",
 		"obsidian": "^1.4.11",
