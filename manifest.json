@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-editor-stopwatch",
 	"name": "Editor Stopwatch Plugin",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
 	"description": "This is a plugin for Obsidian that adds a stopwatch that can be inserted in the editor (https://obsidian.md)\"",
 	"author": "Nils Dammenhayn",

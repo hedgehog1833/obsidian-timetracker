@@ -1,5 +1,6 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { SidebarView } from './src/ui/SidebarView';
+import { EditorStopwatchSettingTab } from './src/EditorStopwatchSettingTab';
 
 interface EditorStopwatchSettings {
 	interval: number;
@@ -34,8 +35,7 @@ export default class EditorStopwatch extends Plugin {
 			},
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		// this.addSettingTab(new EditorStopwatchSettingTab(this.app, this)); // todo nilsd activate?
+		this.addSettingTab(new EditorStopwatchSettingTab(this.app, this));
 	}
 
 	onunload() {}
@@ -67,31 +67,3 @@ export default class EditorStopwatch extends Plugin {
 		}
 	}
 }
-
-// class EditorStopwatchSettingTab extends PluginSettingTab {
-// 	plugin: EditorStopwatch;
-//
-// 	constructor(app: App, plugin: EditorStopwatch) {
-// 		super(app, plugin);
-// 		this.plugin = plugin;
-// 	}
-//
-// 	display(): void {
-// 		const { containerEl } = this;
-//
-// 		containerEl.empty();
-//
-// 		new Setting(containerEl)
-// 			.setName("Setting #1")
-// 			.setDesc("It's a secret")
-// 			.addText((text) =>
-// 				text
-// 					.setPlaceholder("Enter your secret")
-// 					.setValue(this.plugin.settings.mySetting)
-// 					.onChange(async (value) => {
-// 						this.plugin.settings.mySetting = value;
-// 						await this.plugin.saveSettings();
-// 					})
-// 			);
-// 	}
-// }
