@@ -12,5 +12,4 @@ updates:
     groups:
       dependencies:
         patterns:
-          - "*eslint*"
-          - "*react*"
+          - "*"

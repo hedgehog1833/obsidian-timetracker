@@ -1,5 +1,5 @@
 export const enum StopwatchState {
-	INITIALIZED,
-	STARTED,
-	STOPPED,
+	INITIALIZED = 'Initialized',
+	STARTED = 'Started',
+	STOPPED = 'Stopped',
 }
