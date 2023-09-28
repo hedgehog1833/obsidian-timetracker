@@ -10,7 +10,6 @@ export class SidebarView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
 	private readonly plugin: EditorStopwatch;
 	private root: Root;
-	// private intervalId: number;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EditorStopwatch) {
 		super(leaf);
@@ -35,41 +34,16 @@ export class SidebarView extends ItemView {
 	}
 
 	start(): StopwatchState {
-		// this.createInterval();
 		return this.stopwatchModel.start();
 	}
 
 	stop(): StopwatchState {
-		// this.clearInterval();
 		return this.stopwatchModel.stop();
 	}
 
-	// startStop(): StopwatchState {
-	// 	if (this.stopwatchModel.getState() != StopwatchState.STARTED) {
-	// 		return this.stopwatchModel.start();
-	// 	} else {
-	// 		return this.stopwatchModel.stop();
-	// 	}
-	// }
-
 	reset(): StopwatchState {
-		// this.clearInterval();
 		return this.stopwatchModel.reset();
 	}
-
-	// createInterval = () => {
-	// 	if (this.intervalId != 0) {
-	// 		window.clearInterval(this.intervalId);
-	// 	}
-	// 	this.intervalId = window.setInterval(() => {}, this.plugin.settings.interval);
-	// };
-	//
-	// clearInterval = () => {
-	// 	if (this.intervalId != 0) {
-	// 		window.clearInterval(this.intervalId);
-	// 		this.intervalId = 0;
-	// 	}
-	// };
 
 	async onOpen() {
 		this.root = ReactDOM.createRoot(this.containerEl);
