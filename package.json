@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-timetracker",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "This is a plugin for Obsidian that adds a stopwatch that can be inserted in the editor (https://obsidian.md)",
 	"main": "main.js",
 	"scripts": {
