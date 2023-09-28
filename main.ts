@@ -27,7 +27,7 @@ export default class Timetracker extends Plugin {
 		this.addCommand({
 			id: 'timestamp-insert',
 			name: 'Insert timestamp based on current stopwatch value',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor) => {
 				const sidebarView = this.getView();
 				const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
 				currentStopwatchTime && editor.replaceSelection(`${currentStopwatchTime}: `);

@@ -6,10 +6,6 @@ export class StopwatchModel {
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
 
-	getState(): StopwatchState {
-		return this.state;
-	}
-
 	start(): StopwatchState {
 		this.startedAt = dayjs();
 		this.state = StopwatchState.STARTED;
