@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import StopwatchPlugin from '../main';
 
-const SETTING_INTERVAL_DESC = 'Valid value range is 1-1000';
+const SETTING_INTERVAL_DESC = 'Valid value range: 1-1000';
 
 export class TimetrackerSettingTab extends PluginSettingTab {
 	plugin: StopwatchPlugin;
@@ -78,7 +78,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	}
 
 	private createFormatSetting(containerEl: HTMLElement) {
-		const setting = new Setting(containerEl).setName('Time Format').addText((component) => {
+		const setting = new Setting(containerEl).setName('Time format').addText((component) => {
 			component
 				.setValue(this.plugin.settings.format)
 				.setPlaceholder('HH:mm:ss.SSS')
@@ -88,6 +88,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				});
 		});
 		setting.descEl.innerHTML =
-			'For more syntax, refer to ' + "<a href='https://day.js.org/docs/en/display/format'>format reference</a>";
+			'For more syntax, refer to the ' + "<a href='https://day.js.org/docs/en/display/format'>format reference</a>";
 	}
 }
