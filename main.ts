@@ -26,7 +26,7 @@ export default class Timetracker extends Plugin {
 
 		this.addCommand({
 			id: 'timestamp-insert',
-			name: 'Insert timestamp based on current stopwatch',
+			name: 'Insert timestamp based on current stopwatch value',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const sidebarView = this.getView();
 				const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
@@ -60,7 +60,6 @@ export default class Timetracker extends Plugin {
 	}
 
 	getView(): TimetrackerView | null {
-		// todo nilsd refactor to not return null
 		const leaf = this.app.workspace.getLeavesOfType('timetracker-sidebar').first();
 		if (leaf !== null && leaf !== undefined && leaf.view instanceof TimetrackerView) {
 			return leaf.view;

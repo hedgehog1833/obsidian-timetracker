@@ -59,6 +59,8 @@ export class TimetrackerView extends ItemView {
 	}
 
 	async onClose() {
-		this.root.unmount();
+		if (this.root !== null && this.root !== undefined) {
+			this.root.unmount();
+		}
 	}
 }

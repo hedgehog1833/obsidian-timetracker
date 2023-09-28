@@ -50,12 +50,14 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 
 	return (
 		<div className={'stopwatch'}>
-			<button className={'start-stop'} onClick={startOrStopStopwatch}>
-				{stopwatchState == StopwatchState.STARTED ? 'Pause' : 'Start'}
-			</button>
-			<button className={'reset'} onClick={resetStopwatch}>
-				Reset
-			</button>
+			<div className={'stopwatch-buttons'}>
+				<button className={'start-stop-button'} onClick={startOrStopStopwatch}>
+					{stopwatchState == StopwatchState.STARTED ? 'Pause' : 'Start'}
+				</button>
+				<button className={'reset-button'} onClick={resetStopwatch}>
+					Reset
+				</button>
+			</div>
 			<div className={'stopwatch-value'}>{props.getCurrentStopwatchTime()}</div>
 		</div>
 	);

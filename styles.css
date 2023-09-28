@@ -1,3 +1,16 @@
 .stopwatch {
 	padding: 1em;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.stopwatch-buttons {
+	gap: 0.5em;
+	display: flex;
+}
+
+.stopwatch-value {
+	padding-top: 0.5em;
+	display: flex;
 }
