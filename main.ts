@@ -25,7 +25,7 @@ export default class Timetracker extends Plugin {
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
 
 		this.addCommand({
-			id: 'timestamp-insert',
+			id: 'insert-timestamp',
 			name: 'Insert timestamp based on current stopwatch value',
 			editorCallback: (editor: Editor) => {
 				const sidebarView = this.getView();
