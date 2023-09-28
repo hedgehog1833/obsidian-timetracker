@@ -3,7 +3,7 @@
 	"name": "Timetracker Plugin",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "This is a plugin for Obsidian that adds a stopwatch whose value can be inserted in the editor (https://obsidian.md)\"",
+	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey",
 	"author": "Nils Dammenhayn",
 	"authorUrl": "https://www.metal-detector.rocks",
 	"fundingUrl": "https://www.buymeacoffee.com/metaldetector",
