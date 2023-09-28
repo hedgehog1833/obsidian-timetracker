@@ -38,9 +38,7 @@ export default class Timetracker extends Plugin {
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
 	}
 
-	onunload() {
-		this.app.workspace.getLeavesOfType('timetracker-sidebar').forEach((leaf) => leaf.detach());
-	}
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
