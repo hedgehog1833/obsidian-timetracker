@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { StopwatchState } from '../stopwatch/StopwatchState';
-import EditorStopwatch from '../../main';
+import Timetracker from '../../main';
 
 interface StopwatchButtonsProps {
-	plugin: EditorStopwatch;
+	plugin: Timetracker;
 	start: () => StopwatchState;
 	stop: () => StopwatchState;
 	reset: () => StopwatchState;

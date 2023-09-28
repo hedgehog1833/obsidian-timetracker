@@ -3,7 +3,7 @@ import StopwatchPlugin from '../main';
 
 const SETTING_INTERVAL_DESC = 'Valid value range is 1-1000';
 
-export class EditorStopwatchSettingTab extends PluginSettingTab {
+export class TimetrackerSettingTab extends PluginSettingTab {
 	plugin: StopwatchPlugin;
 
 	constructor(app: App, plugin: StopwatchPlugin) {
@@ -16,7 +16,7 @@ export class EditorStopwatchSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'Settings for editor stopwatch plugin.' });
+		containerEl.createEl('h2', { text: 'Settings for timetracker plugin.' });
 
 		this.createIntervalSetting(containerEl);
 		this.createFormatSetting(containerEl);
@@ -32,7 +32,7 @@ export class EditorStopwatchSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.interval.toString())
 					.onChange(async (value) => {
 						try {
-							const interval = EditorStopwatchSettingTab.parseIntervalValue(value.trim());
+							const interval = TimetrackerSettingTab.parseIntervalValue(value.trim());
 							console.log(`interval set to ${interval}`);
 							this.plugin.settings.interval = interval;
 							await this.plugin.saveSettings();
@@ -44,7 +44,7 @@ export class EditorStopwatchSettingTab extends PluginSettingTab {
 							// }
 						} catch (e) {
 							console.log(e);
-							EditorStopwatchSettingTab.showIntervalAlert(setting, e.toString());
+							TimetrackerSettingTab.showIntervalAlert(setting, e.toString());
 						}
 					}),
 			);

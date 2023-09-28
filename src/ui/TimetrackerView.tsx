@@ -3,26 +3,26 @@ import { StopwatchButtons } from './StopwatchButtons';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
 import { StopwatchModel } from '../stopwatch/StopwatchModel';
-import EditorStopwatch from '../../main';
+import Timetracker from '../../main';
 import { StopwatchState } from '../stopwatch/StopwatchState';
 
-export class SidebarView extends ItemView {
+export class TimetrackerView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
-	private readonly plugin: EditorStopwatch;
+	private readonly plugin: Timetracker;
 	private root: Root;
 
-	constructor(leaf: WorkspaceLeaf, plugin: EditorStopwatch) {
+	constructor(leaf: WorkspaceLeaf, plugin: Timetracker) {
 		super(leaf);
 		this.plugin = plugin;
 		this.stopwatchModel = new StopwatchModel();
 	}
 
 	getDisplayText(): string {
-		return 'Stopwatch button sidebar';
+		return 'Timetracker sidebar';
 	}
 
 	getViewType(): string {
-		return 'stopwatch-button-sidebar';
+		return 'timetracker-sidebar';
 	}
 
 	getIcon(): string {
