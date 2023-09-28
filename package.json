@@ -1,6 +1,6 @@
 {
-	"name": "obsidian-timetracker",
-	"version": "1.0.1",
+	"name": "timetracker",
+	"version": "1.0.2",
 	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey",
 	"main": "main.js",
 	"scripts": {
