@@ -10,20 +10,23 @@ export class StopwatchModel {
 		return this.state;
 	}
 
-	start(): void {
+	start(): StopwatchState {
 		this.startedAt = dayjs();
 		this.state = StopwatchState.STARTED;
+		return this.state;
 	}
 
-	stop(): void {
+	stop(): StopwatchState {
 		this.pausedAtOffset = dayjs().diff(this.startedAt, 'millisecond') + this.pausedAtOffset;
 		this.state = StopwatchState.STOPPED;
+		return this.state;
 	}
 
-	reset(): void {
+	reset(): StopwatchState {
 		this.state = StopwatchState.INITIALIZED;
 		this.startedAt = null;
 		this.pausedAtOffset = 0;
+		return this.state;
 	}
 
 	getCurrentValue(format: string): string {

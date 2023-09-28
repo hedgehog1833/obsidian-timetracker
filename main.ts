@@ -35,10 +35,73 @@ export default class EditorStopwatch extends Plugin {
 			},
 		});
 
+		// this.addCommand({
+		// 	id: 'stopwatch-start',
+		// 	name: 'Start the stopwatch',
+		// 	checkCallback: (checking: boolean) => {
+		// 		const sidebarView = this.getView();
+		//
+		// 		console.log('a');
+		//
+		// 		if (checking) {
+		// 			console.log('b');
+		// 			return sidebarView !== null;
+		// 		}
+		//
+		// 		if (sidebarView !== null) {
+		// 			console.log('c');
+		// 			sidebarView.start();
+		// 			return true;
+		// 		} else {
+		// 			return false;
+		// 		}
+		// 	},
+		// });
+		//
+		// this.addCommand({
+		// 	id: 'stopwatch-stop',
+		// 	name: 'Stop the stopwatch',
+		// 	checkCallback: (checking: boolean) => {
+		// 		const sidebarView = this.getView();
+		//
+		// 		if (checking) {
+		// 			return sidebarView !== null;
+		// 		}
+		//
+		// 		if (sidebarView !== null) {
+		// 			sidebarView.stop();
+		// 			return true;
+		// 		} else {
+		// 			return false;
+		// 		}
+		// 	},
+		// });
+		//
+		// this.addCommand({
+		// 	id: 'stopwatch-reset',
+		// 	name: 'Reset the stopwatch',
+		// 	checkCallback: (checking: boolean) => {
+		// 		const sidebarView = this.getView();
+		//
+		// 		if (checking) {
+		// 			return sidebarView !== null;
+		// 		}
+		//
+		// 		if (sidebarView !== null) {
+		// 			sidebarView.reset();
+		// 			return true;
+		// 		} else {
+		// 			return false;
+		// 		}
+		// 	},
+		// });
+
 		this.addSettingTab(new EditorStopwatchSettingTab(this.app, this));
 	}
 
-	onunload() {}
+	onunload() {
+		this.app.workspace.getLeavesOfType('stopwatch-button-sidebar').forEach((leaf) => leaf.detach());
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());

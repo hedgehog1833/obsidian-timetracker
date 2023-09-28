@@ -1,34 +1,32 @@
 import React, { useState } from 'react';
-import { StopwatchModel } from '../stopwatch/StopwatchModel';
 import { StopwatchState } from '../stopwatch/StopwatchState';
 import EditorStopwatch from '../../main';
 
 interface StopwatchButtonsProps {
 	plugin: EditorStopwatch;
-	model: StopwatchModel;
+	start: () => StopwatchState;
+	stop: () => StopwatchState;
+	reset: () => StopwatchState;
+	getCurrentStopwatchTime: () => string;
 }
 
 export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 	const [intervalId, setIntervalId] = useState(0);
-	const [currentStopwatchValue, setCurrentStopwatchValue] = useState('00:00:00.000');
 	const [stopwatchState, setStopwatchState] = useState(StopwatchState.INITIALIZED);
+	const [_, setCurrentValue] = useState(props.getCurrentStopwatchTime);
 
 	const startOrStopStopwatch = () => {
 		if (stopwatchState != StopwatchState.STARTED) {
-			props.model.start();
-			setStopwatchState(props.model.getState());
+			setStopwatchState(props.start());
 			createInterval();
 		} else {
-			props.model.stop();
-			setStopwatchState(props.model.getState());
+			setStopwatchState(props.stop());
 			clearInterval();
 		}
 	};
 
 	const resetStopwatch = () => {
-		props.model.reset();
-		setStopwatchState(props.model.getState());
-		setCurrentStopwatchValue(props.model.getCurrentValue(props.plugin.settings.format));
+		setStopwatchState(props.reset());
 		clearInterval();
 	};
 
@@ -36,10 +34,9 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 		if (intervalId != 0) {
 			window.clearInterval(intervalId);
 		}
-
 		setIntervalId(
 			window.setInterval(() => {
-				setCurrentStopwatchValue(props.model.getCurrentValue(props.plugin.settings.format));
+				setCurrentValue(props.getCurrentStopwatchTime());
 			}, props.plugin.settings.interval),
 		);
 	};
@@ -52,14 +49,14 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 	};
 
 	return (
-		<div>
+		<div className={'stopwatch'}>
 			<button className={'start-stop'} onClick={startOrStopStopwatch}>
-				{stopwatchState == StopwatchState.STARTED ? 'Stop' : 'Start'}
+				{stopwatchState == StopwatchState.STARTED ? 'Pause' : 'Start'}
 			</button>
 			<button className={'reset'} onClick={resetStopwatch}>
 				Reset
 			</button>
-			<div className={'stopwatch-value'}>{currentStopwatchValue}</div>
+			<div className={'stopwatch-value'}>{props.getCurrentStopwatchTime()}</div>
 		</div>
 	);
 };
