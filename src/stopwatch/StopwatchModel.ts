@@ -39,6 +39,6 @@ export class StopwatchModel {
 	}
 
 	private getDateString(milliseconds: number, format: string): string {
-		return dayjs().startOf('day').add(milliseconds, 'millisecond').format(format);
+		return dayjs().startOf('year').add(milliseconds, 'millisecond').format(format);
 	}
 }

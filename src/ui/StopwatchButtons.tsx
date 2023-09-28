@@ -27,6 +27,7 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 
 	const resetStopwatch = () => {
 		setStopwatchState(props.reset());
+		setCurrentValue(props.getCurrentStopwatchTime());
 		clearInterval();
 	};
 

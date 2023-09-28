@@ -37,11 +37,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 							this.plugin.settings.interval = interval;
 							await this.plugin.saveSettings();
 							setting.descEl.textContent = SETTING_INTERVAL_DESC;
-							// todo nilsd check out if needed
-							// const view = this.plugin.getView();
-							// if (view != null) {
-							// 	view.resetInterval();
-							// }
 						} catch (e) {
 							console.log(e);
 							TimetrackerSettingTab.showIntervalAlert(setting, e.toString());
