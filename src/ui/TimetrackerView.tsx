@@ -45,6 +45,11 @@ export class TimetrackerView extends ItemView {
 		return this.stopwatchModel.reset();
 	}
 
+	startStop(): void {
+		const el = this.containerEl.querySelector('button.start-stop-button');
+		(el as HTMLButtonElement).click();
+	}
+
 	async onOpen() {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
