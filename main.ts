@@ -45,7 +45,7 @@ export default class Timetracker extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'start--stop-stopwatch',
+			id: 'start-stop-stopwatch',
 			name: 'Start or stop the stopwatch',
 			checkCallback: (checking: boolean) => {
 				const sidebarView = this.getView();
