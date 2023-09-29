@@ -27,11 +27,20 @@ export default class Timetracker extends Plugin {
 		this.addCommand({
 			id: 'insert-timestamp',
 			name: 'Insert timestamp based on current stopwatch value',
-			editorCallback: (editor: Editor) => {
+			editorCheckCallback: (checking: boolean, editor: Editor) => {
 				const sidebarView = this.getView();
-				const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
-				currentStopwatchTime && editor.replaceSelection(`${currentStopwatchTime}: `);
-				return;
+
+				if (checking) {
+					return sidebarView !== null;
+				}
+
+				if (sidebarView != null) {
+					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
+					currentStopwatchTime && editor.replaceSelection(`${currentStopwatchTime}: `);
+					return true;
+				} else {
+					return false;
+				}
 			},
 		});
 
