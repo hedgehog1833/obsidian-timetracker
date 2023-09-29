@@ -46,7 +46,26 @@ export default class Timetracker extends Plugin {
 				}
 
 				if (sidebarView != null) {
-					sidebarView.startStop();
+					sidebarView.clickStartStop();
+					return true;
+				} else {
+					return false;
+				}
+			},
+		});
+
+		this.addCommand({
+			id: 'reset-stopwatch',
+			name: 'Reset the stopwatch',
+			checkCallback: (checking: boolean) => {
+				const sidebarView = this.getView();
+
+				if (checking) {
+					return sidebarView != null;
+				}
+
+				if (sidebarView != null) {
+					sidebarView.clickReset();
 					return true;
 				} else {
 					return false;

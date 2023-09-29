@@ -45,8 +45,13 @@ export class TimetrackerView extends ItemView {
 		return this.stopwatchModel.reset();
 	}
 
-	startStop(): void {
+	clickStartStop(): void {
 		const el = this.containerEl.querySelector('button.start-stop-button');
+		(el as HTMLButtonElement).click();
+	}
+
+	clickReset(): void {
+		const el = this.containerEl.querySelector('button.reset-button');
 		(el as HTMLButtonElement).click();
 	}
 
