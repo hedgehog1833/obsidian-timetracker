@@ -16,7 +16,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'Settings for timetracker plugin.' });
+		containerEl.createEl('h2', { text: 'Timetracker settings' });
 
 		this.createIntervalSetting(containerEl);
 		this.createFormatSetting(containerEl);
@@ -33,7 +33,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						try {
 							const interval = TimetrackerSettingTab.parseIntervalValue(value.trim());
-							console.log(`interval set to ${interval}`);
+							console.log(`Interval set to ${interval}`);
 							this.plugin.settings.interval = interval;
 							await this.plugin.saveSettings();
 							setting.descEl.textContent = SETTING_INTERVAL_DESC;
@@ -50,11 +50,11 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		if (!value.match(/^[0-9]+$/)) {
 			throw Error('Value should be an integer');
 		}
-		const i = parseInt(value, 10);
-		if (1000 >= i && i > 0) {
-			return i;
+		const intValue = parseInt(value, 10);
+		if (1000 >= intValue && intValue > 0) {
+			return intValue;
 		} else {
-			throw Error('Interval value out of range: ' + i);
+			throw Error(`Interval value out of range: ${intValue}`);
 		}
 	}
 
@@ -82,8 +82,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 		});
-		setting.descEl.innerHTML =
-			'For more syntax, refer to the ' +
-			"<a href='https://github.com/jsmreese/moment-duration-format#template-string'>format reference</a>";
+		setting.descEl.innerHTML = `For more syntax, refer to the <a href='https://day.js.org/docs/en/display/format'>format reference</a>`;
 	}
 }

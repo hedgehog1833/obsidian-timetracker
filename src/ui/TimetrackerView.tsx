@@ -3,7 +3,7 @@ import { StopwatchButtons } from './StopwatchButtons';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
 import { StopwatchModel } from '../stopwatch/StopwatchModel';
-import Timetracker from '../../main';
+import Timetracker, { TIMETRACKER_VIEW_TYPE } from '../../main';
 import { StopwatchState } from '../stopwatch/StopwatchState';
 
 export class TimetrackerView extends ItemView {
@@ -22,7 +22,7 @@ export class TimetrackerView extends ItemView {
 	}
 
 	getViewType(): string {
-		return 'timetracker-sidebar';
+		return TIMETRACKER_VIEW_TYPE;
 	}
 
 	getIcon(): string {

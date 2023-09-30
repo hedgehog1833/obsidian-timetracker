@@ -6,6 +6,8 @@ import momentDurationFormatSetup from 'moment-duration-format';
 
 momentDurationFormatSetup(moment);
 
+export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
+
 interface TimetrackerSettings {
 	interval: number;
 	format: string;
@@ -22,7 +24,7 @@ export default class Timetracker extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.registerView('timetracker-sidebar', (leaf: WorkspaceLeaf) => {
+		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
 			return new TimetrackerView(leaf, this);
 		});
 
@@ -100,16 +102,16 @@ export default class Timetracker extends Plugin {
 	}
 
 	initLeaf(): void {
-		if (this.app.workspace.getLeavesOfType('timetracker-sidebar').length) {
+		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length) {
 			return;
 		}
 		this.app.workspace.getRightLeaf(false).setViewState({
-			type: 'timetracker-sidebar',
+			type: TIMETRACKER_VIEW_TYPE,
 		});
 	}
 
 	getView(): TimetrackerView | null {
-		const leaf = this.app.workspace.getLeavesOfType('timetracker-sidebar').first();
+		const leaf = this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).first();
 		if (leaf !== null && leaf !== undefined && leaf.view instanceof TimetrackerView) {
 			return leaf.view;
 		} else {
