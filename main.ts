@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './src/ui/TimetrackerView';
 import { TimetrackerSettingTab } from './src/TimetrackerSettingTab';
 

@@ -1,4 +1,4 @@
-export const enum StopwatchState {
+export enum StopwatchState {
 	INITIALIZED = 'Initialized',
 	STARTED = 'Started',
 	STOPPED = 'Stopped',
