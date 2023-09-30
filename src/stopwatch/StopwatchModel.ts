@@ -26,7 +26,7 @@ export class StopwatchModel {
 	}
 
 	getCurrentValue(format: string): string {
-		if (this.state == StopwatchState.STARTED) {
+		if (this.state === StopwatchState.STARTED) {
 			const now = dayjs();
 			const diff = now.diff(this.startedAt, 'millisecond') + this.pausedAtOffset;
 			return this.getDateString(diff, format);
