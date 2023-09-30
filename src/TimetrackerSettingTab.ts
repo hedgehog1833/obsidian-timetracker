@@ -82,6 +82,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 		});
-		setting.descEl.innerHTML = `For more syntax, refer to the <a href='https://day.js.org/docs/en/display/format'>format reference</a>`;
+		setting.descEl.innerHTML = `For more syntax, refer to the <a href='https://github.com/jsmreese/moment-duration-format#template-string'>format reference</a>`;
 	}
 }
