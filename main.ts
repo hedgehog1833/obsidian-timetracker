@@ -1,6 +1,10 @@
 import { Editor, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './src/ui/TimetrackerView';
 import { TimetrackerSettingTab } from './src/TimetrackerSettingTab';
+import moment from 'moment';
+import momentDurationFormatSetup from 'moment-duration-format';
+
+momentDurationFormatSetup(moment);
 
 interface TimetrackerSettings {
 	interval: number;

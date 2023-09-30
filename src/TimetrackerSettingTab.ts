@@ -83,6 +83,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				});
 		});
 		setting.descEl.innerHTML =
-			'For more syntax, refer to the ' + "<a href='https://day.js.org/docs/en/display/format'>format reference</a>";
+			'For more syntax, refer to the ' +
+			"<a href='https://github.com/jsmreese/moment-duration-format#template-string'>format reference</a>";
 	}
 }
