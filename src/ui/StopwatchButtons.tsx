@@ -50,6 +50,11 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 		}
 	};
 
+	const reload = () => {
+		setCurrentValue(props.getCurrentStopwatchTime);
+		createInterval();
+	};
+
 	return (
 		<div className="stopwatch">
 			<div className="stopwatch-buttons">
@@ -61,6 +66,7 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 				</button>
 			</div>
 			<div className="stopwatch-value">{props.getCurrentStopwatchTime()}</div>
+			<button className="reload-button" onClick={reload} />
 		</div>
 	);
 };

@@ -13,3 +13,7 @@ The stopwatch's refresh rate in milliseconds. The default value is `100`. The va
 ### Time format
 
 The format for how to print the stopwatch's current value. Default is `HH:mm:ss.SSS`. For more formats see [here](https://github.com/jsmreese/moment-duration-format#template-string). 
+
+### Trimming
+
+Allows cutting off leading zeros, if the given format allows them. With this setting activated, `mm:ss.SSS` will show minutes not until the stopwatch reaches one minute.

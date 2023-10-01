@@ -11,11 +11,13 @@ export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 interface TimetrackerSettings {
 	interval: number;
 	format: string;
+	trimLeadingZeros: boolean;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
 	interval: 100,
 	format: 'HH:mm:ss.SSS',
+	trimLeadingZeros: false,
 };
 
 export default class Timetracker extends Plugin {
@@ -99,6 +101,8 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		const sidebarView = this.getView();
+		sidebarView?.clickReload();
 	}
 
 	initLeaf(): void {

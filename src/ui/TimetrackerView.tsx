@@ -14,7 +14,7 @@ export class TimetrackerView extends ItemView {
 	constructor(leaf: WorkspaceLeaf, plugin: Timetracker) {
 		super(leaf);
 		this.plugin = plugin;
-		this.stopwatchModel = new StopwatchModel();
+		this.stopwatchModel = new StopwatchModel(plugin);
 	}
 
 	getDisplayText(): string {
@@ -30,7 +30,7 @@ export class TimetrackerView extends ItemView {
 	}
 
 	getCurrentStopwatchTime(): string {
-		return this.stopwatchModel.getCurrentValue(this.plugin.settings.format);
+		return this.stopwatchModel.getCurrentValue();
 	}
 
 	start(): StopwatchState {
@@ -52,6 +52,11 @@ export class TimetrackerView extends ItemView {
 
 	clickReset(): void {
 		const el = this.containerEl.querySelector('button.reset-button');
+		(el as HTMLButtonElement).click();
+	}
+
+	clickReload(): void {
+		const el = this.containerEl.querySelector('button.reload-button');
 		(el as HTMLButtonElement).click();
 	}
 

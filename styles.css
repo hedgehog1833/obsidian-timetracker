@@ -14,3 +14,7 @@
 	padding-top: 0.5em;
 	display: flex;
 }
+
+.reload-button {
+	display: none;
+}
