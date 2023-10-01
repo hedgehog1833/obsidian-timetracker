@@ -1,5 +1,5 @@
 import { StopwatchState } from './StopwatchState';
-import { moment } from 'obsidian';
+import moment from 'moment';
 
 export class StopwatchModel {
 	private startedAt: number = 0;
