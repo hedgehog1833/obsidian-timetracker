@@ -16,8 +16,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'Timetracker settings' });
-
 		this.createIntervalSetting(containerEl);
 		this.createFormatSetting(containerEl);
 		this.createTrimmingSetting(containerEl);
