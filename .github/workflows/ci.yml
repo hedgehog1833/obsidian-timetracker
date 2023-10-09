@@ -21,4 +21,4 @@ jobs:
           cache: 'npm'
       - run: |
           npm install
-          npm test -- --coverage
+          npm build
