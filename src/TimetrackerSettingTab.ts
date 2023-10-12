@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import StopwatchPlugin from '../main';
+import StopwatchPlugin from './main';
 
 const SETTING_INTERVAL_DESC = 'Valid value range: 1-1000';
 

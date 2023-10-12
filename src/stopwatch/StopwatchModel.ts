@@ -1,6 +1,6 @@
 import { StopwatchState } from './StopwatchState';
 import { moment } from 'obsidian';
-import Timetracker from '../../main';
+import Timetracker from '../main';
 
 export class StopwatchModel {
 	private plugin: Timetracker;
