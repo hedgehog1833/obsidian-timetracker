@@ -40,6 +40,11 @@ export class StopwatchModel {
 		return this.getDateString(this.pausedAtOffset);
 	}
 
+	setCurrentValue(milliseconds: number): void {
+		this.startedAt = milliseconds;
+		this.pausedAtOffset = Date.now() - this.startedAt;
+	}
+
 	private getDateString(milliseconds: number): string {
 		const formattingSettings = !this.plugin.settings.trimLeadingZeros
 			? {

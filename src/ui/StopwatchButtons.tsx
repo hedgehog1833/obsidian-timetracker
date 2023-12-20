@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StopwatchState } from '../stopwatch/StopwatchState';
 import Timetracker from '../main';
 import React from 'react';
+import TimeInput from './TimeInput';
 
 interface StopwatchButtonsProps {
 	plugin: Timetracker;
@@ -9,6 +10,7 @@ interface StopwatchButtonsProps {
 	stop: () => StopwatchState;
 	reset: () => StopwatchState;
 	getCurrentStopwatchTime: () => string;
+	setCurrentStopwatchTime: (milliseconds: number) => void;
 }
 
 export const StopwatchButtons = (props: StopwatchButtonsProps) => {
@@ -53,6 +55,7 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 	const reload = () => {
 		setCurrentValue(props.getCurrentStopwatchTime);
 		createInterval();
+		clearInterval();
 	};
 
 	return (
@@ -64,6 +67,7 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 				<button className="reset-button" onClick={resetStopwatch}>
 					Reset
 				</button>
+				<TimeInput format={props.plugin.settings.format} setStopwatchValue={props.setCurrentStopwatchTime}></TimeInput>
 			</div>
 			<div className="stopwatch-value">{props.getCurrentStopwatchTime()}</div>
 			<button className="reload-button" onClick={reload} />

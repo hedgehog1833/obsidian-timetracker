@@ -1,7 +1,7 @@
 # Obsidian Timetracker plugin
 
 This Obsidian plugin adds a stopwatch to track time of something. Per hotkey the stopwatch's current value can be inserted into the editor, to make notes to 
-this precise moment in time.
+this precise moment in time. If you forgot to activate the stopwatch, you can set a custom start value.
 The stopwatch functionality is a completely rewritten clone of https://github.com/tokuhirom/obsidian-stopwatch-plugin
 
 ## Configuration
