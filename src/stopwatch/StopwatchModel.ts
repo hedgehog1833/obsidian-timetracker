@@ -49,10 +49,10 @@ export class StopwatchModel {
 		const formattingSettings = !this.plugin.settings.trimLeadingZeros
 			? {
 					trim: 'false',
-			  }
+				}
 			: {
 					trim: 'left',
-			  };
+				};
 		return moment.duration(milliseconds).format(this.plugin.settings.format, formattingSettings);
 	}
 }
