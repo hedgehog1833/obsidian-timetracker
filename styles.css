@@ -1,4 +1,4 @@
-.stopwatch {
+.stopwatch-sidebar {
 	padding: 1em;
 	display: flex;
 	flex-direction: column;
@@ -11,7 +11,6 @@
 }
 
 .stopwatch-value {
-	padding-top: 0.5em;
 	display: flex;
 }
 
@@ -21,4 +20,32 @@
 
 .time-input {
 	max-width: 7em;
+}
+
+.stopwatch-value-container {
+	padding-top: 0.5em;
+	display: flex;
+	align-items: baseline;
+	gap: 0.5em;
+}
+
+input.stopwatch-value-input {
+	outline: none;
+	background-color: transparent;
+	border: none;
+	color: #fa8072;
+	padding-top: 1.5em;
+}
+
+input.stopwatch-value-input:focus {
+	outline: none;
+	border: none;
+	box-shadow: none;
+}
+
+.custom-input {
+	width: 50% !important;
+	text-align: end;
+	font-size: inherit !important;
+	padding-right: 0 !important;
 }

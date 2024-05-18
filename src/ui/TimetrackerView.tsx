@@ -1,5 +1,5 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
-import { StopwatchButtons } from './StopwatchButtons';
+import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
 import { StopwatchModel } from '../stopwatch/StopwatchModel';
@@ -69,7 +69,7 @@ export class TimetrackerView extends ItemView {
 	async onOpen() {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
-			<StopwatchButtons
+			<StopwatchArea
 				plugin={this.plugin}
 				reset={() => this.reset()}
 				start={() => this.start()}

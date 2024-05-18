@@ -4,7 +4,7 @@
 		"baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
-		"jsx": "react",
+		"jsx": "react-jsx",
     "module": "ESNext",
     "target": "ES6",
     "allowJs": true,
