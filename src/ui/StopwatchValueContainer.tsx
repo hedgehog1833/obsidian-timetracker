@@ -8,13 +8,17 @@ export type StopwachValueContainerProps = {
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [inputValue, setInputValue] = useState(props.stopwatchValue);
 
 	const handleOnButtonClick = () => {
 		setIsEditing(!isEditing);
 	};
 
 	const handleOnChange = (newValue: string) => {
+		// const regex = /^\d+:\d+:\d+$/;
+		// if (!regex.test(newValue)) {
+		// 	return;
+		// }
+
 		const valueParts = newValue.split(':').map((part) => part.padStart(2, '0'));
 		const hours = parseInt(valueParts[0]);
 		const minutes = parseInt(valueParts[1]);
@@ -30,8 +34,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			return;
 		}
 
-		setInputValue(newValue);
-
 		const date = new Date();
 		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
 		props.setStopwatchValue(date.getTime());
@@ -43,16 +45,15 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 
 	return (
 		<div className="stopwatch-value-container">
-			{!isEditing && <p className="stopwatch-value">{props.stopwatchValue}</p>}
-			{isEditing && (
-				<input
-					type="text"
-					className="stopwatch-value-input custom-input"
-					value={inputValue}
-					onChange={(event) => handleOnChange(event.target.value)}
-					onBlur={() => handleOnBlur()}
-				/>
-			)}
+			<input
+				type="text"
+				disabled={!isEditing}
+				className="stopwatch-value-input custom-input"
+				value={props.stopwatchValue}
+				onChange={(event) => handleOnChange(event.target.value)}
+				onBlur={() => handleOnBlur()}
+			/>
+
 			<button className="edit-button" onClick={handleOnButtonClick}>
 				{isEditing ? 'Return' : 'Set'}
 			</button>

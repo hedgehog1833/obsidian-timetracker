@@ -34,7 +34,10 @@ input.stopwatch-value-input {
 	background-color: transparent;
 	border: none;
 	color: #fa8072;
-	padding-top: 1.5em;
+}
+
+input.stopwatch-value-input:disabled {
+	color: white
 }
 
 input.stopwatch-value-input:focus {
@@ -47,5 +50,4 @@ input.stopwatch-value-input:focus {
 	width: 50% !important;
 	text-align: end;
 	font-size: inherit !important;
-	padding-right: 0 !important;
 }
