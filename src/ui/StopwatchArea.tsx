@@ -78,7 +78,6 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 				stopwatchValue={props.getCurrentStopwatchTime()}
 				setStopwatchValue={props.setCurrentStopwatchTime}
 				stopStopwatch={() => stopStopwatch()}
-				format={props.plugin.settings.format}
 			></StopwatchValue>
 			<button className="reload-button" onClick={reload} />
 		</div>

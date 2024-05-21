@@ -4,12 +4,12 @@ export type StopwachValueContainerProps = {
 	stopwatchValue: string;
 	setStopwatchValue: (milliseconds: number) => void;
 	stopStopwatch: () => void;
-	format: string;
 };
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const TWO_DIGITS_REGEX = /^\d{0,2}$/;
 	const [isEditing, setIsEditing] = useState(false);
+	const [isBlur, setIsBlur] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -19,10 +19,12 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	}, [isEditing]);
 
 	const handleOnButtonClick = () => {
-		if (!isEditing) {
+		if (!isBlur) {
 			props.stopStopwatch();
+			setIsEditing(true);
+		} else {
+			setIsBlur(false);
 		}
-		setIsEditing(!isEditing);
 	};
 
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +69,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	const handleOnBlur = () => {
+		setIsBlur(true);
 		setIsEditing(false);
 	};
 
