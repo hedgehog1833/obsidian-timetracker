@@ -40,7 +40,8 @@ input.stopwatch-value-input:disabled {
 	color: white
 }
 
-input.stopwatch-value-input:focus {
+input.stopwatch-value-input:focus,
+input.stopwatch-value-input:active {
 	outline: none;
 	border: none;
 	box-shadow: none;
