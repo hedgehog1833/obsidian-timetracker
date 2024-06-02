@@ -18,15 +18,11 @@
 	display: none;
 }
 
-.time-input {
-	max-width: 7em;
-}
-
 .stopwatch-value-container {
-	padding-top: 0.5em;
 	display: flex;
+	flex-direction: row;
 	align-items: baseline;
-	gap: 0.5em;
+	width: fit-content;
 }
 
 input.stopwatch-value-input {
@@ -34,6 +30,9 @@ input.stopwatch-value-input {
 	background-color: transparent;
 	border: none;
 	color: #fa8072;
+	width: 3rem;
+	text-align: center;
+	font-size: inherit !important;
 }
 
 input.stopwatch-value-input:disabled {
@@ -45,10 +44,4 @@ input.stopwatch-value-input:active {
 	outline: none;
 	border: none;
 	box-shadow: none;
-}
-
-.custom-input {
-	width: 50% !important;
-	text-align: end;
-	font-size: inherit !important;
 }
