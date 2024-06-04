@@ -95,33 +95,35 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	return (
-		<div className="stopwatch-value-container">
-			<input
-				ref={inputHoursRef}
-				type="text"
-				disabled={!isEditing}
-				className="stopwatch-value-input"
-				value={props.stopwatchValue.split(':')[0]}
-				onChange={handleOnHoursChange}
-			/>
-			<p>:</p>
-			<input
-				type="text"
-				disabled={!isEditing}
-				className="stopwatch-value-input"
-				value={props.stopwatchValue.split(':')[1]}
-				onChange={handleOnMinutesChange}
-			/>
-			<p>:</p>
-			<input
-				type="text"
-				disabled={!isEditing}
-				className="stopwatch-value-input"
-				value={props.stopwatchValue.split(':')[2]}
-				onChange={handleOnSecondsChange}
-			/>
+		<div className="stopwatch-value-wrapper">
+			<div className="stopwatch-value-container">
+				<input
+					ref={inputHoursRef}
+					type="text"
+					disabled={!isEditing}
+					className="stopwatch-value-input"
+					value={props.stopwatchValue.split(':')[0]}
+					onChange={handleOnHoursChange}
+				/>
+				<p>:</p>
+				<input
+					type="text"
+					disabled={!isEditing}
+					className="stopwatch-value-input"
+					value={props.stopwatchValue.split(':')[1]}
+					onChange={handleOnMinutesChange}
+				/>
+				<p>:</p>
+				<input
+					type="text"
+					disabled={!isEditing}
+					className="stopwatch-value-input"
+					value={props.stopwatchValue.split(':')[2]}
+					onChange={handleOnSecondsChange}
+				/>
+			</div>
 
-			<button className="edit-button" onClick={handleOnButtonClick}>
+			<button className="stopwatch-value-edit-button" onClick={handleOnButtonClick}>
 				{isEditing ? 'Return' : 'Set'}
 			</button>
 		</div>

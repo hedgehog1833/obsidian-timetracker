@@ -18,11 +18,16 @@
 	display: none;
 }
 
+.stopwatch-value-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: fit-content;
+}
+
 .stopwatch-value-container {
 	display: flex;
-	flex-direction: row;
 	align-items: baseline;
-	width: fit-content;
 }
 
 input.stopwatch-value-input {
@@ -30,9 +35,13 @@ input.stopwatch-value-input {
 	background-color: transparent;
 	border: none;
 	color: #fa8072;
-	width: 3rem;
+	width: 1.5rem;
 	text-align: center;
-	font-size: inherit !important;
+	font-size: 1rem;
+}
+
+.stopwatch-value-input input[type='text']{
+	padding:0;
 }
 
 input.stopwatch-value-input:disabled {
@@ -44,4 +53,8 @@ input.stopwatch-value-input:active {
 	outline: none;
 	border: none;
 	box-shadow: none;
+}
+
+.stopwatch-value-edit-button {
+	width: 2.5rem;
 }
