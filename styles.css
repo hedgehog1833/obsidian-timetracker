@@ -54,7 +54,6 @@ input.stopwatch-value-input:active {
 	border: none;
 	box-shadow: none;
 }
-
-.stopwatch-value-edit-button {
-	width: 2.5rem;
+.stopwatch-function-button {
+	width: 4rem
 }

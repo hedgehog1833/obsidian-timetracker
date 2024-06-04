@@ -123,7 +123,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 				/>
 			</div>
 
-			<button className="stopwatch-value-edit-button" onClick={handleOnButtonClick}>
+			<button className="stopwatch-function-button" onClick={handleOnButtonClick}>
 				{isEditing ? 'Return' : 'Set'}
 			</button>
 		</div>
