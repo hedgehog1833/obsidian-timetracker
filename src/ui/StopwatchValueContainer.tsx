@@ -7,7 +7,7 @@ export type StopwachValueContainerProps = {
 };
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
-	const TWO_DIGITS_REGEX = /^\d{0,2}$/;
+	const TWO_DIGITS_REGEX = /^\d{0,1}$/;
 	const [isEditing, setIsEditing] = useState(false);
 	const [hours, setHours] = useState<number>(0);
 	const [minutes, setMinutes] = useState<number>(0);
@@ -38,60 +38,54 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	const handleOnHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const hours = prepareValue(event.target.value);
+		let hours = parseInt(event.target.value);
 
 		if (!hours || hours < 0 || hours > 23) {
-			return;
+			if (!hours) {
+				hours = 0;
+			} else {
+				return;
+			}
 		}
 
 		const date = new Date();
 		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
 		props.setStopwatchValue(date.getTime());
+		setHours(hours);
 	};
 
 	const handleOnMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const minutes = prepareValue(event.target.value);
+		let minutes = parseInt(event.target.value);
 
 		if (!minutes || minutes < 0 || minutes > 59) {
-			return;
+			if (!minutes) {
+				minutes = 0;
+			} else {
+				return;
+			}
 		}
 
 		const date = new Date();
 		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
 		props.setStopwatchValue(date.getTime());
+		setMinutes(minutes);
 	};
 
 	const handleOnSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const seconds = prepareValue(event.target.value);
+		let seconds = parseInt(event.target.value);
 
 		if (!seconds || seconds < 0 || seconds > 59) {
-			return;
+			if (!seconds) {
+				seconds = 0;
+			} else {
+				return;
+			}
 		}
 
 		const date = new Date();
 		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
 		props.setStopwatchValue(date.getTime());
-	};
-
-	const prepareValue = (newValue: string): null | number => {
-		const secondsString = createTimeString(newValue);
-
-		if (!secondsString) {
-			return null;
-		}
-
-		return parseInt(secondsString);
-	};
-
-	const createTimeString = (timeString: string): string | null => {
-		if (timeString && !TWO_DIGITS_REGEX.test(timeString)) {
-			if (isNaN(parseInt(timeString)) || timeString.length <= 2) {
-				return null;
-			} else {
-				return timeString.slice(0, -1);
-			}
-		}
-		return timeString;
+		setSeconds(seconds);
 	};
 
 	return (
@@ -100,6 +94,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 				<input
 					ref={inputHoursRef}
 					type="text"
+					pattern="^\d{0,2}$"
 					disabled={!isEditing}
 					className="stopwatch-value-input"
 					value={props.stopwatchValue.split(':')[0]}
@@ -108,6 +103,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 				<p>:</p>
 				<input
 					type="text"
+					pattern="[0-9]{2}"
 					disabled={!isEditing}
 					className="stopwatch-value-input"
 					value={props.stopwatchValue.split(':')[1]}
@@ -116,6 +112,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 				<p>:</p>
 				<input
 					type="text"
+					pattern="[0-9]{2}"
 					disabled={!isEditing}
 					className="stopwatch-value-input"
 					value={props.stopwatchValue.split(':')[2]}
