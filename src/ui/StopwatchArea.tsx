@@ -67,10 +67,10 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	return (
 		<div className="stopwatch-sidebar">
 			<div className="stopwatch-buttons">
-				<button className="stopwatch-function-button" onClick={startOrStopStopwatch}>
+				<button className="start-stop-button stopwatch-function-button" onClick={startOrStopStopwatch}>
 					{stopwatchState === StopwatchState.STARTED ? 'Pause' : 'Start'}
 				</button>
-				<button className="stopwatch-function-button" onClick={resetStopwatch}>
+				<button className="reset-button stopwatch-function-button" onClick={resetStopwatch}>
 					Reset
 				</button>
 			</div>
