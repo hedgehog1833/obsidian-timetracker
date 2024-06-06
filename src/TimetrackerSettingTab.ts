@@ -31,7 +31,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.interval.toString())
 					.onChange(async (value) => {
 						try {
-							this.plugin.settings.interval = TimetrackerSettingTab.parseIntervalValue(value.trim());
+							this.plugin.settings.interval = TimetrackerSettingTab.parseIntervalValue(value);
 							await this.plugin.saveSettings();
 						} catch (e) {
 							console.log(e);
@@ -45,7 +45,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		const setting = new Setting(containerEl).setName('Time format').addText((component) => {
 			component
 				.setValue(this.plugin.settings.format)
-				.setPlaceholder('HH:mm:ss.SSS')
+				.setPlaceholder('HH:mm:ss')
 				.onChange(async (value) => {
 					try {
 						this.plugin.settings.format = TimetrackerSettingTab.parseFormatValue(value);
