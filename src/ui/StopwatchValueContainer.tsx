@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import TimeInput from './TimeInput';
 
 export type StopwachValueContainerProps = {
 	stopwatchValue: string;
@@ -7,26 +8,28 @@ export type StopwachValueContainerProps = {
 };
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
-	const TWO_DIGITS_REGEX = /^\d{0,1}$/;
 	const [isEditing, setIsEditing] = useState(false);
+	const [isBlur, setIsBlur] = useState(false);
 	const [hours, setHours] = useState<number>(0);
 	const [minutes, setMinutes] = useState<number>(0);
 	const [seconds, setSeconds] = useState<number>(0);
-	const inputHoursRef = useRef<HTMLInputElement>(null);
+	const inputSecondsRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
+		console.log(`useEffect isEditing: ${isEditing}, isBlur: ${isBlur}`);
 		if (isEditing) {
-			inputHoursRef.current?.focus();
+			inputSecondsRef.current?.focus();
 		}
 	}, [isEditing]);
 
 	const handleOnButtonClick = () => {
-		if (isEditing) {
-			setIsEditing(false);
-		} else {
+		console.log(`handleOnButtonClick isEditing: ${isEditing}, isBlur: ${isBlur}`);
+		if (!isBlur) {
 			props.stopStopwatch();
 			setIsEditing(true);
 			initializeTimeValues();
+		} else {
+			setIsBlur(false);
 		}
 	};
 
@@ -40,12 +43,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const handleOnHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		let hours = parseInt(event.target.value);
 
-		if (!hours || hours < 0 || hours > 23) {
-			if (!hours) {
-				hours = 0;
-			} else {
-				return;
-			}
+		if (hours > 99) {
+			hours = 0;
 		}
 
 		const date = new Date();
@@ -57,12 +56,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const handleOnMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		let minutes = parseInt(event.target.value);
 
-		if (!minutes || minutes < 0 || minutes > 59) {
-			if (!minutes) {
-				minutes = 0;
-			} else {
-				return;
-			}
+		if (minutes > 59) {
+			minutes = 0;
 		}
 
 		const date = new Date();
@@ -74,12 +69,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const handleOnSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		let seconds = parseInt(event.target.value);
 
-		if (!seconds || seconds < 0 || seconds > 59) {
-			if (!seconds) {
-				seconds = 0;
-			} else {
-				return;
-			}
+		if (seconds > 59) {
+			seconds = 0;
 		}
 
 		const date = new Date();
@@ -88,35 +79,38 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		setSeconds(seconds);
 	};
 
+	const handleOnBlur = () => {
+		console.log(`handleOnBlur`);
+		setIsBlur(true);
+		setIsEditing(false);
+	};
+
+	// const setValue = (hours: number, seconds: number, minutes: number) => {
+	// 	const date = new Date();
+	// 	date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
+	// 	props.setStopwatchValue(date.getTime());
+	// };
+
 	return (
 		<div className="stopwatch-value-wrapper">
-			<div className="stopwatch-value-container">
-				<input
-					ref={inputHoursRef}
-					type="text"
-					pattern="^\d{0,2}$"
-					disabled={!isEditing}
-					className="stopwatch-value-input"
-					value={props.stopwatchValue.split(':')[0]}
-					onChange={handleOnHoursChange}
+			<div className="stopwatch-value-container" onBlur={handleOnBlur}>
+				<TimeInput
+					stopwatchValue={props.stopwatchValue.split(':')[0]}
+					isEditing={isEditing}
+					onChangeHandler={handleOnHoursChange}
 				/>
 				<p>:</p>
-				<input
-					type="text"
-					pattern="[0-9]{2}"
-					disabled={!isEditing}
-					className="stopwatch-value-input"
-					value={props.stopwatchValue.split(':')[1]}
-					onChange={handleOnMinutesChange}
+				<TimeInput
+					stopwatchValue={props.stopwatchValue.split(':')[1]}
+					isEditing={isEditing}
+					onChangeHandler={handleOnMinutesChange}
 				/>
 				<p>:</p>
-				<input
-					type="text"
-					pattern="[0-9]{2}"
-					disabled={!isEditing}
-					className="stopwatch-value-input"
-					value={props.stopwatchValue.split(':')[2]}
-					onChange={handleOnSecondsChange}
+				<TimeInput
+					stopwatchValue={props.stopwatchValue.split(':')[2]}
+					isEditing={isEditing}
+					onChangeHandler={handleOnSecondsChange}
+					focusRef={inputSecondsRef}
 				/>
 			</div>
 
