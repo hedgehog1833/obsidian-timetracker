@@ -25,6 +25,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			props.stopStopwatch();
 			setIsEditing(true);
 			initializeTimeValues();
+		} else {
+			setIsEditing(false);
 		}
 	};
 
