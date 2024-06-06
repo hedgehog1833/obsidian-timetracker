@@ -45,6 +45,7 @@ export class StopwatchModel {
 		if (elapsedTime >= this.ONE_HUNDRED_HOURS_MILLISECONDS) {
 			this.startedAt = Date.now();
 			this.pausedAtOffset = 0;
+			elapsedTime = 0;
 		}
 
 		return this.getDateString(elapsedTime);
