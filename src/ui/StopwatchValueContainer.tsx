@@ -9,27 +9,22 @@ export type StopwachValueContainerProps = {
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [isBlur, setIsBlur] = useState(false);
 	const [hours, setHours] = useState<number>(0);
 	const [minutes, setMinutes] = useState<number>(0);
 	const [seconds, setSeconds] = useState<number>(0);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		console.log(`useEffect isEditing: ${isEditing}, isBlur: ${isBlur}`);
 		if (isEditing) {
 			inputSecondsRef.current?.focus();
 		}
 	}, [isEditing]);
 
 	const handleOnButtonClick = () => {
-		console.log(`handleOnButtonClick isEditing: ${isEditing}, isBlur: ${isBlur}`);
-		if (!isBlur) {
+		if (!isEditing) {
 			props.stopStopwatch();
 			setIsEditing(true);
 			initializeTimeValues();
-		} else {
-			setIsBlur(false);
 		}
 	};
 
@@ -79,12 +74,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		setSeconds(seconds);
 	};
 
-	const handleOnBlur = () => {
-		console.log(`handleOnBlur`);
-		setIsBlur(true);
-		setIsEditing(false);
-	};
-
 	// const setValue = (hours: number, seconds: number, minutes: number) => {
 	// 	const date = new Date();
 	// 	date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
@@ -93,7 +82,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 
 	return (
 		<div className="stopwatch-value-wrapper">
-			<div className="stopwatch-value-container" onBlur={handleOnBlur}>
+			<div className="stopwatch-value-container">
 				<TimeInput
 					stopwatchValue={props.stopwatchValue.split(':')[0]}
 					isEditing={isEditing}
