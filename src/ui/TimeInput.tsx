@@ -16,7 +16,7 @@ const TimeInput = (props: TimeInputProps) => {
 				pattern="^\d{0,2}$"
 				disabled={!props.isEditing}
 				className="stopwatch-value-input"
-				value={props.stopwatchValue.split(':')[0]}
+				value={props.stopwatchValue}
 				onChange={props.onChangeHandler}
 			/>
 		</>
