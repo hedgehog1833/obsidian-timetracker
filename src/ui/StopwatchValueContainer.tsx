@@ -44,9 +44,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			hours = 0;
 		}
 
-		const date = new Date();
-		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
-		props.setStopwatchValue(date.getTime());
+		setValue(hours, minutes, seconds);
 		setHours(hours);
 	};
 
@@ -57,9 +55,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			minutes = 0;
 		}
 
-		const date = new Date();
-		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
-		props.setStopwatchValue(date.getTime());
+		setValue(hours, minutes, seconds);
 		setMinutes(minutes);
 	};
 
@@ -70,17 +66,15 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			seconds = 0;
 		}
 
-		const date = new Date();
-		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
-		props.setStopwatchValue(date.getTime());
+		setValue(hours, minutes, seconds);
 		setSeconds(seconds);
 	};
 
-	// const setValue = (hours: number, seconds: number, minutes: number) => {
-	// 	const date = new Date();
-	// 	date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
-	// 	props.setStopwatchValue(date.getTime());
-	// };
+	const setValue = (hours: number, minutes: number, seconds: number) => {
+		const date = new Date();
+		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
+		props.setStopwatchValue(date.getTime());
+	};
 
 	return (
 		<div className="stopwatch-value-wrapper">
