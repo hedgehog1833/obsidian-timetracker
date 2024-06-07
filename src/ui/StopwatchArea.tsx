@@ -60,8 +60,6 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 
 	const reload = () => {
 		setCurrentValue(props.getCurrentStopwatchTime);
-		createInterval();
-		clearInterval();
 	};
 
 	return (
