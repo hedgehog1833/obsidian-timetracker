@@ -7,7 +7,7 @@ export class StopwatchModel {
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
-	private readonly ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000;
+	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
 
 	constructor(plugin: Timetracker) {
 		this.plugin = plugin;
@@ -42,7 +42,7 @@ export class StopwatchModel {
 			elapsedTime = this.pausedAtOffset;
 		}
 
-		if (elapsedTime >= this.ONE_HUNDRED_HOURS_MILLISECONDS) {
+		if (elapsedTime >= this.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS) {
 			this.startedAt = Date.now();
 			this.pausedAtOffset = 0;
 			elapsedTime = 0;
