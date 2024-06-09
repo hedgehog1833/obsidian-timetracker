@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import TimeInput, { TimeInputCategory } from './TimeInput';
+import TimeInput from './TimeInput';
 import Timetracker from '../main';
 
 export type StopwachValueContainerProps = {
@@ -89,7 +89,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={props.stopwatchValue.split(':')[0]}
 						isEditing={isEditing}
 						onChangeHandler={handleOnHoursChange}
-						category={TimeInputCategory.HOURS}
 					/>
 				)}
 				{showHours && showMinutes && <p>:</p>}
@@ -98,7 +97,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={props.stopwatchValue.split(':')[1]}
 						isEditing={isEditing}
 						onChangeHandler={handleOnMinutesChange}
-						category={TimeInputCategory.MINUTES}
 					/>
 				)}
 				{((showHours && !showMinutes) || showMinutes) && showSeconds && <p>:</p>}
@@ -108,7 +106,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						isEditing={isEditing}
 						onChangeHandler={handleOnSecondsChange}
 						focusRef={inputSecondsRef}
-						category={TimeInputCategory.SECONDS}
 					/>
 				)}
 			</div>
