@@ -15,6 +15,9 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const [minutes, setMinutes] = useState<number>(0);
 	const [seconds, setSeconds] = useState<number>(0);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
+	const showHours = props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h');
+	const showMinutes = props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m');
+	const showSeconds = props.plugin.settings.format.contains('S') || props.plugin.settings.format.contains('s');
 
 	useEffect(() => {
 		if (isEditing) {
@@ -81,7 +84,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	return (
 		<div className="stopwatch-value-wrapper">
 			<div className="stopwatch-value-container">
-				{(props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h')) && (
+				{showHours && (
 					<TimeInput
 						stopwatchValue={props.stopwatchValue.split(':')[0]}
 						isEditing={isEditing}
@@ -89,9 +92,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						category={TimeInputCategory.HOURS}
 					/>
 				)}
-				{(props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h')) &&
-					(props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m')) && <p>:</p>}
-				{(props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m')) && (
+				{showHours && showMinutes && <p>:</p>}
+				{showMinutes && (
 					<TimeInput
 						stopwatchValue={props.stopwatchValue.split(':')[1]}
 						isEditing={isEditing}
@@ -99,12 +101,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						category={TimeInputCategory.MINUTES}
 					/>
 				)}
-				{(((props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h')) &&
-					!(props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m'))) ||
-					props.plugin.settings.format.contains('M') ||
-					props.plugin.settings.format.contains('m')) &&
-					(props.plugin.settings.format.contains('S') || props.plugin.settings.format.contains('s')) && <p>:</p>}
-				{(props.plugin.settings.format.contains('S') || props.plugin.settings.format.contains('s')) && (
+				{((showHours && !showMinutes) || showMinutes) && showSeconds && <p>:</p>}
+				{showSeconds && (
 					<TimeInput
 						stopwatchValue={props.stopwatchValue.split(':')[2]}
 						isEditing={isEditing}
