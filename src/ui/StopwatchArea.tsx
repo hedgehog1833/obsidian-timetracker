@@ -40,26 +40,29 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 		clearInterval();
 	};
 
-	const createInterval = () => {
+	const createInterval = (): number => {
 		if (intervalId !== 0) {
 			window.clearInterval(intervalId);
 		}
-		setIntervalId(
-			window.setInterval(() => {
-				setCurrentValue(props.getCurrentStopwatchTime());
-			}, props.plugin.settings.interval),
-		);
+		let interValId = window.setInterval(() => {
+			setCurrentValue(props.getCurrentStopwatchTime());
+		}, props.plugin.settings.interval);
+		setIntervalId(interValId);
+		return interValId;
 	};
 
-	const clearInterval = () => {
-		if (intervalId !== 0) {
+	const clearInterval = (givenIntervalId?: number) => {
+		if (givenIntervalId) {
+			window.clearInterval(givenIntervalId);
+		} else if (intervalId !== 0) {
 			window.clearInterval(intervalId);
 			setIntervalId(0);
 		}
 	};
 
 	const reload = () => {
-		setCurrentValue(props.getCurrentStopwatchTime);
+		setCurrentValue(props.getCurrentStopwatchTime());
+		clearInterval(createInterval());
 	};
 
 	return (
@@ -76,6 +79,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 				stopwatchValue={props.getCurrentStopwatchTime()}
 				setStopwatchValue={props.setCurrentStopwatchTime}
 				stopStopwatch={() => stopStopwatch()}
+				plugin={props.plugin}
 			></StopwatchValue>
 			<button className="reload-button" onClick={reload} />
 		</div>

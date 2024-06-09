@@ -32,7 +32,7 @@ export class StopwatchModel {
 		return this.state;
 	}
 
-	getCurrentValue(): string {
+	getCurrentValue(complete?: boolean): string {
 		let elapsedTime = 0;
 
 		if (this.state === StopwatchState.STARTED) {
@@ -48,7 +48,7 @@ export class StopwatchModel {
 			elapsedTime = 0;
 		}
 
-		return this.getDateString(elapsedTime);
+		return this.getDateString(elapsedTime, complete);
 	}
 
 	setCurrentValue(milliseconds: number): void {
@@ -56,7 +56,7 @@ export class StopwatchModel {
 		this.pausedAtOffset = Date.now() - this.startedAt;
 	}
 
-	private getDateString(milliseconds: number): string {
+	private getDateString(milliseconds: number, complete?: boolean): string {
 		const formattingSettings = !this.plugin.settings.trimLeadingZeros
 			? {
 					trim: 'false',
@@ -64,6 +64,8 @@ export class StopwatchModel {
 			: {
 					trim: 'left',
 				};
-		return moment.duration(milliseconds).format(this.plugin.settings.format, formattingSettings);
+		return moment
+			.duration(milliseconds)
+			.format(complete ? 'HH:mm:ss' : this.plugin.settings.format, formattingSettings);
 	}
 }

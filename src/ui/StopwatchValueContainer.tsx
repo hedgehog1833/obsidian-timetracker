@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import TimeInput from './TimeInput';
+import TimeInput, { TimeInputCategory } from './TimeInput';
+import Timetracker from '../main';
 
 export type StopwachValueContainerProps = {
 	stopwatchValue: string;
 	setStopwatchValue: (milliseconds: number) => void;
 	stopStopwatch: () => void;
+	plugin: Timetracker;
 };
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
@@ -79,24 +81,38 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	return (
 		<div className="stopwatch-value-wrapper">
 			<div className="stopwatch-value-container">
-				<TimeInput
-					stopwatchValue={props.stopwatchValue.split(':')[0]}
-					isEditing={isEditing}
-					onChangeHandler={handleOnHoursChange}
-				/>
-				<p>:</p>
-				<TimeInput
-					stopwatchValue={props.stopwatchValue.split(':')[1]}
-					isEditing={isEditing}
-					onChangeHandler={handleOnMinutesChange}
-				/>
-				<p>:</p>
-				<TimeInput
-					stopwatchValue={props.stopwatchValue.split(':')[2]}
-					isEditing={isEditing}
-					onChangeHandler={handleOnSecondsChange}
-					focusRef={inputSecondsRef}
-				/>
+				{(props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h')) && (
+					<TimeInput
+						stopwatchValue={props.stopwatchValue.split(':')[0]}
+						isEditing={isEditing}
+						onChangeHandler={handleOnHoursChange}
+						category={TimeInputCategory.HOURS}
+					/>
+				)}
+				{(props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h')) &&
+					(props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m')) && <p>:</p>}
+				{(props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m')) && (
+					<TimeInput
+						stopwatchValue={props.stopwatchValue.split(':')[1]}
+						isEditing={isEditing}
+						onChangeHandler={handleOnMinutesChange}
+						category={TimeInputCategory.MINUTES}
+					/>
+				)}
+				{(((props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h')) &&
+					!(props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m'))) ||
+					props.plugin.settings.format.contains('M') ||
+					props.plugin.settings.format.contains('m')) &&
+					(props.plugin.settings.format.contains('S') || props.plugin.settings.format.contains('s')) && <p>:</p>}
+				{(props.plugin.settings.format.contains('S') || props.plugin.settings.format.contains('s')) && (
+					<TimeInput
+						stopwatchValue={props.stopwatchValue.split(':')[2]}
+						isEditing={isEditing}
+						onChangeHandler={handleOnSecondsChange}
+						focusRef={inputSecondsRef}
+						category={TimeInputCategory.SECONDS}
+					/>
+				)}
 			</div>
 
 			<button className="stopwatch-function-button" onClick={handleOnButtonClick}>

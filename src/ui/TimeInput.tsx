@@ -5,7 +5,14 @@ export type TimeInputProps = {
 	isEditing: boolean;
 	onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	focusRef?: React.RefObject<HTMLInputElement>;
+	category: TimeInputCategory;
 };
+
+export enum TimeInputCategory {
+	HOURS,
+	MINUTES,
+	SECONDS,
+}
 
 const TimeInput = (props: TimeInputProps) => {
 	return (

@@ -34,7 +34,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 							this.plugin.settings.interval = TimetrackerSettingTab.parseIntervalValue(value);
 							await this.plugin.saveSettings();
 						} catch (e) {
-							console.log(e);
 							TimetrackerSettingTab.showIntervalAlert(setting, e.toString());
 						}
 					}),
@@ -51,7 +50,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 						this.plugin.settings.format = TimetrackerSettingTab.parseFormatValue(value);
 						await this.plugin.saveSettings();
 					} catch (e) {
-						console.log(e);
 						TimetrackerSettingTab.showFormatAlert(setting, e.toString());
 					}
 				});
@@ -101,7 +99,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			cls: 'settings-interval-alert',
 		});
 		alert.setText(message);
-		console.log(message);
 		container.appendChild(note);
 		container.appendChild(alert);
 	}
@@ -115,7 +112,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			cls: 'settings-format-alert',
 		});
 		alert.setText(message);
-		console.log(message);
 		container.appendChild(note);
 		container.appendChild(alert);
 	}
