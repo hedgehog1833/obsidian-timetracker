@@ -21,20 +21,24 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	}
 
 	private createFormatSetting(containerEl: HTMLElement): void {
-		const setting = new Setting(containerEl).setName('Time format').addText((component) => {
-			component
-				.setValue(this.plugin.settings.format)
-				.setPlaceholder('HH:mm:ss')
-				.onChange(async (value) => {
-					try {
-						this.plugin.settings.format = TimetrackerSettingTab.parseFormatValue(value);
-						await this.plugin.saveSettings();
-					} catch (e) {
-						TimetrackerSettingTab.showFormatAlert(setting, e.toString());
-					}
-				});
+		new Setting(containerEl).setName('Show hours').addToggle((component) => {
+			component.setValue(this.plugin.settings.showHours).onChange(async (value) => {
+				this.plugin.settings.showHours = value;
+				await this.plugin.saveSettings();
+			});
 		});
-		setting.descEl.innerHTML = `For more syntax, refer to the <a href='https://github.com/jsmreese/moment-duration-format#template-string'>format reference</a>`;
+		new Setting(containerEl).setName('Show minutes').addToggle((component) => {
+			component.setValue(this.plugin.settings.showMinutes).onChange(async (value) => {
+				this.plugin.settings.showMinutes = value;
+				await this.plugin.saveSettings();
+			});
+		});
+		new Setting(containerEl).setName('Show seconds').addToggle((component) => {
+			component.setValue(this.plugin.settings.showSeconds).onChange(async (value) => {
+				this.plugin.settings.showSeconds = value;
+				await this.plugin.saveSettings();
+			});
+		});
 	}
 
 	private createTrimmingSetting(containerEl: HTMLElement): void {

@@ -9,12 +9,20 @@ momentDurationFormatSetup(moment);
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
 interface TimetrackerSettings {
-	format: string;
+	format: string | null;
+	interval: number | null;
+	showHours: boolean;
+	showMinutes: boolean;
+	showSeconds: boolean;
 	trimLeadingZeros: boolean;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
-	format: 'HH:mm:ss.SSS',
+	format: null,
+	interval: null,
+	showHours: true,
+	showMinutes: true,
+	showSeconds: true,
 	trimLeadingZeros: false,
 };
 
@@ -94,7 +102,18 @@ export default class Timetracker extends Plugin {
 	onunload() {}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const data: TimetrackerSettings = await this.loadData();
+		if (data?.format) {
+			data.showHours = data.format.contains('H') || data.format.contains('h');
+			data.showMinutes = data.format.contains('M') || data.format.contains('m');
+			data.showSeconds = data.format.contains('S') || data.format.contains('s');
+		}
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+		if (this.settings.format) {
+			this.settings.format = null;
+			this.settings.interval = null;
+			await this.saveSettings();
+		}
 	}
 
 	async saveSettings() {

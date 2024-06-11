@@ -15,9 +15,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const [minutes, setMinutes] = useState<number>(0);
 	const [seconds, setSeconds] = useState<number>(0);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
-	const showHours = props.plugin.settings.format.contains('H') || props.plugin.settings.format.contains('h');
-	const showMinutes = props.plugin.settings.format.contains('M') || props.plugin.settings.format.contains('m');
-	const showSeconds = props.plugin.settings.format.contains('S') || props.plugin.settings.format.contains('s');
 
 	useEffect(() => {
 		if (isEditing) {
@@ -84,23 +81,25 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	return (
 		<div className="stopwatch-value-wrapper">
 			<div className="stopwatch-value-container">
-				{showHours && (
+				{props.plugin.settings.showHours && (
 					<TimeInput
 						stopwatchValue={props.stopwatchValue.split(':')[0]}
 						isEditing={isEditing}
 						onChangeHandler={handleOnHoursChange}
 					/>
 				)}
-				{showHours && showMinutes && <p>:</p>}
-				{showMinutes && (
+				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && <p>:</p>}
+				{props.plugin.settings.showMinutes && (
 					<TimeInput
 						stopwatchValue={props.stopwatchValue.split(':')[1]}
 						isEditing={isEditing}
 						onChangeHandler={handleOnMinutesChange}
 					/>
 				)}
-				{((showHours && !showMinutes) || showMinutes) && showSeconds && <p>:</p>}
-				{showSeconds && (
+				{((props.plugin.settings.showHours && !props.plugin.settings.showMinutes) ||
+					props.plugin.settings.showMinutes) &&
+					props.plugin.settings.showSeconds && <p>:</p>}
+				{props.plugin.settings.showSeconds && (
 					<TimeInput
 						stopwatchValue={props.stopwatchValue.split(':')[2]}
 						isEditing={isEditing}

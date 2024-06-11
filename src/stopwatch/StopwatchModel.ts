@@ -8,6 +8,7 @@ export class StopwatchModel {
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
 	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
+	private readonly COMPLETE_TIME_FORMAT = 'HH:mm:ss';
 
 	constructor(plugin: Timetracker) {
 		this.plugin = plugin;
@@ -64,8 +65,34 @@ export class StopwatchModel {
 			: {
 					trim: 'left',
 				};
-		return moment
-			.duration(milliseconds)
-			.format(complete ? 'HH:mm:ss' : this.plugin.settings.format, formattingSettings);
+		return moment.duration(milliseconds).format(this.getFormat(complete), formattingSettings);
+	}
+
+	private getFormat(complete?: boolean): string {
+		if (complete) {
+			return this.COMPLETE_TIME_FORMAT;
+		}
+		if (this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return this.COMPLETE_TIME_FORMAT;
+		}
+		if (this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+			return 'HH:mm';
+		}
+		if (this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return 'HH:ss';
+		}
+		if (this.plugin.settings.showHours && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+			return 'HH';
+		}
+		if (!this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return 'mm:ss';
+		}
+		if (!this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+			return 'mm';
+		}
+		if (!this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return 'ss';
+		}
+		return this.COMPLETE_TIME_FORMAT;
 	}
 }
