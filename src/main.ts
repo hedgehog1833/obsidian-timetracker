@@ -9,8 +9,8 @@ momentDurationFormatSetup(moment);
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
 interface TimetrackerSettings {
-	format: string | null;
-	interval: number | null;
+	format: string | null; // deprecated
+	interval: number | null; // deprecated
 	showHours: boolean;
 	showMinutes: boolean;
 	showSeconds: boolean;
