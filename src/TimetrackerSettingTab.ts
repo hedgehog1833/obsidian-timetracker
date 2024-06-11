@@ -16,28 +16,8 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		this.createIntervalSetting(containerEl);
 		this.createFormatSetting(containerEl);
 		this.createTrimmingSetting(containerEl);
-	}
-
-	createIntervalSetting(containerEl: HTMLElement): void {
-		const setting = new Setting(containerEl)
-			.setName('Stopwatch refresh interval')
-			.setDesc(SETTING_INTERVAL_DESC)
-			.addText((text) =>
-				text
-					.setPlaceholder('Stopwatch refresh interval')
-					.setValue(this.plugin.settings.interval.toString())
-					.onChange(async (value) => {
-						try {
-							this.plugin.settings.interval = TimetrackerSettingTab.parseIntervalValue(value);
-							await this.plugin.saveSettings();
-						} catch (e) {
-							TimetrackerSettingTab.showIntervalAlert(setting, e.toString());
-						}
-					}),
-			);
 	}
 
 	private createFormatSetting(containerEl: HTMLElement): void {
@@ -69,38 +49,12 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			});
 	}
 
-	private static parseIntervalValue(src: string): number {
-		const value = src.trim();
-		if (!value.match(/^[0-9]+$/)) {
-			throw Error('Value should be an integer');
-		}
-		const intValue = parseInt(value, 10);
-		if (1000 >= intValue && intValue > 0) {
-			return intValue;
-		} else {
-			throw Error(`Interval value out of range: ${intValue}`);
-		}
-	}
-
 	private static parseFormatValue(src: string): string {
 		const value = src.trim();
 		if (value === null || value === undefined || value.length === 0) {
 			throw Error('Value should not be empty');
 		}
 		return value;
-	}
-
-	private static showIntervalAlert(setting: Setting, message: string) {
-		setting.descEl.empty();
-		const container = setting.descEl.createDiv();
-		const note = setting.descEl.createDiv();
-		note.setText(SETTING_INTERVAL_DESC);
-		const alert = setting.descEl.createDiv({
-			cls: 'settings-interval-alert',
-		});
-		alert.setText(message);
-		container.appendChild(note);
-		container.appendChild(alert);
 	}
 
 	private static showFormatAlert(setting: Setting, message: string) {

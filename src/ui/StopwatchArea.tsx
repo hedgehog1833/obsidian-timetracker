@@ -16,6 +16,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	const [intervalId, setIntervalId] = useState(0);
 	const [stopwatchState, setStopwatchState] = useState(StopwatchState.INITIALIZED);
 	const [, setCurrentValue] = useState(props.getCurrentStopwatchTime);
+	const STOPWATCH_INTERVAL = 100;
 
 	const startOrStopStopwatch = () => {
 		if (stopwatchState !== StopwatchState.STARTED) {
@@ -46,7 +47,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 		}
 		let interValId = window.setInterval(() => {
 			setCurrentValue(props.getCurrentStopwatchTime());
-		}, props.plugin.settings.interval);
+		}, STOPWATCH_INTERVAL);
 		setIntervalId(interValId);
 		return interValId;
 	};

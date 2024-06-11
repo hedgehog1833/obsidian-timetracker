@@ -9,13 +9,11 @@ momentDurationFormatSetup(moment);
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
 interface TimetrackerSettings {
-	interval: number;
 	format: string;
 	trimLeadingZeros: boolean;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
-	interval: 100,
 	format: 'HH:mm:ss.SSS',
 	trimLeadingZeros: false,
 };

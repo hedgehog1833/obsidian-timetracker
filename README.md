@@ -6,10 +6,6 @@ The stopwatch functionality is a completely rewritten clone of https://github.co
 
 ## Configuration
 
-### Refresh interval
-
-The stopwatch's refresh rate in milliseconds. The default value is `100`. The valid value range lies between 1 and 1000 milliseconds.
-
 ### Time format
 
 The format for how to print the stopwatch's current value. Default is `HH:mm:ss.SSS`. For more formats see [here](https://github.com/jsmreese/moment-duration-format#template-string). 
