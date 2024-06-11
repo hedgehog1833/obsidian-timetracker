@@ -52,25 +52,4 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				});
 			});
 	}
-
-	private static parseFormatValue(src: string): string {
-		const value = src.trim();
-		if (value === null || value === undefined || value.length === 0) {
-			throw Error('Value should not be empty');
-		}
-		return value;
-	}
-
-	private static showFormatAlert(setting: Setting, message: string) {
-		setting.descEl.empty();
-		const container = setting.descEl.createDiv();
-		const note = setting.descEl.createDiv();
-		note.setText(SETTING_INTERVAL_DESC);
-		const alert = setting.descEl.createDiv({
-			cls: 'settings-format-alert',
-		});
-		alert.setText(message);
-		container.appendChild(note);
-		container.appendChild(alert);
-	}
 }

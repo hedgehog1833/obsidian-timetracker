@@ -58,21 +58,16 @@ export class StopwatchModel {
 	}
 
 	private getDateString(milliseconds: number, complete?: boolean): string {
-		const formattingSettings = !this.plugin.settings.trimLeadingZeros
-			? {
-					trim: 'false',
-				}
-			: {
-					trim: 'left',
-				};
-		return moment.duration(milliseconds).format(this.getFormat(complete), formattingSettings);
+		return moment.duration(milliseconds).format(this.getFormat(complete), {
+			trim: 'false',
+		});
 	}
 
 	private getFormat(complete?: boolean): string {
-		if (complete) {
-			return this.COMPLETE_TIME_FORMAT;
-		}
-		if (this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+		if (
+			complete ||
+			(this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds)
+		) {
 			return this.COMPLETE_TIME_FORMAT;
 		}
 		if (this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
@@ -93,6 +88,7 @@ export class StopwatchModel {
 		if (!this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
 			return 'ss';
 		}
+		console.log('should not happen: unknown time format, defaulting to HH:mm:ss');
 		return this.COMPLETE_TIME_FORMAT;
 	}
 }
