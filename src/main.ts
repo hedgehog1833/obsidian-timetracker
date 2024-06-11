@@ -49,7 +49,7 @@ export default class Timetracker extends Plugin {
 				}
 
 				if (sidebarView != null) {
-					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTimeFormatted() || null;
+					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
 					currentStopwatchTime && editor.replaceSelection(`${currentStopwatchTime}: `);
 					return true;
 				} else {

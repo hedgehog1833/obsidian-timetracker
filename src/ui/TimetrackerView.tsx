@@ -29,12 +29,8 @@ export class TimetrackerView extends ItemView {
 		return 'clock';
 	}
 
-	getCurrentStopwatchTimeComplete(): string {
-		return this.stopwatchModel.getCurrentValue(true);
-	}
-
-	getCurrentStopwatchTimeFormatted(): string {
-		return this.stopwatchModel.getCurrentValue();
+	getCurrentStopwatchTime(complete?: boolean): string {
+		return this.stopwatchModel.getCurrentValue(complete);
 	}
 
 	setCurrentStopwatchTime(milliseconds: number): void {
@@ -78,7 +74,7 @@ export class TimetrackerView extends ItemView {
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
-				getCurrentStopwatchTime={() => this.getCurrentStopwatchTimeComplete()}
+				getCurrentStopwatchTime={() => this.getCurrentStopwatchTime(true)}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
 			/>,
 		);
