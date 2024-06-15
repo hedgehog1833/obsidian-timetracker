@@ -4,7 +4,7 @@ export type TimeInputProps = {
 	stopwatchValue: string;
 	isEditing: boolean;
 	onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	focusRef?: React.RefObject<HTMLInputElement>;
+	focusRef: React.RefObject<HTMLInputElement>;
 };
 
 const TimeInput = (props: TimeInputProps) => {

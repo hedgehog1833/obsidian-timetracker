@@ -14,11 +14,19 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const [hours, setHours] = useState<number>(0);
 	const [minutes, setMinutes] = useState<number>(0);
 	const [seconds, setSeconds] = useState<number>(0);
+	const inputHoursRef = useRef<HTMLInputElement>(null);
+	const inputMinutesRef = useRef<HTMLInputElement>(null);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (isEditing) {
-			inputSecondsRef.current?.focus();
+			if (props.plugin.settings.showSeconds) {
+				inputSecondsRef.current?.focus();
+			} else if (props.plugin.settings.showMinutes) {
+				inputMinutesRef.current?.focus();
+			} else if (props.plugin.settings.showHours) {
+				inputHoursRef.current?.focus();
+			}
 		}
 	}, [isEditing]);
 
@@ -93,6 +101,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={prepareStopwatchValue(props.stopwatchValue.split(':')[0])}
 						isEditing={isEditing}
 						onChangeHandler={handleOnHoursChange}
+						focusRef={inputHoursRef}
 					/>
 				)}
 				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && <p>:</p>}
@@ -101,6 +110,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={prepareStopwatchValue(props.stopwatchValue.split(':')[1])}
 						isEditing={isEditing}
 						onChangeHandler={handleOnMinutesChange}
+						focusRef={inputMinutesRef}
 					/>
 				)}
 				{((props.plugin.settings.showHours && !props.plugin.settings.showMinutes) ||
