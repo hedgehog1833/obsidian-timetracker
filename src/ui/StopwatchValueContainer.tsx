@@ -48,10 +48,9 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	const handleOnHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let hours = parseInt(event.target.value);
-
+		const hours = parseInt(prepareValue(event));
 		if (hours > 99) {
-			hours = 0;
+			return;
 		}
 
 		setValue(hours, minutes, seconds);
@@ -59,10 +58,9 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	const handleOnMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let minutes = parseInt(event.target.value);
-
+		const minutes = parseInt(prepareValue(event));
 		if (minutes > 59) {
-			minutes = 0;
+			return;
 		}
 
 		setValue(hours, minutes, seconds);
@@ -70,14 +68,26 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	const handleOnSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let seconds = parseInt(event.target.value);
-
+		const seconds = parseInt(prepareValue(event));
 		if (seconds > 59) {
-			seconds = 0;
+			return;
 		}
 
 		setValue(hours, minutes, seconds);
 		setSeconds(seconds);
+	};
+
+	const prepareValue = (event: React.ChangeEvent<HTMLInputElement>): string => {
+		const cursorPosition = event.target.selectionStart;
+		let value = event.target.value;
+		if (cursorPosition) {
+			if (cursorPosition === 1 || cursorPosition === 3) {
+				return value.slice(0, 1) + value.slice(2);
+			} else if (cursorPosition === 2) {
+				return value.slice(0, -1);
+			}
+		}
+		return value;
 	};
 
 	const setValue = (hours: number, minutes: number, seconds: number) => {

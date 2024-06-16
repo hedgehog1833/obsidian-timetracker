@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export type TimeInputProps = {
 	stopwatchValue: string;
@@ -8,6 +8,21 @@ export type TimeInputProps = {
 };
 
 const TimeInput = (props: TimeInputProps) => {
+	const [cursorPosition, setCursorPosition] = useState<number | null>(null);
+
+	useEffect(() => {
+		if (props.focusRef.current) {
+			props.focusRef.current.setSelectionRange(cursorPosition, cursorPosition);
+		}
+	}, [cursorPosition]);
+
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event.target?.selectionStart) {
+			setCursorPosition(event.target.selectionStart);
+			props.onChangeHandler(event);
+		}
+	};
+
 	return (
 		<>
 			<input
@@ -17,7 +32,7 @@ const TimeInput = (props: TimeInputProps) => {
 				disabled={!props.isEditing}
 				className="stopwatch-value-input"
 				value={props.stopwatchValue}
-				onChange={props.onChangeHandler}
+				onChange={handleChange}
 			/>
 		</>
 	);
