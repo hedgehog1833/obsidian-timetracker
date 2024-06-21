@@ -18,6 +18,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const inputMinutesRef = useRef<HTMLInputElement>(null);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
 	const stopwatchValueWrapperRef = useRef<HTMLDivElement>(null);
+	const separatorElement = <p className={'separator'}>:</p>;
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -172,7 +173,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
 					/>
 				)}
-				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && <p>:</p>}
+				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && separatorElement}
 				{props.plugin.settings.showMinutes && (
 					<TimeInput
 						stopwatchValue={formatMinuteValue()}
@@ -184,7 +185,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 				)}
 				{((props.plugin.settings.showHours && !props.plugin.settings.showMinutes) ||
 					props.plugin.settings.showMinutes) &&
-					props.plugin.settings.showSeconds && <p>:</p>}
+					props.plugin.settings.showSeconds &&
+					separatorElement}
 				{props.plugin.settings.showSeconds && (
 					<TimeInput
 						stopwatchValue={formatSecondValue()}
