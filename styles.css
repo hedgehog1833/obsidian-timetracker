@@ -41,7 +41,7 @@ input.stopwatch-value-input {
 	font-size: 1rem;
 }
 
-.stopwatch-value-input input[type='text']{
+.stopwatch-value-input input[type='text'] {
 	padding: 0;
 }
 

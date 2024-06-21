@@ -5,6 +5,7 @@ export type TimeInputProps = {
 	isEditing: boolean;
 	onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	focusRef: React.RefObject<HTMLInputElement>;
+	trimLeadingZeros: boolean;
 };
 
 const TimeInput = (props: TimeInputProps) => {
@@ -33,6 +34,7 @@ const TimeInput = (props: TimeInputProps) => {
 				className="stopwatch-value-input"
 				value={props.stopwatchValue}
 				onChange={handleChange}
+				placeholder={props.trimLeadingZeros ? '0' : '00'}
 			/>
 		</>
 	);

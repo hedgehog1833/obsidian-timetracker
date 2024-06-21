@@ -51,36 +51,36 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	const handleOnHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const hours = parseInt(prepareValue(event));
+		const hours = parseInt(adjustInput(event));
 		if (hours > 99) {
 			return;
 		}
 
-		setValue(hours, minutes, seconds);
+		setStopwatchValue(hours, minutes, seconds);
 		setHours(hours);
 	};
 
 	const handleOnMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const minutes = parseInt(prepareValue(event));
+		const minutes = parseInt(adjustInput(event));
 		if (minutes > 59) {
 			return;
 		}
 
-		setValue(hours, minutes, seconds);
+		setStopwatchValue(hours, minutes, seconds);
 		setMinutes(minutes);
 	};
 
 	const handleOnSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const seconds = parseInt(prepareValue(event));
+		const seconds = parseInt(adjustInput(event));
 		if (seconds > 59) {
 			return;
 		}
 
-		setValue(hours, minutes, seconds);
+		setStopwatchValue(hours, minutes, seconds);
 		setSeconds(seconds);
 	};
 
-	const prepareValue = (event: React.ChangeEvent<HTMLInputElement>): string => {
+	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
 		const cursorPosition = event.target.selectionStart;
 		let value = event.target.value;
 		if (cursorPosition) {
@@ -93,17 +93,57 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		return value;
 	};
 
-	const setValue = (hours: number, minutes: number, seconds: number) => {
+	const setStopwatchValue = (hours: number, minutes: number, seconds: number) => {
 		const date = new Date();
 		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
 		props.setStopwatchValue(date.getTime());
 	};
 
-	const prepareStopwatchValue = (value: string): string => {
-		if (props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
-			return value.slice(1);
+	const formatHourValue = (): string => {
+		const tempMinutes = props.stopwatchValue.split(':')[1];
+		const tempSeconds = props.stopwatchValue.split(':')[2];
+		let value = props.stopwatchValue.split(':')[0];
+		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
+			value = value.slice(1);
 		}
-		return value;
+		return (value !== '0' && value !== '00') ||
+			isEditing ||
+			((value === '0' || value === '00') &&
+				!props.plugin.settings.showMinutes &&
+				!props.plugin.settings.showSeconds &&
+				(parseInt(tempSeconds) > 0 || parseInt(tempMinutes) > 0))
+			? value
+			: '';
+	};
+
+	const formatMinuteValue = (): string => {
+		const tempHours = props.stopwatchValue.split(':')[0];
+		const tempSeconds = props.stopwatchValue.split(':')[2];
+		let value = props.stopwatchValue.split(':')[1];
+		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
+			value = value.slice(1);
+		}
+		return (value !== '0' && value !== '00') ||
+			isEditing ||
+			parseInt(tempHours) > 0 ||
+			((value === '0' || value === '00') &&
+				!props.plugin.settings.showSeconds &&
+				parseInt(tempHours) == 0 &&
+				parseInt(tempSeconds) > 0)
+			? value
+			: '';
+	};
+
+	const formatSecondValue = (): string => {
+		const tempHours = props.stopwatchValue.split(':')[0];
+		const tempMinutes = props.stopwatchValue.split(':')[1];
+		let value = props.stopwatchValue.split(':')[2];
+		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
+			value = value.slice(1);
+		}
+		return (value !== '0' && value !== '00') || isEditing || parseInt(tempHours) > 0 || parseInt(tempMinutes) > 0
+			? value
+			: '';
 	};
 
 	return (
@@ -111,19 +151,21 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			<div className="stopwatch-value-container">
 				{props.plugin.settings.showHours && (
 					<TimeInput
-						stopwatchValue={prepareStopwatchValue(props.stopwatchValue.split(':')[0])}
+						stopwatchValue={formatHourValue()}
 						isEditing={isEditing}
 						onChangeHandler={handleOnHoursChange}
 						focusRef={inputHoursRef}
+						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
 					/>
 				)}
 				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && <p>:</p>}
 				{props.plugin.settings.showMinutes && (
 					<TimeInput
-						stopwatchValue={prepareStopwatchValue(props.stopwatchValue.split(':')[1])}
+						stopwatchValue={formatMinuteValue()}
 						isEditing={isEditing}
 						onChangeHandler={handleOnMinutesChange}
 						focusRef={inputMinutesRef}
+						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
 					/>
 				)}
 				{((props.plugin.settings.showHours && !props.plugin.settings.showMinutes) ||
@@ -131,10 +173,11 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 					props.plugin.settings.showSeconds && <p>:</p>}
 				{props.plugin.settings.showSeconds && (
 					<TimeInput
-						stopwatchValue={prepareStopwatchValue(props.stopwatchValue.split(':')[2])}
+						stopwatchValue={formatSecondValue()}
 						isEditing={isEditing}
 						onChangeHandler={handleOnSecondsChange}
 						focusRef={inputSecondsRef}
+						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
 					/>
 				)}
 			</div>
