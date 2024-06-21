@@ -7,6 +7,8 @@ export class StopwatchModel {
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
+	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
+	private readonly COMPLETE_TIME_FORMAT = 'HH:mm:ss';
 
 	constructor(plugin: Timetracker) {
 		this.plugin = plugin;
@@ -31,13 +33,23 @@ export class StopwatchModel {
 		return this.state;
 	}
 
-	getCurrentValue(): string {
+	getCurrentValue(complete?: boolean): string {
+		let elapsedTime = 0;
+
 		if (this.state === StopwatchState.STARTED) {
 			const now = Date.now();
-			const diff = now - this.startedAt + this.pausedAtOffset;
-			return this.getDateString(diff);
+			elapsedTime = now - this.startedAt + this.pausedAtOffset;
+		} else {
+			elapsedTime = this.pausedAtOffset;
 		}
-		return this.getDateString(this.pausedAtOffset);
+
+		if (elapsedTime >= this.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS) {
+			this.startedAt = Date.now();
+			this.pausedAtOffset = 0;
+			elapsedTime = 0;
+		}
+
+		return this.getDateString(elapsedTime, complete);
 	}
 
 	setCurrentValue(milliseconds: number): void {
@@ -45,14 +57,38 @@ export class StopwatchModel {
 		this.pausedAtOffset = Date.now() - this.startedAt;
 	}
 
-	private getDateString(milliseconds: number): string {
-		const formattingSettings = !this.plugin.settings.trimLeadingZeros
-			? {
-					trim: 'false',
-				}
-			: {
-					trim: 'left',
-				};
-		return moment.duration(milliseconds).format(this.plugin.settings.format, formattingSettings);
+	private getDateString(milliseconds: number, complete?: boolean): string {
+		return moment.duration(milliseconds).format(this.getFormat(complete), {
+			trim: 'false',
+		});
+	}
+
+	private getFormat(complete?: boolean): string {
+		if (
+			complete ||
+			(this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds)
+		) {
+			return this.COMPLETE_TIME_FORMAT;
+		}
+		if (this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+			return 'HH:mm';
+		}
+		if (this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return 'HH:ss';
+		}
+		if (this.plugin.settings.showHours && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+			return 'HH';
+		}
+		if (!this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return 'mm:ss';
+		}
+		if (!this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+			return 'mm';
+		}
+		if (!this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+			return 'ss';
+		}
+		console.log('should not happen: unknown time format, defaulting to HH:mm:ss');
+		return this.COMPLETE_TIME_FORMAT;
 	}
 }

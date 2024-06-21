@@ -6,14 +6,10 @@ The stopwatch functionality is a completely rewritten clone of https://github.co
 
 ## Configuration
 
-### Refresh interval
+### Time format: hours, minutes, seconds
 
-The stopwatch's refresh rate in milliseconds. The default value is `100`. The valid value range lies between 1 and 1000 milliseconds.
-
-### Time format
-
-The format for how to print the stopwatch's current value. Default is `HH:mm:ss.SSS`. For more formats see [here](https://github.com/jsmreese/moment-duration-format#template-string). 
+The format for how to print the stopwatch's current value. Default is to display hours, minutes and seconds `00:00:00`. Each can be turned on and off separately. 
 
 ### Trimming
 
-Allows cutting off leading zeros, if the given format allows them. With this setting activated, `mm:ss.SSS` will show minutes not until the stopwatch reaches one minute.
+Allows cutting off leading zeros. With this setting activated, `01:10:01` will be displayed as `1:10:1`.

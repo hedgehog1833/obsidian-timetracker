@@ -1,5 +1,5 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
-import { StopwatchButtons } from './StopwatchButtons';
+import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
 import { StopwatchModel } from '../stopwatch/StopwatchModel';
@@ -29,8 +29,8 @@ export class TimetrackerView extends ItemView {
 		return 'clock';
 	}
 
-	getCurrentStopwatchTime(): string {
-		return this.stopwatchModel.getCurrentValue();
+	getCurrentStopwatchTime(complete?: boolean): string {
+		return this.stopwatchModel.getCurrentValue(complete);
 	}
 
 	setCurrentStopwatchTime(milliseconds: number): void {
@@ -69,12 +69,12 @@ export class TimetrackerView extends ItemView {
 	async onOpen() {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
-			<StopwatchButtons
+			<StopwatchArea
 				plugin={this.plugin}
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
-				getCurrentStopwatchTime={() => this.getCurrentStopwatchTime()}
+				getCurrentStopwatchTime={() => this.getCurrentStopwatchTime(true)}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
 			/>,
 		);
