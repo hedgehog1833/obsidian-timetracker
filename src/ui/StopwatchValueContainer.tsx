@@ -37,13 +37,10 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		if (isEditing) {
 			if (props.plugin.settings.showSeconds) {
 				inputSecondsRef.current?.focus();
-				inputSecondsRef.current?.setSelectionRange(0, 0);
 			} else if (props.plugin.settings.showMinutes) {
 				inputMinutesRef.current?.focus();
-				inputMinutesRef.current?.setSelectionRange(0, 0);
 			} else if (props.plugin.settings.showHours) {
 				inputHoursRef.current?.focus();
-				inputHoursRef.current?.setSelectionRange(0, 0);
 			}
 		}
 	}, [isEditing]);

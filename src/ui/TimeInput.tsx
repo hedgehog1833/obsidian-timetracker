@@ -24,6 +24,10 @@ const TimeInput = (props: TimeInputProps) => {
 		}
 	};
 
+	const onFocusHandler = () => {
+		props.focusRef.current?.setSelectionRange(0, 0);
+	};
+
 	return (
 		<>
 			<input
@@ -35,6 +39,7 @@ const TimeInput = (props: TimeInputProps) => {
 				value={props.stopwatchValue}
 				onChange={handleChange}
 				placeholder={props.trimLeadingZeros ? '0' : '00'}
+				onFocus={onFocusHandler}
 			/>
 		</>
 	);
