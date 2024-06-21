@@ -17,6 +17,20 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const inputHoursRef = useRef<HTMLInputElement>(null);
 	const inputMinutesRef = useRef<HTMLInputElement>(null);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
+	const stopwatchValueWrapperRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (stopwatchValueWrapperRef.current && !stopwatchValueWrapperRef.current.contains(event.target as Node)) {
+				setIsEditing(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [stopwatchValueWrapperRef.current]);
 
 	useEffect(() => {
 		if (isEditing) {
@@ -147,7 +161,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	};
 
 	return (
-		<div className="stopwatch-value-wrapper">
+		<div ref={stopwatchValueWrapperRef} className="stopwatch-value-wrapper">
 			<div className="stopwatch-value-container">
 				{props.plugin.settings.showHours && (
 					<TimeInput
