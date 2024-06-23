@@ -6,6 +6,7 @@ export type TimeInputProps = {
 	onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	focusRef: React.RefObject<HTMLInputElement>;
 	trimLeadingZeros: boolean;
+	onKeyDownHandler: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 const TimeInput = (props: TimeInputProps) => {
@@ -40,6 +41,7 @@ const TimeInput = (props: TimeInputProps) => {
 				onChange={handleChange}
 				placeholder={props.trimLeadingZeros ? '0' : '00'}
 				onFocus={onFocusHandler}
+				onKeyDown={props.onKeyDownHandler}
 			/>
 		</>
 	);
