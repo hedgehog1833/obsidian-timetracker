@@ -158,33 +158,61 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			: '';
 	};
 
-	const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
 		if (event.key === 'Backspace') {
-			event.preventDefault();
-			const cursorPosition = ref.current?.selectionStart;
-			if (cursorPosition) {
-				const value =
-					ref == inputSecondsRef ? seconds : ref == inputMinutesRef ? minutes : ref == inputHoursRef ? hours : null;
-				if (value != null) {
-					let tempValue = null;
-					if (cursorPosition === 1) {
-						tempValue = parseInt(value.toString().substring(1)) || 0;
-					} else if (cursorPosition === 2) {
-						tempValue = parseInt(value.toString().slice(0, -1)) || 0;
-					}
-					if (tempValue != null) {
-						if (ref == inputSecondsRef) {
-							setStopwatchValue(hours, minutes, tempValue);
-							setSeconds(tempValue);
-						} else if (ref == inputMinutesRef) {
-							setStopwatchValue(hours, tempValue, seconds);
-							setMinutes(tempValue);
-						} else if (ref == inputHoursRef) {
-							setStopwatchValue(tempValue, minutes, seconds);
-							setHours(tempValue);
-						}
-					}
+			handleBackspace(event, ref);
+		} else if (event.key === 'Delete') {
+			handleDelete(event, ref);
+		}
+	};
+
+	const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
+		event.preventDefault();
+		const cursorPosition = ref.current?.selectionStart;
+		if (cursorPosition) {
+			const value =
+				ref == inputSecondsRef ? seconds : ref == inputMinutesRef ? minutes : ref == inputHoursRef ? hours : null;
+			if (value != null) {
+				let tempValue = null;
+				if (cursorPosition === 1) {
+					tempValue = parseInt(value.toString().substring(1)) || 0;
+				} else if (cursorPosition === 2) {
+					tempValue = parseInt(value.toString().slice(0, -1)) || 0;
 				}
+				setValueForRef(tempValue, ref);
+			}
+		}
+	};
+
+	const handleDelete = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
+		event.preventDefault();
+		const cursorPosition = ref.current?.selectionStart;
+		if (cursorPosition != null) {
+			const value =
+				ref == inputSecondsRef ? seconds : ref == inputMinutesRef ? minutes : ref == inputHoursRef ? hours : null;
+			if (value != null) {
+				let tempValue = null;
+				if (cursorPosition === 0) {
+					tempValue = parseInt(value.toString().substring(1)) || 0;
+				} else if (cursorPosition === 1) {
+					tempValue = parseInt(value.toString().slice(0, -1)) || 0;
+				}
+				setValueForRef(tempValue, ref);
+			}
+		}
+	};
+
+	const setValueForRef = (value: number | null, ref: React.RefObject<HTMLInputElement>) => {
+		if (value != null) {
+			if (ref == inputSecondsRef) {
+				setStopwatchValue(hours, minutes, value);
+				setSeconds(value);
+			} else if (ref == inputMinutesRef) {
+				setStopwatchValue(hours, value, seconds);
+				setMinutes(value);
+			} else if (ref == inputHoursRef) {
+				setStopwatchValue(value, minutes, seconds);
+				setHours(value);
 			}
 		}
 	};
@@ -199,7 +227,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						onChangeHandler={handleOnHoursChange}
 						focusRef={inputHoursRef}
 						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
-						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleBackspace(event, inputHoursRef)}
+						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputHoursRef)}
 					/>
 				)}
 				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && separatorElement}
@@ -210,7 +238,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						onChangeHandler={handleOnMinutesChange}
 						focusRef={inputMinutesRef}
 						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
-						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleBackspace(event, inputMinutesRef)}
+						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputMinutesRef)}
 					/>
 				)}
 				{((props.plugin.settings.showHours && !props.plugin.settings.showMinutes) ||
@@ -224,7 +252,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						onChangeHandler={handleOnSecondsChange}
 						focusRef={inputSecondsRef}
 						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
-						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleBackspace(event, inputSecondsRef)}
+						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputSecondsRef)}
 					/>
 				)}
 			</div>
