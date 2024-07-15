@@ -9,8 +9,10 @@ momentDurationFormatSetup(moment);
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
 interface TimetrackerSettings {
-	format: string | null; // deprecated
-	interval: number | null; // deprecated
+	/** @deprecated custom formats are no longer supported, switches used instead */
+	format: string | null;
+	/** @deprecated customizing the refresh interval is no longer supported, defaults to 1 second */
+	interval: number | null;
 	showHours: boolean;
 	showMinutes: boolean;
 	showSeconds: boolean;
