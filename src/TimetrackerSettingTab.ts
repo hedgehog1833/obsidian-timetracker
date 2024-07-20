@@ -68,7 +68,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 	private createTextColorSetting(containerEl: HTMLElement): void {
 		new Setting(containerEl)
-			.setName('Color')
+			.setName('Text color')
 			.setDesc("Set the timestamp's text color")
 			.addColorPicker((component) => {
 				component.setValue(this.plugin.settings.textColor).onChange(async (value) => {
