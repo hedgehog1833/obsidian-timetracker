@@ -17,6 +17,8 @@ interface TimetrackerSettings {
 	showMinutes: boolean;
 	showSeconds: boolean;
 	trimLeadingZeros: boolean;
+	lineBreakAfterInsert: boolean;
+	textColor: string;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
@@ -26,6 +28,8 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 	showMinutes: true,
 	showSeconds: true,
 	trimLeadingZeros: false,
+	lineBreakAfterInsert: false,
+	textColor: '',
 };
 
 export default class Timetracker extends Plugin {
@@ -52,7 +56,13 @@ export default class Timetracker extends Plugin {
 
 				if (sidebarView != null) {
 					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
-					currentStopwatchTime && editor.replaceSelection(`${currentStopwatchTime}: `);
+					if (currentStopwatchTime) {
+						const formattedStopwatchTime = this.settings.textColor
+							? `<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>`
+							: `${currentStopwatchTime}`;
+						const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
+						editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
+					}
 					return true;
 				} else {
 					return false;
