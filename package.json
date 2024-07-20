@@ -1,7 +1,7 @@
 {
 	"name": "timetracker",
-	"version": "1.3.0",
-	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey",
+	"version": "1.4.0",
+	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey.",
 	"main": "./src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
