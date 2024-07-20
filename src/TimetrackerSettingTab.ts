@@ -57,7 +57,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	private createLineBreakSetting(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName('Line break')
-			.setDesc('Add a line break after inserting timestamp')
+			.setDesc('Add a line break after the inserted timestamp')
 			.addToggle((component) => {
 				component.setValue(this.plugin.settings.lineBreakAfterInsert).onChange(async (value) => {
 					this.plugin.settings.lineBreakAfterInsert = value;
