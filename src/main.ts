@@ -56,15 +56,12 @@ export default class Timetracker extends Plugin {
 
 				if (sidebarView != null) {
 					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
-					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 					if (currentStopwatchTime) {
-						if (this.settings.textColor) {
-							editor.replaceSelection(
-								`<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>${suffix}`,
-							);
-						} else {
-							editor.replaceSelection(`${currentStopwatchTime}${suffix}`);
-						}
+						const formattedStopwatchTime = this.settings.textColor
+							? `<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>`
+							: `${currentStopwatchTime}`;
+						const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
+						editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
 					}
 					return true;
 				} else {
