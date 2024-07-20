@@ -45,7 +45,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	private createTrimmingSetting(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName('Trimming')
-			.setDesc('Remove leading zeros')
+			.setDesc('Remove leading zeros.')
 			.addToggle((component) => {
 				component.setValue(this.plugin.settings.trimLeadingZeros).onChange(async (value) => {
 					this.plugin.settings.trimLeadingZeros = value;
@@ -57,7 +57,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	private createLineBreakSetting(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName('Line break')
-			.setDesc('Add a line break after the inserted timestamp')
+			.setDesc('Add a line break after the inserted timestamp.')
 			.addToggle((component) => {
 				component.setValue(this.plugin.settings.lineBreakAfterInsert).onChange(async (value) => {
 					this.plugin.settings.lineBreakAfterInsert = value;
@@ -69,7 +69,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	private createTextColorSetting(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName('Text color')
-			.setDesc("Set the timestamp's text color")
+			.setDesc("Set the inserted timestamp's text color.")
 			.addColorPicker((component) => {
 				component.setValue(this.plugin.settings.textColor).onChange(async (value) => {
 					this.plugin.settings.textColor = value;
