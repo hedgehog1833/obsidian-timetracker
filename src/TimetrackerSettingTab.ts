@@ -1,8 +1,9 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, ColorComponent, PluginSettingTab, Setting } from 'obsidian';
 import StopwatchPlugin from './main';
 
 export class TimetrackerSettingTab extends PluginSettingTab {
 	plugin: StopwatchPlugin;
+	colorPickerInstance?: ColorComponent;
 
 	constructor(app: App, plugin: StopwatchPlugin) {
 		super(app, plugin);
@@ -16,6 +17,8 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 		this.createFormatSetting(containerEl);
 		this.createTrimmingSetting(containerEl);
+		this.createLineBreakSetting(containerEl);
+		this.createTextColorSetting(containerEl);
 	}
 
 	private createFormatSetting(containerEl: HTMLElement): void {
@@ -46,6 +49,39 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			.addToggle((component) => {
 				component.setValue(this.plugin.settings.trimLeadingZeros).onChange(async (value) => {
 					this.plugin.settings.trimLeadingZeros = value;
+					await this.plugin.saveSettings();
+				});
+			});
+	}
+
+	private createLineBreakSetting(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName('Line break')
+			.setDesc('Add a line break after inserting timestamp')
+			.addToggle((component) => {
+				component.setValue(this.plugin.settings.lineBreakAfterInsert).onChange(async (value) => {
+					this.plugin.settings.lineBreakAfterInsert = value;
+					await this.plugin.saveSettings();
+				});
+			});
+	}
+
+	private createTextColorSetting(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName('Color')
+			.setDesc("Set the timestamp's text color")
+			.addColorPicker((component) => {
+				component.setValue(this.plugin.settings.textColor).onChange(async (value) => {
+					this.plugin.settings.textColor = value;
+					await this.plugin.saveSettings();
+				});
+				this.colorPickerInstance = component;
+			})
+			.addButton((component) => {
+				component.setButtonText('Reset to default');
+				component.onClick(async (_) => {
+					this.colorPickerInstance?.setValue('');
+					this.plugin.settings.textColor = '';
 					await this.plugin.saveSettings();
 				});
 			});
