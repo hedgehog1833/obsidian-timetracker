@@ -2,7 +2,7 @@ import { TimeUnit } from '../ui/TimeUnit';
 import { TimetrackerSettings } from '../main';
 
 const useFormatTimeValue = (settings: TimetrackerSettings) => {
-	const formatTimeValue = (stopwatchValue: string, timeUnit: TimeUnit, isEditing: boolean): string => {
+	const doFormatTimeValue = (stopwatchValue: string, timeUnit: TimeUnit, isEditing: boolean): string => {
 		const parts = stopwatchValue.split(':');
 		let value = parts[timeUnit.valueOf()];
 
@@ -37,7 +37,7 @@ const useFormatTimeValue = (settings: TimetrackerSettings) => {
 		return (value !== '0' && value !== '00') || isEditing;
 	};
 
-	return { formatTimeValue };
+	return { doFormatTimeValue };
 };
 
 export default useFormatTimeValue;

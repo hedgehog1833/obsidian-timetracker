@@ -16,7 +16,7 @@ export type TimeInputProps = {
 
 const TimeInput = (props: TimeInputProps) => {
 	const [cursorPosition, setCursorPosition] = useState<number | null>(null);
-	const { formatTimeValue } = useFormatTimeValue(props.settings);
+	const { doFormatTimeValue } = useFormatTimeValue(props.settings);
 	const { doHandleTimeChange } = useHandleTimeChange(props.setStopwatchValue);
 	const { doHandleRemoval } = useHandleRemoval(props.focusRef, props.setStopwatchValue);
 
@@ -55,7 +55,7 @@ const TimeInput = (props: TimeInputProps) => {
 				pattern="^\d{0,2}$"
 				disabled={!props.isEditing}
 				className="stopwatch-value-input"
-				value={formatTimeValue(props.stopwatchValue, props.timeUnit, props.isEditing)}
+				value={doFormatTimeValue(props.stopwatchValue, props.timeUnit, props.isEditing)}
 				placeholder={props.settings.trimLeadingZeros ? '0' : '00'}
 				onChange={handleTimeChange}
 				onFocus={handleFocus}
