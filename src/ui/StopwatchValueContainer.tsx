@@ -12,9 +12,6 @@ export type StopwachValueContainerProps = {
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [hours, setHours] = useState<number>(0);
-	const [minutes, setMinutes] = useState<number>(0);
-	const [seconds, setSeconds] = useState<number>(0);
 	const inputHoursRef = useRef<HTMLInputElement>(null);
 	const inputMinutesRef = useRef<HTMLInputElement>(null);
 	const inputSecondsRef = useRef<HTMLInputElement>(null);
@@ -50,130 +47,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		if (!isEditing) {
 			props.stopStopwatch();
 			setIsEditing(true);
-			initializeTimeValues();
 		} else {
 			setIsEditing(false);
-		}
-	};
-
-	const initializeTimeValues = () => {
-		const valueParts = props.stopwatchValue.split(':');
-		setHours(parseInt(valueParts[0]));
-		setMinutes(parseInt(valueParts[1]));
-		setSeconds(parseInt(valueParts[2]));
-	};
-
-	const handleTimeChange = (unit: TimeUnit, event: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = parseInt(adjustInput(event));
-		let tempHours = hours;
-		let tempMinutes = minutes;
-		let tempSeconds = seconds;
-
-		switch (unit) {
-			case TimeUnit.HOURS:
-				if (newValue > 99) return;
-				tempHours = newValue;
-				break;
-			case TimeUnit.MINUTES:
-				if (newValue > 59) return;
-				tempMinutes = newValue;
-				break;
-			case TimeUnit.SECONDS:
-				if (newValue > 59) return;
-				tempSeconds = newValue;
-				break;
-		}
-
-		setStopwatchValue(tempHours, tempMinutes, tempSeconds);
-
-		switch (unit) {
-			case TimeUnit.HOURS:
-				setHours(newValue);
-				break;
-			case TimeUnit.MINUTES:
-				setMinutes(newValue);
-				break;
-			case TimeUnit.SECONDS:
-				setSeconds(newValue);
-				break;
-		}
-	};
-
-	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
-		const cursorPosition = event.target.selectionStart;
-		let value = event.target.value;
-		if (cursorPosition) {
-			if (cursorPosition === 1) {
-				return value.slice(0, 1) + value.slice(2);
-			} else if (cursorPosition === 2) {
-				return value.slice(0, -1);
-			}
-		}
-		return value;
-	};
-
-	const setStopwatchValue = (hours: number, minutes: number, seconds: number) => {
-		const date = new Date();
-		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
-		props.setStopwatchValue(date.getTime());
-	};
-
-	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
-		if (event.key === 'Backspace') {
-			handleBackspace(event, ref);
-		} else if (event.key === 'Delete') {
-			handleDelete(event, ref);
-		}
-	};
-
-	const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
-		event.preventDefault();
-		const cursorPosition = ref.current?.selectionStart;
-		if (cursorPosition) {
-			const value =
-				ref == inputSecondsRef ? seconds : ref == inputMinutesRef ? minutes : ref == inputHoursRef ? hours : null;
-			if (value != null) {
-				let tempValue = null;
-				if (cursorPosition === 1) {
-					tempValue = parseInt(value.toString().substring(1)) || 0;
-				} else if (cursorPosition === 2) {
-					tempValue = parseInt(value.toString().slice(0, -1)) || 0;
-				}
-				setValueForRef(tempValue, ref);
-			}
-		}
-	};
-
-	const handleDelete = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
-		event.preventDefault();
-		const cursorPosition = ref.current?.selectionStart;
-		if (cursorPosition != null) {
-			const value =
-				ref == inputSecondsRef ? seconds : ref == inputMinutesRef ? minutes : ref == inputHoursRef ? hours : null;
-			if (value != null) {
-				let tempValue = null;
-				if (cursorPosition === 0) {
-					tempValue = parseInt(value.toString().substring(1)) || 0;
-				} else if (cursorPosition === 1) {
-					tempValue = parseInt(value.toString().slice(0, -1)) || 0;
-				}
-				setValueForRef(tempValue, ref);
-			}
-		}
-	};
-
-	const setValueForRef = (value: number | null, ref: React.RefObject<HTMLInputElement>) => {
-		if (value != null) {
-			if (ref == inputSecondsRef) {
-				setStopwatchValue(hours, minutes, value);
-				setSeconds(value);
-			} else if (ref == inputMinutesRef) {
-				setStopwatchValue(hours, value, seconds);
-				setMinutes(value);
-			} else if (ref == inputHoursRef) {
-				setStopwatchValue(value, minutes, seconds);
-				setHours(value);
-			}
 		}
 	};
 
@@ -187,8 +62,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
 						focusRef={inputHoursRef}
-						onChangeHandler={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(TimeUnit.HOURS, event)}
-						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputHoursRef)}
+						setStopwatchValue={props.setStopwatchValue}
 					/>
 				)}
 				{props.settings.showHours && props.settings.showMinutes && separatorElement}
@@ -199,8 +73,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
 						focusRef={inputMinutesRef}
-						onChangeHandler={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(TimeUnit.MINUTES, event)}
-						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputMinutesRef)}
+						setStopwatchValue={props.setStopwatchValue}
 					/>
 				)}
 				{((props.settings.showHours && !props.settings.showMinutes) || props.settings.showMinutes) &&
@@ -213,8 +86,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
 						focusRef={inputSecondsRef}
-						onChangeHandler={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(TimeUnit.SECONDS, event)}
-						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputSecondsRef)}
+						setStopwatchValue={props.setStopwatchValue}
 					/>
 				)}
 			</div>

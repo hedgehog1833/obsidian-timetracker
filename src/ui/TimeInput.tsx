@@ -8,8 +8,7 @@ export type TimeInputProps = {
 	stopwatchValue: string;
 	isEditing: boolean;
 	focusRef: React.RefObject<HTMLInputElement>;
-	onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	onKeyDownHandler: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+	setStopwatchValue: (milliseconds: number) => void;
 };
 
 const TimeInput = (props: TimeInputProps) => {
@@ -20,13 +19,6 @@ const TimeInput = (props: TimeInputProps) => {
 			props.focusRef.current.setSelectionRange(cursorPosition, cursorPosition);
 		}
 	}, [cursorPosition]);
-
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		if (event.target?.selectionStart) {
-			setCursorPosition(event.target.selectionStart);
-			props.onChangeHandler(event);
-		}
-	};
 
 	const onFocusHandler = () => {
 		props.focusRef.current?.setSelectionRange(0, 0);
@@ -69,6 +61,151 @@ const TimeInput = (props: TimeInputProps) => {
 		return (value !== '0' && value !== '00') || props.isEditing;
 	};
 
+	const handleTimeChange = (unit: TimeUnit, event: React.ChangeEvent<HTMLInputElement>) => {
+		setCursorPosition(event.target.selectionStart);
+		const newValue = parseInt(adjustInput(event));
+		const parts = props.stopwatchValue.split(':');
+		let tempHours = parseInt(parts[TimeUnit.HOURS.valueOf()]);
+		let tempMinutes = parseInt(parts[TimeUnit.MINUTES.valueOf()]);
+		let tempSeconds = parseInt(parts[TimeUnit.SECONDS.valueOf()]);
+
+		switch (unit) {
+			case TimeUnit.HOURS:
+				if (newValue > 99) return;
+				tempHours = newValue;
+				break;
+			case TimeUnit.MINUTES:
+				if (newValue > 59) return;
+				tempMinutes = newValue;
+				break;
+			case TimeUnit.SECONDS:
+				if (newValue > 59) return;
+				tempSeconds = newValue;
+				break;
+		}
+
+		setStopwatchValue(tempHours, tempMinutes, tempSeconds);
+	};
+
+	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
+		const cursorPosition = event.target.selectionStart;
+		let value = event.target.value;
+		if (cursorPosition) {
+			if (cursorPosition === 1) {
+				return value.slice(0, 1) + value.slice(2);
+			} else if (cursorPosition === 2) {
+				return value.slice(0, -1);
+			}
+		}
+		return value;
+	};
+
+	const setStopwatchValue = (hours: number, minutes: number, seconds: number) => {
+		const date = new Date();
+		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
+		props.setStopwatchValue(date.getTime());
+	};
+
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === 'Backspace') {
+			handleBackspace(event);
+		} else if (event.key === 'Delete') {
+			handleDelete(event);
+		}
+	};
+
+	const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		event.preventDefault();
+		const cursorPosition = props.focusRef.current?.selectionStart;
+		if (cursorPosition) {
+			const parts = props.stopwatchValue.split(':');
+			const tempHours = parseInt(parts[TimeUnit.HOURS.valueOf()]);
+			const tempMinutes = parseInt(parts[TimeUnit.MINUTES.valueOf()]);
+			const tempSeconds = parseInt(parts[TimeUnit.SECONDS.valueOf()]);
+			let value;
+
+			switch (props.timeUnitType) {
+				case TimeUnit.HOURS:
+					value = tempHours;
+					break;
+				case TimeUnit.MINUTES:
+					value = tempMinutes;
+					break;
+				case TimeUnit.SECONDS:
+					value = tempSeconds;
+					break;
+			}
+			if (value != null) {
+				let tempValue = null;
+				if (cursorPosition === 1) {
+					tempValue = parseInt(value.toString().substring(1)) || 0;
+				} else if (cursorPosition === 2) {
+					tempValue = parseInt(value.toString().slice(0, -1)) || 0;
+				}
+
+				if (tempValue != null) {
+					switch (props.timeUnitType) {
+						case TimeUnit.HOURS:
+							setStopwatchValue(tempValue, tempMinutes, tempSeconds);
+							break;
+						case TimeUnit.MINUTES:
+							setStopwatchValue(tempHours, tempValue, tempSeconds);
+							break;
+						case TimeUnit.SECONDS:
+							setStopwatchValue(tempHours, tempMinutes, tempValue);
+							break;
+					}
+				}
+			}
+		}
+	};
+
+	const handleDelete = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		event.preventDefault();
+		const cursorPosition = props.focusRef.current?.selectionStart;
+		if (cursorPosition != null) {
+			const parts = props.stopwatchValue.split(':');
+			const tempHours = parseInt(parts[TimeUnit.HOURS.valueOf()]);
+			const tempMinutes = parseInt(parts[TimeUnit.MINUTES.valueOf()]);
+			const tempSeconds = parseInt(parts[TimeUnit.SECONDS.valueOf()]);
+			let value;
+
+			switch (props.timeUnitType) {
+				case TimeUnit.HOURS:
+					value = tempHours;
+					break;
+				case TimeUnit.MINUTES:
+					value = tempMinutes;
+					break;
+				case TimeUnit.SECONDS:
+					value = tempSeconds;
+					break;
+			}
+			if (value != null) {
+				let tempValue = null;
+				if (cursorPosition === 0) {
+					tempValue = parseInt(value.toString().substring(1)) || 0;
+				} else if (cursorPosition === 1) {
+					tempValue = parseInt(value.toString().slice(0, -1)) || 0;
+				}
+
+				if (tempValue != null) {
+					switch (props.timeUnitType) {
+						case TimeUnit.HOURS:
+							setStopwatchValue(tempValue, tempMinutes, tempSeconds);
+							break;
+						case TimeUnit.MINUTES:
+							setStopwatchValue(tempHours, tempValue, tempSeconds);
+							break;
+						case TimeUnit.SECONDS:
+							setStopwatchValue(tempHours, tempMinutes, tempValue);
+							break;
+					}
+				}
+			}
+		}
+	};
+
 	return (
 		<>
 			<input
@@ -79,9 +216,9 @@ const TimeInput = (props: TimeInputProps) => {
 				className="stopwatch-value-input"
 				value={formatTimeUnitValue()}
 				placeholder={props.settings.trimLeadingZeros ? '0' : '00'}
-				onChange={handleChange}
+				onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(props.timeUnitType, event)}
 				onFocus={onFocusHandler}
-				onKeyDown={props.onKeyDownHandler}
+				onKeyDown={handleKeyDown}
 			/>
 		</>
 	);
