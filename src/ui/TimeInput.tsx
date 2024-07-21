@@ -3,7 +3,7 @@ import { TimetrackerSettings } from '../main';
 import { TimeUnit } from './TimeUnit';
 
 export type TimeInputProps = {
-	timeUnitType: TimeUnit;
+	timeUnit: TimeUnit;
 	settings: TimetrackerSettings;
 	stopwatchValue: string;
 	isEditing: boolean;
@@ -26,18 +26,18 @@ const TimeInput = (props: TimeInputProps) => {
 
 	const formatTimeUnitValue = (): string => {
 		const parts = props.stopwatchValue.split(':');
-		let value = parts[props.timeUnitType.valueOf()];
+		let value = parts[props.timeUnit.valueOf()];
 
 		if (!props.isEditing && props.settings.trimLeadingZeros && value.startsWith('0')) {
 			value = value.slice(1);
 		}
 
 		return satisfiesDefaultConditions(value) ||
-			(props.timeUnitType === TimeUnit.HOURS &&
+			(props.timeUnit === TimeUnit.HOURS &&
 				satisfiesHourConditions(parts[TimeUnit.MINUTES.valueOf()], parts[TimeUnit.SECONDS.valueOf()])) ||
-			(props.timeUnitType === TimeUnit.MINUTES &&
+			(props.timeUnit === TimeUnit.MINUTES &&
 				satisfiesMinuteConditions(parts[TimeUnit.HOURS.valueOf()], parts[TimeUnit.SECONDS.valueOf()])) ||
-			(props.timeUnitType === TimeUnit.SECONDS &&
+			(props.timeUnit === TimeUnit.SECONDS &&
 				satisfiesSecondsConditions(parts[TimeUnit.HOURS], parts[TimeUnit.MINUTES.valueOf()]))
 			? value
 			: '';
@@ -61,7 +61,7 @@ const TimeInput = (props: TimeInputProps) => {
 		return (value !== '0' && value !== '00') || props.isEditing;
 	};
 
-	const handleTimeChange = (unit: TimeUnit, event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setCursorPosition(event.target.selectionStart);
 		const newValue = parseInt(adjustInput(event));
 		const parts = props.stopwatchValue.split(':');
@@ -69,7 +69,7 @@ const TimeInput = (props: TimeInputProps) => {
 		let tempMinutes = parseInt(parts[TimeUnit.MINUTES.valueOf()]);
 		let tempSeconds = parseInt(parts[TimeUnit.SECONDS.valueOf()]);
 
-		switch (unit) {
+		switch (props.timeUnit) {
 			case TimeUnit.HOURS:
 				if (newValue > 99) {
 					return;
@@ -96,12 +96,10 @@ const TimeInput = (props: TimeInputProps) => {
 	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
 		const cursorPosition = event.target.selectionStart;
 		let value = event.target.value;
-		if (cursorPosition) {
-			if (cursorPosition === 1) {
-				return value.slice(0, 1) + value.slice(2);
-			} else if (cursorPosition === 2) {
-				return value.slice(0, -1);
-			}
+		if (cursorPosition === 1) {
+			return value.slice(0, 1) + value.slice(2);
+		} else if (cursorPosition === 2) {
+			return value.slice(0, -1);
 		}
 		return value;
 	};
@@ -149,7 +147,8 @@ const TimeInput = (props: TimeInputProps) => {
 		const tempMinutes = parseInt(parts[TimeUnit.MINUTES.valueOf()]);
 		const tempSeconds = parseInt(parts[TimeUnit.SECONDS.valueOf()]);
 		let value;
-		switch (props.timeUnitType) {
+
+		switch (props.timeUnit) {
 			case TimeUnit.HOURS:
 				value = tempHours;
 				break;
@@ -170,7 +169,7 @@ const TimeInput = (props: TimeInputProps) => {
 
 	const setStopwatchValueOnRemoval = (hours: number, minutes: number, seconds: number, currentValue: number | null) => {
 		if (currentValue != null) {
-			switch (props.timeUnitType) {
+			switch (props.timeUnit) {
 				case TimeUnit.HOURS:
 					setStopwatchValue(currentValue, minutes, seconds);
 					break;
@@ -194,7 +193,7 @@ const TimeInput = (props: TimeInputProps) => {
 				className="stopwatch-value-input"
 				value={formatTimeUnitValue()}
 				placeholder={props.settings.trimLeadingZeros ? '0' : '00'}
-				onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(props.timeUnitType, event)}
+				onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(event)}
 				onFocus={onFocusHandler}
 				onKeyDown={handleKeyDown}
 			/>

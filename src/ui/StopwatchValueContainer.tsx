@@ -57,7 +57,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 			<div className="stopwatch-value-container">
 				{props.settings.showHours && (
 					<TimeInput
-						timeUnitType={TimeUnit.HOURS}
+						timeUnit={TimeUnit.HOURS}
 						settings={props.settings}
 						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
@@ -68,7 +68,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 				{props.settings.showHours && props.settings.showMinutes && separatorElement}
 				{props.settings.showMinutes && (
 					<TimeInput
-						timeUnitType={TimeUnit.MINUTES}
+						timeUnit={TimeUnit.MINUTES}
 						settings={props.settings}
 						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
@@ -81,7 +81,7 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 					separatorElement}
 				{props.settings.showSeconds && (
 					<TimeInput
-						timeUnitType={TimeUnit.SECONDS}
+						timeUnit={TimeUnit.SECONDS}
 						settings={props.settings}
 						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
