@@ -13,3 +13,11 @@ The format for how to print the stopwatch's current value. Default is to display
 ### Trimming
 
 Allows cutting off leading zeros. With this setting activated, `01:10:01` will be displayed as `1:10:1`.
+
+### Line break
+
+Adds a line break after the inserted timestamp instead of the default whitespace.
+
+### Text color
+
+The inserted timestamp's text color can be chosen via color picker. The color is applied via an html span.
