@@ -118,10 +118,8 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
 			value = value.slice(1);
 		}
-		return (value !== '0' && value !== '00') ||
-			isEditing ||
-			((value === '0' || value === '00') &&
-				!props.plugin.settings.showMinutes &&
+		return satisfiesDefaultConditions(value) ||
+			(!props.plugin.settings.showMinutes &&
 				!props.plugin.settings.showSeconds &&
 				(parseInt(tempSeconds) > 0 || parseInt(tempMinutes) > 0))
 			? value
@@ -135,13 +133,9 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
 			value = value.slice(1);
 		}
-		return (value !== '0' && value !== '00') ||
-			isEditing ||
+		return satisfiesDefaultConditions(value) ||
 			parseInt(tempHours) > 0 ||
-			((value === '0' || value === '00') &&
-				!props.plugin.settings.showSeconds &&
-				parseInt(tempHours) == 0 &&
-				parseInt(tempSeconds) > 0)
+			(!props.plugin.settings.showSeconds && parseInt(tempSeconds) > 0)
 			? value
 			: '';
 	};
@@ -153,9 +147,11 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
 			value = value.slice(1);
 		}
-		return (value !== '0' && value !== '00') || isEditing || parseInt(tempHours) > 0 || parseInt(tempMinutes) > 0
-			? value
-			: '';
+		return satisfiesDefaultConditions(value) || parseInt(tempHours) > 0 || parseInt(tempMinutes) > 0 ? value : '';
+	};
+
+	const satisfiesDefaultConditions = (value: string): boolean => {
+		return (value !== '0' && value !== '00') || isEditing;
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
