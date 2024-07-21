@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TimeInput from './TimeInput';
-import Timetracker from '../main';
+import { TimetrackerSettings } from '../main';
+import { TimeUnit } from './TimeUnit';
 
 export type StopwachValueContainerProps = {
 	stopwatchValue: string;
 	setStopwatchValue: (milliseconds: number) => void;
 	stopStopwatch: () => void;
-	plugin: Timetracker;
+	settings: TimetrackerSettings;
 };
 
 const StopwachValueContainer = (props: StopwachValueContainerProps) => {
@@ -35,11 +36,11 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 
 	useEffect(() => {
 		if (isEditing) {
-			if (props.plugin.settings.showSeconds) {
+			if (props.settings.showSeconds) {
 				inputSecondsRef.current?.focus();
-			} else if (props.plugin.settings.showMinutes) {
+			} else if (props.settings.showMinutes) {
 				inputMinutesRef.current?.focus();
-			} else if (props.plugin.settings.showHours) {
+			} else if (props.settings.showHours) {
 				inputHoursRef.current?.focus();
 			}
 		}
@@ -62,34 +63,40 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		setSeconds(parseInt(valueParts[2]));
 	};
 
-	const handleOnHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const hours = parseInt(adjustInput(event));
-		if (hours > 99) {
-			return;
+	const handleTimeChange = (unit: TimeUnit, event: React.ChangeEvent<HTMLInputElement>) => {
+		const newValue = parseInt(adjustInput(event));
+		let tempHours = hours;
+		let tempMinutes = minutes;
+		let tempSeconds = seconds;
+
+		switch (unit) {
+			case TimeUnit.HOURS:
+				if (newValue > 99) return;
+				tempHours = newValue;
+				break;
+			case TimeUnit.MINUTES:
+				if (newValue > 59) return;
+				tempMinutes = newValue;
+				break;
+			case TimeUnit.SECONDS:
+				if (newValue > 59) return;
+				tempSeconds = newValue;
+				break;
 		}
 
-		setStopwatchValue(hours, minutes, seconds);
-		setHours(hours);
-	};
+		setStopwatchValue(tempHours, tempMinutes, tempSeconds);
 
-	const handleOnMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const minutes = parseInt(adjustInput(event));
-		if (minutes > 59) {
-			return;
+		switch (unit) {
+			case TimeUnit.HOURS:
+				setHours(newValue);
+				break;
+			case TimeUnit.MINUTES:
+				setMinutes(newValue);
+				break;
+			case TimeUnit.SECONDS:
+				setSeconds(newValue);
+				break;
 		}
-
-		setStopwatchValue(hours, minutes, seconds);
-		setMinutes(minutes);
-	};
-
-	const handleOnSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const seconds = parseInt(adjustInput(event));
-		if (seconds > 59) {
-			return;
-		}
-
-		setStopwatchValue(hours, minutes, seconds);
-		setSeconds(seconds);
 	};
 
 	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
@@ -109,49 +116,6 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 		const date = new Date();
 		date.setHours(date.getHours() - hours, date.getMinutes() - minutes, date.getSeconds() - seconds);
 		props.setStopwatchValue(date.getTime());
-	};
-
-	const formatHourValue = (): string => {
-		const tempMinutes = props.stopwatchValue.split(':')[1];
-		const tempSeconds = props.stopwatchValue.split(':')[2];
-		let value = props.stopwatchValue.split(':')[0];
-		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
-			value = value.slice(1);
-		}
-		return satisfiesDefaultConditions(value) ||
-			(!props.plugin.settings.showMinutes &&
-				!props.plugin.settings.showSeconds &&
-				(parseInt(tempSeconds) > 0 || parseInt(tempMinutes) > 0))
-			? value
-			: '';
-	};
-
-	const formatMinuteValue = (): string => {
-		const tempHours = props.stopwatchValue.split(':')[0];
-		const tempSeconds = props.stopwatchValue.split(':')[2];
-		let value = props.stopwatchValue.split(':')[1];
-		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
-			value = value.slice(1);
-		}
-		return satisfiesDefaultConditions(value) ||
-			parseInt(tempHours) > 0 ||
-			(!props.plugin.settings.showSeconds && parseInt(tempSeconds) > 0)
-			? value
-			: '';
-	};
-
-	const formatSecondValue = (): string => {
-		const tempHours = props.stopwatchValue.split(':')[0];
-		const tempMinutes = props.stopwatchValue.split(':')[1];
-		let value = props.stopwatchValue.split(':')[2];
-		if (!isEditing && props.plugin.settings.trimLeadingZeros && value.startsWith('0')) {
-			value = value.slice(1);
-		}
-		return satisfiesDefaultConditions(value) || parseInt(tempHours) > 0 || parseInt(tempMinutes) > 0 ? value : '';
-	};
-
-	const satisfiesDefaultConditions = (value: string): boolean => {
-		return (value !== '0' && value !== '00') || isEditing;
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, ref: React.RefObject<HTMLInputElement>) => {
@@ -216,38 +180,40 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	return (
 		<div ref={stopwatchValueWrapperRef} className="stopwatch-value-wrapper">
 			<div className="stopwatch-value-container">
-				{props.plugin.settings.showHours && (
+				{props.settings.showHours && (
 					<TimeInput
-						stopwatchValue={formatHourValue()}
+						timeUnitType={TimeUnit.HOURS}
+						settings={props.settings}
+						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
-						onChangeHandler={handleOnHoursChange}
 						focusRef={inputHoursRef}
-						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
+						onChangeHandler={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(TimeUnit.HOURS, event)}
 						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputHoursRef)}
 					/>
 				)}
-				{props.plugin.settings.showHours && props.plugin.settings.showMinutes && separatorElement}
-				{props.plugin.settings.showMinutes && (
+				{props.settings.showHours && props.settings.showMinutes && separatorElement}
+				{props.settings.showMinutes && (
 					<TimeInput
-						stopwatchValue={formatMinuteValue()}
+						timeUnitType={TimeUnit.MINUTES}
+						settings={props.settings}
+						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
-						onChangeHandler={handleOnMinutesChange}
 						focusRef={inputMinutesRef}
-						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
+						onChangeHandler={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(TimeUnit.MINUTES, event)}
 						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputMinutesRef)}
 					/>
 				)}
-				{((props.plugin.settings.showHours && !props.plugin.settings.showMinutes) ||
-					props.plugin.settings.showMinutes) &&
-					props.plugin.settings.showSeconds &&
+				{((props.settings.showHours && !props.settings.showMinutes) || props.settings.showMinutes) &&
+					props.settings.showSeconds &&
 					separatorElement}
-				{props.plugin.settings.showSeconds && (
+				{props.settings.showSeconds && (
 					<TimeInput
-						stopwatchValue={formatSecondValue()}
+						timeUnitType={TimeUnit.SECONDS}
+						settings={props.settings}
+						stopwatchValue={props.stopwatchValue}
 						isEditing={isEditing}
-						onChangeHandler={handleOnSecondsChange}
 						focusRef={inputSecondsRef}
-						trimLeadingZeros={props.plugin.settings.trimLeadingZeros}
+						onChangeHandler={(event: React.ChangeEvent<HTMLInputElement>) => handleTimeChange(TimeUnit.SECONDS, event)}
 						onKeyDownHandler={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event, inputSecondsRef)}
 					/>
 				)}

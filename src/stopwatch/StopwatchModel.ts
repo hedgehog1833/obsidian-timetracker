@@ -1,17 +1,17 @@
 import { StopwatchState } from './StopwatchState';
 import { moment } from 'obsidian';
-import Timetracker from '../main';
+import Timetracker, { TimetrackerSettings } from '../main';
 
 export class StopwatchModel {
-	private plugin: Timetracker;
+	private settings: TimetrackerSettings;
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
 	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
 	private readonly COMPLETE_TIME_FORMAT = 'HH:mm:ss';
 
-	constructor(plugin: Timetracker) {
-		this.plugin = plugin;
+	constructor(settings: TimetrackerSettings) {
+		this.settings = settings;
 	}
 
 	start(): StopwatchState {
@@ -34,7 +34,7 @@ export class StopwatchModel {
 	}
 
 	getCurrentValue(complete?: boolean): string {
-		let elapsedTime = 0;
+		let elapsedTime: number;
 
 		if (this.state === StopwatchState.STARTED) {
 			const now = Date.now();
@@ -64,28 +64,25 @@ export class StopwatchModel {
 	}
 
 	private getFormat(complete?: boolean): string {
-		if (
-			complete ||
-			(this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds)
-		) {
+		if (complete || (this.settings.showHours && this.settings.showMinutes && this.settings.showSeconds)) {
 			return this.COMPLETE_TIME_FORMAT;
 		}
-		if (this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+		if (this.settings.showHours && this.settings.showMinutes && !this.settings.showSeconds) {
 			return 'HH:mm';
 		}
-		if (this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+		if (this.settings.showHours && !this.settings.showMinutes && this.settings.showSeconds) {
 			return 'HH:ss';
 		}
-		if (this.plugin.settings.showHours && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+		if (this.settings.showHours && !this.settings.showMinutes && !this.settings.showSeconds) {
 			return 'HH';
 		}
-		if (!this.plugin.settings.showHours && this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+		if (!this.settings.showHours && this.settings.showMinutes && this.settings.showSeconds) {
 			return 'mm:ss';
 		}
-		if (!this.plugin.settings.showHours && this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+		if (!this.settings.showHours && this.settings.showMinutes && !this.settings.showSeconds) {
 			return 'mm';
 		}
-		if (!this.plugin.settings.showHours && !this.plugin.settings.showMinutes && this.plugin.settings.showSeconds) {
+		if (!this.settings.showHours && !this.settings.showMinutes && this.settings.showSeconds) {
 			return 'ss';
 		}
 		console.log('should not happen: unknown time format, defaulting to HH:mm:ss');

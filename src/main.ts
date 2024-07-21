@@ -8,7 +8,7 @@ momentDurationFormatSetup(moment);
 
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
-interface TimetrackerSettings {
+export interface TimetrackerSettings {
 	/** @deprecated custom formats are no longer supported, switches used instead */
 	format: string | null;
 	/** @deprecated customizing the refresh interval is no longer supported, defaults to 1 second */
@@ -39,7 +39,7 @@ export default class Timetracker extends Plugin {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			return new TimetrackerView(leaf, this);
+			return new TimetrackerView(leaf, this.settings);
 		});
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));

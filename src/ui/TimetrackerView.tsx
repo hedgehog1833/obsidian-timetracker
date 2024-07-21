@@ -3,18 +3,18 @@ import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
 import { StopwatchModel } from '../stopwatch/StopwatchModel';
-import Timetracker, { TIMETRACKER_VIEW_TYPE } from '../main';
+import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/StopwatchState';
 
 export class TimetrackerView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
-	private readonly plugin: Timetracker;
+	private readonly settings: TimetrackerSettings;
 	private root: Root;
 
-	constructor(leaf: WorkspaceLeaf, plugin: Timetracker) {
+	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
 		super(leaf);
-		this.plugin = plugin;
-		this.stopwatchModel = new StopwatchModel(plugin);
+		this.settings = settings;
+		this.stopwatchModel = new StopwatchModel(settings);
 	}
 
 	getDisplayText(): string {
@@ -70,7 +70,7 @@ export class TimetrackerView extends ItemView {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
 			<StopwatchArea
-				plugin={this.plugin}
+				settings={this.settings}
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
