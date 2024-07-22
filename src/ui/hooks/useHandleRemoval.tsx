@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimeUnit } from '../ui/TimeUnit';
+import { TimeUnit } from '../TimeUnit';
 import useSetStopwatchValue from './useSetStopwatchValue';
 
 const useHandleRemoval = (

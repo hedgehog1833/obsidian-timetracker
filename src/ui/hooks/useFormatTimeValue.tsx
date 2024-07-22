@@ -1,5 +1,5 @@
-import { TimeUnit } from '../ui/TimeUnit';
-import { TimetrackerSettings } from '../main';
+import { TimeUnit } from '../TimeUnit';
+import { TimetrackerSettings } from '../../main';
 
 const useFormatTimeValue = (settings: TimetrackerSettings) => {
 	const doFormatTimeValue = (stopwatchValue: string, timeUnit: TimeUnit, isEditing: boolean): string => {

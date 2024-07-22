@@ -85,7 +85,7 @@ export class StopwatchModel {
 		if (!this.settings.showHours && !this.settings.showMinutes && this.settings.showSeconds) {
 			return 'ss';
 		}
-		console.log('should not happen: unknown time format, defaulting to HH:mm:ss');
+		console.warn('should not happen: unknown time format, defaulting to HH:mm:ss');
 		return this.COMPLETE_TIME_FORMAT;
 	}
 }
