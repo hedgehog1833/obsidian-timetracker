@@ -1,3 +1,5 @@
+hey ho let's go
+
 # Obsidian Timetracker plugin
 
 This Obsidian plugin adds a stopwatch to track time of something. Per hotkey the stopwatch's current value can be inserted into the editor, to make notes to 
