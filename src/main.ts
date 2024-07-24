@@ -57,9 +57,11 @@ export default class Timetracker extends Plugin {
 				if (sidebarView != null) {
 					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
 					if (currentStopwatchTime) {
-						const formattedStopwatchTime = this.settings.textColor
-							? `<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>`
-							: `${currentStopwatchTime}`;
+						const style = window.getComputedStyle(sidebarView.containerEl);
+						const formattedStopwatchTime =
+							this.settings.textColor !== this.rgbToHex(style.color)
+								? `<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>`
+								: currentStopwatchTime;
 						const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 						editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
 					}
@@ -120,12 +122,24 @@ export default class Timetracker extends Plugin {
 			data.showMinutes = data.format.contains('M') || data.format.contains('m');
 			data.showSeconds = data.format.contains('S') || data.format.contains('s');
 		}
+		let doSave = false;
+		if (data?.textColor?.length == 0) {
+			const sidebarView = this.getView();
+			if (sidebarView) {
+				const style = window.getComputedStyle(sidebarView.containerEl);
+				data.textColor = style.color;
+			} else {
+				data.textColor = '#dadada';
+			}
+			doSave = true;
+		}
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 		if (this.settings.format) {
 			this.settings.format = null;
 			this.settings.interval = null;
-			await this.saveSettings();
+			doSave = true;
 		}
+		doSave && (await this.saveSettings());
 	}
 
 	async saveSettings() {
@@ -152,5 +166,15 @@ export default class Timetracker extends Plugin {
 		} else {
 			return null;
 		}
+	}
+
+	rgbToHex(rgbColor: string): string {
+		const rgbValues = rgbColor.slice(4, -1);
+		const [r, g, b] = rgbValues.split(',').map((value) => parseInt(value));
+		const componentToHex = (c: number) => {
+			const hex = c.toString(16);
+			return hex.length === 1 ? '0' + hex : hex;
+		};
+		return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
 	}
 }
