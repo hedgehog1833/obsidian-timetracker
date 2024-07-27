@@ -59,7 +59,7 @@ export default class Timetracker extends Plugin {
 					if (currentStopwatchTime) {
 						const style = window.getComputedStyle(sidebarView.containerEl);
 						const formattedStopwatchTime =
-							this.settings.textColor !== this.rgbToHex(style.color)
+							this.settings.textColor !== this.rgbToHex(style?.color)
 								? `<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>`
 								: currentStopwatchTime;
 						const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);

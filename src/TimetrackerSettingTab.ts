@@ -81,7 +81,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				component.setButtonText('Reset to default');
 				component.onClick(async (_) => {
 					const style = window.getComputedStyle(containerEl);
-					const defaultColor = this.plugin.rgbToHex(style.color);
+					const defaultColor = this.plugin.rgbToHex(style?.color);
 					this.colorPickerInstance?.setValue(defaultColor);
 					this.plugin.settings.textColor = defaultColor;
 					await this.plugin.saveSettings();
