@@ -116,30 +116,11 @@ export default class Timetracker extends Plugin {
 	onunload() {}
 
 	async loadSettings() {
-		const data: TimetrackerSettings = await this.loadData();
-		if (data?.format) {
-			data.showHours = data.format.contains('H') || data.format.contains('h');
-			data.showMinutes = data.format.contains('M') || data.format.contains('m');
-			data.showSeconds = data.format.contains('S') || data.format.contains('s');
-		}
-		let doSave = false;
-		if (data?.textColor?.length == 0) {
-			const sidebarView = this.getView();
-			if (sidebarView) {
-				const style = window.getComputedStyle(sidebarView.containerEl);
-				data.textColor = style.color;
-			} else {
-				data.textColor = '#dadada';
-			}
-			doSave = true;
-		}
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
-		if (this.settings.format) {
-			this.settings.format = null;
-			this.settings.interval = null;
-			doSave = true;
-		}
-		doSave && (await this.saveSettings());
+		const loadedSettings: TimetrackerSettings = await this.loadData();
+		const isFormatMigrated: boolean = this.migrateFormat(loadedSettings);
+		const isFirstTextColorLoaded: boolean = this.loadFirstTextColor(loadedSettings);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
+		(isFormatMigrated || isFirstTextColorLoaded) && (await this.saveSettings());
 	}
 
 	async saveSettings() {
@@ -168,13 +149,42 @@ export default class Timetracker extends Plugin {
 		}
 	}
 
+	migrateFormat(settings: TimetrackerSettings | null): boolean {
+		if (settings?.format) {
+			settings.showHours = settings.format.contains('H') || settings.format.contains('h');
+			settings.showMinutes = settings.format.contains('M') || settings.format.contains('m');
+			settings.showSeconds = settings.format.contains('S') || settings.format.contains('s');
+			settings.format = null;
+			settings.interval = null;
+			return true;
+		}
+		return false;
+	}
+
+	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
+		if (settings?.textColor?.length == 0) {
+			const sidebarView = this.getView();
+			if (sidebarView) {
+				const style = window.getComputedStyle(sidebarView.containerEl);
+				settings.textColor = style.color;
+			} else {
+				settings.textColor = '#dadada';
+			}
+			return true;
+		}
+		return false;
+	}
+
 	rgbToHex(rgbColor: string): string {
-		const rgbValues = rgbColor.slice(4, -1);
-		const [r, g, b] = rgbValues.split(',').map((value) => parseInt(value));
-		const componentToHex = (c: number) => {
-			const hex = c.toString(16);
-			return hex.length === 1 ? '0' + hex : hex;
-		};
-		return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+		if (rgbColor) {
+			const rgbValues = rgbColor.slice(4, -1);
+			const [r, g, b] = rgbValues.split(',').map((value) => parseInt(value));
+			const componentToHex = (c: number) => {
+				const hex = c.toString(16);
+				return hex.length === 1 ? '0' + hex : hex;
+			};
+			return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+		}
+		return '#dadada';
 	}
 }
