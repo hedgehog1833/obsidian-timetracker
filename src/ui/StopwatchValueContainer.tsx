@@ -3,14 +3,14 @@ import TimeInput from './TimeInput';
 import { TimetrackerSettings } from '../main';
 import { TimeUnit } from './TimeUnit';
 
-export type StopwachValueContainerProps = {
+export type StopwatchValueContainerProps = {
 	stopwatchValue: string;
 	setStopwatchValue: (milliseconds: number) => void;
 	stopStopwatch: () => void;
 	settings: TimetrackerSettings;
 };
 
-const StopwachValueContainer = (props: StopwachValueContainerProps) => {
+const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const inputHoursRef = useRef<HTMLInputElement>(null);
 	const inputMinutesRef = useRef<HTMLInputElement>(null);
@@ -98,4 +98,4 @@ const StopwachValueContainer = (props: StopwachValueContainerProps) => {
 	);
 };
 
-export default StopwachValueContainer;
+export default StopwatchValueContainer;
