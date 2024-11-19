@@ -47,6 +47,7 @@ export default class Timetracker extends Plugin {
 		this.addCommand({
 			id: 'insert-timestamp',
 			name: 'Insert timestamp based on current stopwatch value',
+			icon: 'alarm-clock-plus',
 			editorCheckCallback: (checking: boolean, editor: Editor) => {
 				const sidebarView = this.getView();
 
@@ -75,6 +76,7 @@ export default class Timetracker extends Plugin {
 		this.addCommand({
 			id: 'start-stop-stopwatch',
 			name: 'Start or stop the stopwatch',
+			icon: 'alarm-clock',
 			checkCallback: (checking: boolean) => {
 				const sidebarView = this.getView();
 
@@ -94,6 +96,7 @@ export default class Timetracker extends Plugin {
 		this.addCommand({
 			id: 'reset-stopwatch',
 			name: 'Reset the stopwatch',
+			icon: 'alarm-clock-off',
 			checkCallback: (checking: boolean) => {
 				const sidebarView = this.getView();
 
