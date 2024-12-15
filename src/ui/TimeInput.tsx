@@ -10,7 +10,7 @@ export type TimeInputProps = {
 	settings: TimetrackerSettings;
 	stopwatchValue: string;
 	isEditing: boolean;
-	focusRef: React.RefObject<HTMLInputElement>;
+	focusRef: React.RefObject<HTMLInputElement | null>;
 	setStopwatchValue: (milliseconds: number) => void;
 };
 
