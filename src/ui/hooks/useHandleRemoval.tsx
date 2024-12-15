@@ -3,7 +3,7 @@ import { TimeUnit } from '../TimeUnit';
 import useSetStopwatchValue from './useSetStopwatchValue';
 
 const useHandleRemoval = (
-	focusRef: React.RefObject<HTMLInputElement>,
+	focusRef: React.RefObject<HTMLInputElement | null>,
 	setStopwatchValue: (milliseconds: number) => void,
 ) => {
 	const { doSetStopwatchValue } = useSetStopwatchValue(setStopwatchValue);
