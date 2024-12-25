@@ -92,7 +92,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 	private createPrintFormatSetting(containerEl: HTMLElement): void {
 		const descriptionText =
-			'Use the following placeholders: ${hours}, ${minutes}, ${seconds}<br/>Trimming still applies.';
+			'Use the following placeholders: ${hours}, ${minutes}, ${seconds}.<br/>Trimming still applies.';
 		const maxLength = 256;
 		const setting = new Setting(containerEl).setName('Printed time format').addText((component) => {
 			component
