@@ -19,6 +19,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		this.createTrimmingSetting(containerEl);
 		this.createLineBreakSetting(containerEl);
 		this.createTextColorSetting(containerEl);
+		this.createPrintFormatSetting(containerEl);
 	}
 
 	private createFormatSetting(containerEl: HTMLElement): void {
@@ -87,5 +88,18 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+	}
+
+	private createPrintFormatSetting(containerEl: HTMLElement): void {
+		const setting = new Setting(containerEl).setName('Printed time format').addText((component) => {
+			component
+				.setValue(this.plugin.settings.printFormat)
+				.setPlaceholder(`\${hours}:\${minutes}:\${seconds}`)
+				.onChange(async (value) => {
+					this.plugin.settings.printFormat = value;
+					await this.plugin.saveSettings();
+				});
+		});
+		setting.descEl.innerHTML = 'Use the following placeholders: ${hours}, ${minutes}, ${seconds}';
 	}
 }
