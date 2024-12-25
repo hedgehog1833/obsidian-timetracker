@@ -188,11 +188,11 @@ export default class Timetracker extends Plugin {
 	formatPrintValue(view: TimetrackerView): string {
 		let printValue: string;
 		if (this.settings.printFormat.length > 0) {
-			const stopwatchValues = view.getCurrentStopwatchTime(true).split(':');
+			const stopwatchValues = this.getCurrentTimeValues(view);
 			printValue = this.settings.printFormat
-				.replace('${hours}', parseInt(stopwatchValues[0]).toString())
-				.replace('${minutes}', parseInt(stopwatchValues[1]).toString())
-				.replace('${seconds}', parseInt(stopwatchValues[2]).toString());
+				.replace('${hours}', stopwatchValues[0])
+				.replace('${minutes}', stopwatchValues[1])
+				.replace('${seconds}', stopwatchValues[2]);
 		} else {
 			printValue = view.getCurrentStopwatchTime();
 		}
@@ -200,5 +200,13 @@ export default class Timetracker extends Plugin {
 		return this.settings.textColor !== this.rgbToHex(textColor)
 			? `<span style="color:${this.settings.textColor};">${printValue}</span>`
 			: printValue;
+	}
+
+	getCurrentTimeValues(view: TimetrackerView): [string, string, string] {
+		const stopwatchValues = view.getCurrentStopwatchTime(true).split(':');
+		const [hours, minutes, seconds] = stopwatchValues.map((value) =>
+			this.settings.trimLeadingZeros ? parseInt(value).toString() : value,
+		);
+		return [hours, minutes, seconds];
 	}
 }
