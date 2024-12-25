@@ -91,15 +91,23 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	}
 
 	private createPrintFormatSetting(containerEl: HTMLElement): void {
+		const descriptionText =
+			'Use the following placeholders: ${hours}, ${minutes}, ${seconds}<br/>Trimming still applies.';
+		const maxLength = 256;
 		const setting = new Setting(containerEl).setName('Printed time format').addText((component) => {
 			component
 				.setValue(this.plugin.settings.printFormat)
 				.setPlaceholder('${hours}:${minutes}:${seconds}')
 				.onChange(async (value) => {
-					this.plugin.settings.printFormat = value.trim().length == 0 && value.length != 0 ? '' : value;
-					await this.plugin.saveSettings();
+					if (value.length <= maxLength) {
+						this.plugin.settings.printFormat = value.trim().length == 0 && value.length != 0 ? '' : value;
+						setting.descEl.innerHTML = descriptionText;
+						await this.plugin.saveSettings();
+					} else {
+						setting.descEl.innerHTML = `Value is too long. Maximum length is ${maxLength} characters.`;
+					}
 				});
 		});
-		setting.descEl.innerHTML = 'Use the following placeholders: ${hours}, ${minutes}, ${seconds}';
+		setting.descEl.innerHTML = descriptionText;
 	}
 }
