@@ -94,10 +94,12 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		const setting = new Setting(containerEl).setName('Printed time format').addText((component) => {
 			component
 				.setValue(this.plugin.settings.printFormat)
-				.setPlaceholder(`\${hours}:\${minutes}:\${seconds}`)
+				.setPlaceholder('${hours}:${minutes}:${seconds}')
 				.onChange(async (value) => {
-					this.plugin.settings.printFormat = value;
-					await this.plugin.saveSettings();
+					if (value.trim().length !== 0) {
+						this.plugin.settings.printFormat = value;
+						await this.plugin.saveSettings();
+					}
 				});
 		});
 		setting.descEl.innerHTML = 'Use the following placeholders: ${hours}, ${minutes}, ${seconds}';
