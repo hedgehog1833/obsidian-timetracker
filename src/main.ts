@@ -1,7 +1,6 @@
-import { Editor, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, moment, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './TimetrackerSettingTab';
-import { moment } from 'obsidian';
 import momentDurationFormatSetup from 'moment-duration-format';
 
 momentDurationFormatSetup(moment);
@@ -19,6 +18,7 @@ export interface TimetrackerSettings {
 	trimLeadingZeros: boolean;
 	lineBreakAfterInsert: boolean;
 	textColor: string;
+	printFormat: string;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
@@ -30,6 +30,7 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 	trimLeadingZeros: false,
 	lineBreakAfterInsert: false,
 	textColor: '',
+	printFormat: '',
 };
 
 export default class Timetracker extends Plugin {
@@ -56,16 +57,9 @@ export default class Timetracker extends Plugin {
 				}
 
 				if (sidebarView != null) {
-					const currentStopwatchTime = sidebarView?.getCurrentStopwatchTime() || null;
-					if (currentStopwatchTime) {
-						const style = window.getComputedStyle(sidebarView.containerEl);
-						const formattedStopwatchTime =
-							this.settings.textColor !== this.rgbToHex(style?.color)
-								? `<span style="color:${this.settings.textColor};">${currentStopwatchTime}</span>`
-								: currentStopwatchTime;
-						const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
-						editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
-					}
+					const formattedStopwatchTime = this.formatPrintValue(sidebarView);
+					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
+					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
 					return true;
 				} else {
 					return false;
@@ -189,5 +183,30 @@ export default class Timetracker extends Plugin {
 			return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
 		}
 		return '#dadada';
+	}
+
+	formatPrintValue(view: TimetrackerView): string {
+		let printValue: string;
+		if (this.settings.printFormat.length > 0) {
+			const stopwatchValues = this.getCurrentTimeValues(view);
+			printValue = this.settings.printFormat
+				.replace('${hours}', stopwatchValues[0])
+				.replace('${minutes}', stopwatchValues[1])
+				.replace('${seconds}', stopwatchValues[2]);
+		} else {
+			printValue = view.getCurrentStopwatchTime();
+		}
+		const textColor = window.getComputedStyle(view.containerEl)?.color;
+		return this.settings.textColor !== this.rgbToHex(textColor)
+			? `<span style="color:${this.settings.textColor};">${printValue}</span>`
+			: printValue;
+	}
+
+	getCurrentTimeValues(view: TimetrackerView): [string, string, string] {
+		const stopwatchValues = view.getCurrentStopwatchTime(true).split(':');
+		const [hours, minutes, seconds] = stopwatchValues.map((value) =>
+			this.settings.trimLeadingZeros ? parseInt(value).toString() : value,
+		);
+		return [hours, minutes, seconds];
 	}
 }
