@@ -4,7 +4,7 @@
 	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey.",
 	"main": "./src/main.js",
 	"scripts": {
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"build": "tsc -noEmit -skipLibCheck && npm test && node esbuild.config.mjs production",
 		"dev": "node esbuild.config.mjs",
 		"format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
 		"lint": "npx eslint ./src",
