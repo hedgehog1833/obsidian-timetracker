@@ -1,6 +1,7 @@
 import { StopwatchState } from './StopwatchState';
-import { moment } from 'obsidian';
 import { TimetrackerSettings } from '../main';
+import { format } from './MomentWrapper';
+import { getFormat } from './FormatSettings';
 
 export class StopwatchModel {
 	private settings: TimetrackerSettings;
@@ -49,43 +50,11 @@ export class StopwatchModel {
 			elapsedTime = 0;
 		}
 
-		return this.getDateString(elapsedTime, complete);
+		return format(elapsedTime, getFormat(this.settings, complete));
 	}
 
 	setCurrentValue(milliseconds: number): void {
 		this.startedAt = milliseconds;
 		this.pausedAtOffset = Date.now() - this.startedAt;
-	}
-
-	private getDateString(milliseconds: number, complete?: boolean): string {
-		return moment.duration(milliseconds).format(this.getFormat(complete), {
-			trim: 'false',
-		});
-	}
-
-	private getFormat(complete?: boolean): string {
-		if (complete || (this.settings.showHours && this.settings.showMinutes && this.settings.showSeconds)) {
-			return this.COMPLETE_TIME_FORMAT;
-		}
-		if (this.settings.showHours && this.settings.showMinutes && !this.settings.showSeconds) {
-			return 'HH:mm';
-		}
-		if (this.settings.showHours && !this.settings.showMinutes && this.settings.showSeconds) {
-			return 'HH:ss';
-		}
-		if (this.settings.showHours && !this.settings.showMinutes && !this.settings.showSeconds) {
-			return 'HH';
-		}
-		if (!this.settings.showHours && this.settings.showMinutes && this.settings.showSeconds) {
-			return 'mm:ss';
-		}
-		if (!this.settings.showHours && this.settings.showMinutes && !this.settings.showSeconds) {
-			return 'mm';
-		}
-		if (!this.settings.showHours && !this.settings.showMinutes && this.settings.showSeconds) {
-			return 'ss';
-		}
-		console.warn('should not happen: unknown time format, defaulting to HH:mm:ss');
-		return this.COMPLETE_TIME_FORMAT;
 	}
 }
