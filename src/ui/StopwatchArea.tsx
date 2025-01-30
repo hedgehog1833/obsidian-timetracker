@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StopwatchState } from '../stopwatch/StopwatchState';
+import { StopwatchState } from '../stopwatch/stopwatchState';
 import { TimetrackerSettings } from '../main';
 import StopwatchValueContainer from './StopwatchValueContainer';
 

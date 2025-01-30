@@ -2,9 +2,9 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
-import { StopwatchModel } from '../stopwatch/StopwatchModel';
+import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
-import { StopwatchState } from '../stopwatch/StopwatchState';
+import { StopwatchState } from '../stopwatch/stopwatchState';
 
 export class TimetrackerView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
