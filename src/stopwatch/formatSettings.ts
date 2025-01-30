@@ -1,6 +1,6 @@
 import { TimetrackerSettings } from '../main';
 
-export function getFormat(settings: TimetrackerSettings, complete?: boolean): string {
+const getFormat = (settings: TimetrackerSettings, complete?: boolean): string => {
 	const COMPLETE_TIME_FORMAT = 'HH:mm:ss';
 	if (complete || (settings.showHours && settings.showMinutes && settings.showSeconds)) {
 		return COMPLETE_TIME_FORMAT;
@@ -25,4 +25,6 @@ export function getFormat(settings: TimetrackerSettings, complete?: boolean): st
 	}
 	console.warn('should not happen: unknown time format, defaulting to HH:mm:ss');
 	return COMPLETE_TIME_FORMAT;
-}
+};
+
+export default getFormat;
