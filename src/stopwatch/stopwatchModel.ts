@@ -1,15 +1,14 @@
 import { StopwatchState } from './stopwatchState';
 import { TimetrackerSettings } from '../main';
-import { format } from './momentWrapper';
-import { getFormat } from './formatSettings';
+import format from './momentWrapper';
+import getFormat from './formatSettings';
 
 export class StopwatchModel {
-	private settings: TimetrackerSettings;
+	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
+	private readonly settings: TimetrackerSettings;
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
-	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
-	private readonly COMPLETE_TIME_FORMAT = 'HH:mm:ss';
 
 	constructor(settings: TimetrackerSettings) {
 		this.settings = settings;
