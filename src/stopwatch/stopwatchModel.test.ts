@@ -1,10 +1,10 @@
 import { StopwatchModel } from './stopwatchModel';
 import { StopwatchState } from './stopwatchState';
 import { TimetrackerSettings } from '../main';
-import { format } from './momentWrapper';
+import format from './momentWrapper';
 
 jest.mock('./momentWrapper', () => ({
-	format: jest.fn(),
+	default: jest.fn(),
 }));
 
 describe('StopwatchModel', () => {
