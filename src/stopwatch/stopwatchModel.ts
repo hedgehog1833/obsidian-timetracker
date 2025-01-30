@@ -1,7 +1,7 @@
-import { StopwatchState } from './StopwatchState';
+import { StopwatchState } from './stopwatchState';
 import { TimetrackerSettings } from '../main';
-import { format } from './MomentWrapper';
-import { getFormat } from './FormatSettings';
+import { format } from './momentWrapper';
+import { getFormat } from './formatSettings';
 
 export class StopwatchModel {
 	private settings: TimetrackerSettings;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TimetrackerSettings } from '../main';
-import { TimeUnit } from './TimeUnit';
+import { TimeUnit } from './timeUnit';
 import useFormatTimeValue from './hooks/useFormatTimeValue';
 import useHandleTimeChange from './hooks/useHandleTimeChange';
 import useHandleRemoval from './hooks/useHandleRemoval';

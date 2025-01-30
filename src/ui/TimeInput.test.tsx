@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import TimeInput, { TimeInputProps } from './TimeInput';
-import { TimeUnit } from './TimeUnit';
+import { TimeUnit } from './timeUnit';
 import { createRef, useState } from 'react';
 import useHandleTimeChange from './hooks/useHandleTimeChange';
 import useHandleRemoval from './hooks/useHandleRemoval';
