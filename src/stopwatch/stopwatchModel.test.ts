@@ -1,25 +1,19 @@
 import { StopwatchModel } from './stopwatchModel';
 import { StopwatchState } from './stopwatchState';
-import { TimetrackerSettings } from '../main';
 import format from './momentWrapper';
 
 jest.mock('./momentWrapper', () => ({
 	default: jest.fn(),
 }));
 
-describe('StopwatchModel', () => {
-	let settings: TimetrackerSettings;
+describe('stopwatchModel', () => {
+	let timeFormat: string;
 	let stopwatch: StopwatchModel;
 	let nowSpy: jest.SpyInstance;
 
 	beforeEach(() => {
-		settings = {
-			showHours: true,
-			showMinutes: true,
-			showSeconds: true,
-			trimLeadingZeros: true,
-		} as TimetrackerSettings;
-		stopwatch = new StopwatchModel(settings);
+		timeFormat = 'HH:mm:ss';
+		stopwatch = new StopwatchModel(timeFormat);
 		nowSpy = jest.spyOn(Date, 'now');
 	});
 
@@ -59,7 +53,7 @@ describe('StopwatchModel', () => {
 		const value = stopwatch.getCurrentValue();
 
 		// then
-		expect(format).toHaveBeenCalledWith(0, 'HH:mm:ss');
+		expect(format).toHaveBeenCalledWith(0, timeFormat);
 
 		// and
 		expect(value).toBe('01:02:03');
@@ -76,6 +70,21 @@ describe('StopwatchModel', () => {
 		stopwatch.getCurrentValue();
 
 		// then
-		expect(format).toHaveBeenCalledWith(now - elapsedTime, 'HH:mm:ss');
+		expect(format).toHaveBeenCalledWith(now - elapsedTime, timeFormat);
+	});
+
+	it('setCurrentFormat: should set the current format of the stopwatch', () => {
+		// given
+		const currentFormat = 'HH:mm:ss';
+		stopwatch.getCurrentValue();
+		expect(format).toHaveBeenCalledWith(expect.any(Number), currentFormat);
+		const newFormat = 'mm:ss';
+
+		// when
+		stopwatch.setCurrentFormat(newFormat);
+		stopwatch.getCurrentValue();
+
+		// then
+		expect(format).toHaveBeenCalledWith(expect.any(Number), newFormat);
 	});
 });

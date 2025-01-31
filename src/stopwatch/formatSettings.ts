@@ -1,7 +1,8 @@
 import { TimetrackerSettings } from '../main';
 
+export const COMPLETE_TIME_FORMAT: string = 'HH:mm:ss';
+
 const getFormat = (settings: TimetrackerSettings, complete?: boolean): string => {
-	const COMPLETE_TIME_FORMAT = 'HH:mm:ss';
 	if (complete || (settings.showHours && settings.showMinutes && settings.showSeconds)) {
 		return COMPLETE_TIME_FORMAT;
 	}
@@ -20,11 +21,7 @@ const getFormat = (settings: TimetrackerSettings, complete?: boolean): string =>
 	if (!settings.showHours && settings.showMinutes && !settings.showSeconds) {
 		return 'mm';
 	}
-	if (!settings.showHours && !settings.showMinutes && settings.showSeconds) {
-		return 'ss';
-	}
-	console.warn('should not happen: unknown time format, defaulting to HH:mm:ss');
-	return COMPLETE_TIME_FORMAT;
+	return 'ss';
 };
 
 export default getFormat;

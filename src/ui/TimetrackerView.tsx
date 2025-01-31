@@ -5,6 +5,7 @@ import React from 'react';
 import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
+import getFormat from '../stopwatch/formatSettings';
 
 export class TimetrackerView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
@@ -14,7 +15,7 @@ export class TimetrackerView extends ItemView {
 	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
 		super(leaf);
 		this.settings = settings;
-		this.stopwatchModel = new StopwatchModel(settings);
+		this.stopwatchModel = new StopwatchModel(getFormat(this.settings));
 	}
 
 	getDisplayText(): string {
@@ -64,6 +65,10 @@ export class TimetrackerView extends ItemView {
 	clickReload(): void {
 		const el = this.containerEl.querySelector('button.reload-button');
 		(el as HTMLButtonElement).click();
+	}
+
+	setFormatInStopwatch(): void {
+		this.stopwatchModel.setCurrentFormat(getFormat(this.settings));
 	}
 
 	async onOpen() {

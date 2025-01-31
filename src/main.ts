@@ -122,7 +122,9 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		this.getView()?.clickReload();
+		const view = this.getView();
+		view?.setFormatInStopwatch();
+		view?.clickReload();
 	}
 
 	initLeaf(): void {
