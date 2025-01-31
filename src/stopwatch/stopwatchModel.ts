@@ -1,17 +1,16 @@
 import { StopwatchState } from './stopwatchState';
-import { TimetrackerSettings } from '../main';
 import format from './momentWrapper';
-import getFormat from './formatSettings';
+import { COMPLETE_TIME_FORMAT } from './formatSettings';
 
 export class StopwatchModel {
 	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
-	private readonly settings: TimetrackerSettings;
+	private currentTimeFormat: string;
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
 
-	constructor(settings: TimetrackerSettings) {
-		this.settings = settings;
+	constructor(currentFormat: string) {
+		this.currentTimeFormat = currentFormat;
 	}
 
 	start(): StopwatchState {
@@ -49,11 +48,16 @@ export class StopwatchModel {
 			elapsedTime = 0;
 		}
 
-		return format(elapsedTime, getFormat(this.settings, complete));
+		const currentFormat = complete ? COMPLETE_TIME_FORMAT : this.currentTimeFormat;
+		return format(elapsedTime, currentFormat);
 	}
 
 	setCurrentValue(milliseconds: number): void {
 		this.startedAt = milliseconds;
 		this.pausedAtOffset = Date.now() - this.startedAt;
+	}
+
+	setCurrentFormat(newFormat: string): void {
+		this.currentTimeFormat = newFormat;
 	}
 }
