@@ -65,7 +65,7 @@ describe('formatSettings', () => {
 
 	it('showMinutes, showSeconds returns "mm:ss"', () => {
 		// given
-		settings.showMinutes = false;
+		settings.showHours = false;
 
 		// when
 		const format = getFormat(settings, false);
