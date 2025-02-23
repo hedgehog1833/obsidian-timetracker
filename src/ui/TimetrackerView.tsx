@@ -7,6 +7,9 @@ import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 import getFormat from '../stopwatch/formatSettings';
 
+const VIEW_DISPLAY_TEXT = 'Timetracker sidebar';
+const VIEW_ICON = 'clock';
+
 export class TimetrackerView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
 	private readonly settings: TimetrackerSettings;
@@ -19,7 +22,7 @@ export class TimetrackerView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'Timetracker sidebar';
+		return VIEW_DISPLAY_TEXT;
 	}
 
 	getViewType(): string {
@@ -27,7 +30,7 @@ export class TimetrackerView extends ItemView {
 	}
 
 	getIcon(): string {
-		return 'clock';
+		return VIEW_ICON;
 	}
 
 	getCurrentStopwatchTime(complete?: boolean): string {
