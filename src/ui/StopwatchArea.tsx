@@ -3,14 +3,14 @@ import { StopwatchState } from '../stopwatch/stopwatchState';
 import { TimetrackerSettings } from '../main';
 import StopwatchValueContainer from './StopwatchValueContainer';
 
-interface StopwatchAreaProps {
+export type StopwatchAreaProps = {
 	settings: TimetrackerSettings;
 	start: () => StopwatchState;
 	stop: () => StopwatchState;
 	reset: () => StopwatchState;
 	getCurrentStopwatchTime: () => string;
 	setCurrentStopwatchTime: (milliseconds: number) => void;
-}
+};
 
 export const StopwatchArea = (props: StopwatchAreaProps) => {
 	const [intervalId, setIntervalId] = useState(0);
@@ -74,10 +74,14 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	return (
 		<div className="stopwatch-sidebar">
 			<div className="stopwatch-buttons">
-				<button className="start-stop-button stopwatch-function-button" onClick={startOrStopStopwatch}>
+				<button
+					className="start-stop-button stopwatch-function-button"
+					onClick={startOrStopStopwatch}
+					data-testid="start-stop-button"
+				>
 					{stopwatchState === StopwatchState.STARTED ? 'Pause' : 'Start'}
 				</button>
-				<button className="reset-button stopwatch-function-button" onClick={resetStopwatch}>
+				<button className="reset-button stopwatch-function-button" onClick={resetStopwatch} data-testid="reset-button">
 					Reset
 				</button>
 			</div>
@@ -86,8 +90,8 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 				setStopwatchValue={props.setCurrentStopwatchTime}
 				stopStopwatch={() => stopStopwatch()}
 				settings={props.settings}
-			></StopwatchValueContainer>
-			<button className="reload-button" onClick={reload} />
+			/>
+			<button className="reload-button" onClick={reload} data-testid="reload-button" />
 		</div>
 	);
 };

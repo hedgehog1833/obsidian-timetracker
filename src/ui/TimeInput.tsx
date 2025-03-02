@@ -60,6 +60,7 @@ const TimeInput = (props: TimeInputProps) => {
 				onChange={handleTimeChange}
 				onFocus={handleFocus}
 				onKeyDown={handleKeyDown}
+				data-testid="time-input"
 			/>
 		</>
 	);

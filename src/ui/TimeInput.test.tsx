@@ -4,6 +4,7 @@ import { TimeUnit } from './timeUnit';
 import { createRef, useState } from 'react';
 import useHandleTimeChange from './hooks/useHandleTimeChange';
 import useHandleRemoval from './hooks/useHandleRemoval';
+import { TimetrackerSettings } from '../main';
 
 jest.mock('./hooks/useHandleTimeChange');
 jest.mock('./hooks/useHandleRemoval');
@@ -29,7 +30,7 @@ describe('TimeInput', () => {
 
 	const defaultProps: TimeInputProps = {
 		timeUnit: TimeUnit.MINUTES,
-		settings: { trimLeadingZeros: true } as any,
+		settings: { trimLeadingZeros: true } as TimetrackerSettings,
 		stopwatchValue: '01:00:00',
 		isEditing: true,
 		focusRef: createRef<HTMLInputElement>(),
@@ -37,16 +38,22 @@ describe('TimeInput', () => {
 	};
 
 	it('should render correctly', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		expect(getByPlaceholderText('0') as HTMLInputElement).toBeDefined();
+		// when
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+
+		// then
+		expect(getByTestId('time-input') as HTMLInputElement).toBeDefined();
 	});
 
 	it('onChange: should call doHandleTimeChange on value change', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 
+		// when
 		fireEvent.change(input, { target: { value: '02' } });
 
+		// then
 		expect(mockDoHandleTimeChange).toHaveBeenCalledWith(
 			expect.any(Object),
 			defaultProps.stopwatchValue,
@@ -55,22 +62,28 @@ describe('TimeInput', () => {
 	});
 
 	it('onChange: should call setCursorPosition on value change', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 		const selectionStart = 2;
 		const event = { target: { value: '02', selectionStart: selectionStart } };
 
+		// when
 		fireEvent.change(input, event);
 
+		// then
 		expect(mockSetCursorPosition).toHaveBeenCalledWith(selectionStart);
 	});
 
 	it('onKeyDown: should call doHandleRemoval on backspace key', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 
+		// when
 		fireEvent.keyDown(input, { key: 'Backspace' });
 
+		// then
 		expect(mockDoHandleRemoval).toHaveBeenCalledWith(
 			expect.any(Object),
 			defaultProps.stopwatchValue,
@@ -79,23 +92,29 @@ describe('TimeInput', () => {
 	});
 
 	it('onKeyDown: should call setCursorPosition on backspace key', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 		const selectionStart = 2;
 		input.selectionStart = selectionStart;
 		defaultProps.focusRef.current = input;
 
+		// when
 		fireEvent.keyDown(input, { key: 'Backspace' });
 
+		// then
 		expect(mockSetCursorPosition).toHaveBeenCalledWith(selectionStart + 1);
 	});
 
 	it('onKeyDown: should call doHandleRemoval on delete key', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 
+		// when
 		fireEvent.keyDown(input, { key: 'Delete' });
 
+		// then
 		expect(mockDoHandleRemoval).toHaveBeenCalledWith(
 			expect.any(Object),
 			defaultProps.stopwatchValue,
@@ -104,34 +123,43 @@ describe('TimeInput', () => {
 	});
 
 	it('onKeyDown: should call setCursorPosition on delete key', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 		const selectionStart = 2;
 		input.selectionStart = selectionStart;
 		defaultProps.focusRef.current = input;
 
+		// when
 		fireEvent.keyDown(input, { key: 'Delete' });
 
+		// then
 		expect(mockSetCursorPosition).toHaveBeenCalledWith(selectionStart + 1);
 	});
 
 	it('onKeyDown: should do nothing on other keys', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 
+		// when
 		fireEvent.keyDown(input, { key: 'Enter' });
 
+		// then
 		expect(mockSetCursorPosition).toHaveBeenCalledTimes(0);
 		expect(mockDoHandleRemoval).toHaveBeenCalledTimes(0);
 	});
 
 	it('onFocus: should set selectionRange on ref to zero', () => {
-		const { getByPlaceholderText } = render(<TimeInput {...defaultProps} />);
-		const input = getByPlaceholderText('0') as HTMLInputElement;
+		// given
+		const { getByTestId } = render(<TimeInput {...defaultProps} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
 		input.selectionStart = 2;
 
+		// when
 		fireEvent.focus(input);
 
+		// then
 		expect(input.selectionStart).toBe(0);
 	});
 });

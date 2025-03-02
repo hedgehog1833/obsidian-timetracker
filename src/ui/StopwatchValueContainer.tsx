@@ -53,7 +53,7 @@ const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 	};
 
 	return (
-		<div ref={stopwatchValueWrapperRef} className="stopwatch-value-wrapper">
+		<div ref={stopwatchValueWrapperRef} className="stopwatch-value-wrapper" data-testid="stopwatch-value-container">
 			<div className="stopwatch-value-container">
 				{props.settings.showHours && (
 					<TimeInput
