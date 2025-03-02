@@ -1,33 +1,9 @@
 import { StopwatchArea, StopwatchAreaProps } from './StopwatchArea';
 import { fireEvent, getByTestId, render } from '@testing-library/react';
 import { TimetrackerSettings } from '../main';
-import { useState } from 'react';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 
-jest.mock('react', () => ({
-	...jest.requireActual('react'),
-	useState: jest.fn(),
-}));
-
 describe('StopwatchArea', () => {
-	const setIntervalId = jest.fn();
-	const setStopwatchState = jest.fn();
-	const setCurrentValue = jest.fn();
-
-	// beforeEach(() => {
-	// 	(useState as jest.Mock)
-	// 		.mockReturnValueOnce([0, setIntervalId])
-	// 		.mockReturnValueOnce([StopwatchState.INITIALIZED, setStopwatchState])
-	// 		.mockReturnValueOnce(['', setCurrentValue]);
-	// });
-
-	beforeEach(() => {
-		(useState as jest.Mock)
-			.mockImplementationOnce(() => [0, setIntervalId])
-			.mockImplementationOnce(() => [StopwatchState.INITIALIZED, setStopwatchState])
-			.mockImplementationOnce(() => ['', setCurrentValue]);
-	});
-
 	const defaultProps: StopwatchAreaProps = {
 		settings: { trimLeadingZeros: true } as TimetrackerSettings,
 		start: jest.fn(),
@@ -40,17 +16,21 @@ describe('StopwatchArea', () => {
 	it('should render start-stop-button correctly', () => {
 		// when
 		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+		const button = getByTestId('start-stop-button') as HTMLButtonElement;
 
 		// then
-		expect(getByTestId('start-stop-button') as HTMLButtonElement).toBeDefined();
+		expect(button).toBeDefined();
+		expect(button.textContent).toBe('Start');
 	});
 
 	it('should render reset-button correctly', () => {
 		// when
 		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+		const button = getByTestId('reset-button') as HTMLButtonElement;
 
 		// then
 		expect(getByTestId('reset-button') as HTMLButtonElement).toBeDefined();
+		expect(button.textContent).toBe('Reset');
 	});
 
 	it('should render reload-button correctly', () => {
@@ -69,8 +49,9 @@ describe('StopwatchArea', () => {
 		expect(getByTestId('stopwatch-value-container') as HTMLElement).toBeDefined();
 	});
 
-	it(`onClick 'start-stop-button': should call startOrStopStopwatch`, () => {
+	it(`onClick 'start-stop-button': button text changes to 'Pause'`, () => {
 		// given
+		(defaultProps.start as jest.Mock).mockReturnValue(StopwatchState.STARTED);
 		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
 		const button = getByTestId('start-stop-button') as HTMLButtonElement;
 
@@ -78,6 +59,48 @@ describe('StopwatchArea', () => {
 		fireEvent.click(button);
 
 		// then
-		expect(setStopwatchState).toHaveBeenCalled();
+		expect(button.textContent).toBe('Pause');
+	});
+
+	it(`onClick 'start-stop-button': clicking twice changes button text back to 'Start'`, () => {
+		// given
+		(defaultProps.start as jest.Mock)
+			.mockReturnValueOnce(StopwatchState.STARTED)
+			.mockReturnValueOnce(StopwatchState.STOPPED);
+		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+		const button = getByTestId('start-stop-button') as HTMLButtonElement;
+
+		// when
+		fireEvent.click(button);
+
+		// then
+		expect(button.textContent).toBe('Pause');
+
+		// when
+		fireEvent.click(button);
+
+		// then
+		expect(button.textContent).toBe('Start');
+	});
+
+	it(`onClick 'reset-button': clicking button after clicking start changes start button back text to 'Start'`, () => {
+		// given
+		(defaultProps.start as jest.Mock).mockReturnValue(StopwatchState.STARTED);
+		(defaultProps.reset as jest.Mock).mockReturnValue(StopwatchState.INITIALIZED);
+		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+		const startButton = getByTestId('start-stop-button') as HTMLButtonElement;
+		const resetButton = getByTestId('reset-button') as HTMLButtonElement;
+
+		// when
+		fireEvent.click(startButton);
+
+		// then
+		expect(startButton.textContent).toBe('Pause');
+
+		// when
+		fireEvent.click(resetButton);
+
+		// then
+		expect(startButton.textContent).toBe('Start');
 	});
 });
