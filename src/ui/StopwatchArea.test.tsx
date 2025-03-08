@@ -4,14 +4,22 @@ import { TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 
 describe('StopwatchArea', () => {
-	const defaultProps: StopwatchAreaProps = {
-		settings: { trimLeadingZeros: true } as TimetrackerSettings,
-		start: jest.fn(),
-		stop: jest.fn(),
-		reset: jest.fn(),
-		getCurrentStopwatchTime: jest.fn(),
-		setCurrentStopwatchTime: jest.fn(),
-	};
+	let defaultProps: StopwatchAreaProps;
+
+	beforeEach(() => {
+		defaultProps = {
+			settings: { trimLeadingZeros: true } as TimetrackerSettings,
+			start: jest.fn(),
+			stop: jest.fn(),
+			reset: jest.fn(),
+			getCurrentStopwatchTime: jest.fn(),
+			setCurrentStopwatchTime: jest.fn(),
+		};
+	});
+
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
 
 	it('should render start-stop-button correctly', () => {
 		// when
