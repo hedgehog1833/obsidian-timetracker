@@ -103,12 +103,12 @@ describe('StopwatchArea', () => {
 		fireEvent.click(startButton);
 
 		// then
-		expect(startButton.textContent).toBe('Pause');
+		expect(startButton.textContent).toBe('ASDF');
 
 		// when
 		fireEvent.click(resetButton);
 
 		// then
-		expect(startButton.textContent).toBe('Start');
+		expect(startButton.textContent).toBe('FDSA');
 	});
 });

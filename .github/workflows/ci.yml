@@ -17,9 +17,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install || echo "Install failed"
+        run: npm install
       - name: Build
-        run: npm run build || echo "Build failed"
+        run: npm run build
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
