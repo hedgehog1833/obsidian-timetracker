@@ -6,6 +6,8 @@ import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 import getFormat from '../stopwatch/formatSettings';
+import format from '../stopwatch/momentWrapper';
+import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 
 const VIEW_DISPLAY_TEXT = 'Timetracker sidebar';
 const VIEW_ICON = 'clock';
@@ -18,7 +20,11 @@ export class TimetrackerView extends ItemView {
 	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
 		super(leaf);
 		this.settings = settings;
-		this.stopwatchModel = new StopwatchModel(getFormat(this.settings));
+		this.stopwatchModel = new StopwatchModel(
+			getFormat(this.settings),
+			this.settings.timerValue?.startedAt || 0,
+			this.settings.timerValue?.offset || 0,
+		);
 	}
 
 	getDisplayText(): string {
@@ -33,8 +39,15 @@ export class TimetrackerView extends ItemView {
 		return VIEW_ICON;
 	}
 
-	getCurrentStopwatchTime(complete?: boolean): string {
-		return this.stopwatchModel.getCurrentValue(complete);
+	getElapsedTime(): number {
+		return this.stopwatchModel.getElapsedTime();
+	}
+
+	getCurrentStopwatchModelValues(): { startedAt: number; offset: number } {
+		return {
+			startedAt: this.stopwatchModel.getStartedAt(),
+			offset: this.stopwatchModel.getPausedAtOffset(),
+		};
 	}
 
 	setCurrentStopwatchTime(milliseconds: number): void {
@@ -82,7 +95,7 @@ export class TimetrackerView extends ItemView {
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
-				getCurrentStopwatchTime={() => this.getCurrentStopwatchTime(true)}
+				getCurrentStopwatchTime={() => this.format()}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
 			/>,
 		);
@@ -92,5 +105,9 @@ export class TimetrackerView extends ItemView {
 		if (this.root !== null && this.root !== undefined) {
 			this.root.unmount();
 		}
+	}
+
+	format(): string {
+		return format(this.stopwatchModel.getElapsedTime(), COMPLETE_TIME_FORMAT);
 	}
 }
