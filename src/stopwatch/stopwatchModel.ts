@@ -9,8 +9,10 @@ export class StopwatchModel {
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
 
-	constructor(currentFormat: string) {
+	constructor(currentFormat: string, startedAt: number, offset: number) {
 		this.currentTimeFormat = currentFormat;
+		this.startedAt = startedAt;
+		this.pausedAtOffset = offset;
 	}
 
 	start(): StopwatchState {
@@ -59,5 +61,13 @@ export class StopwatchModel {
 
 	setCurrentFormat(newFormat: string): void {
 		this.currentTimeFormat = newFormat;
+	}
+
+	getStartedAt(): number {
+		return this.startedAt;
+	}
+
+	getPausedAtOffset(): number {
+		return this.pausedAtOffset;
 	}
 }
