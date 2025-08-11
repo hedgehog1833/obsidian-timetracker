@@ -1,4 +1,4 @@
-import { Editor, EventRef, moment, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, EventRef, moment, Plugin, WorkspaceLeaf, Platform } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import momentDurationFormatSetup from 'moment-duration-format';
@@ -50,7 +50,7 @@ export default class Timetracker extends Plugin {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			return new TimetrackerView(leaf, this.settings);
+			return new TimetrackerView(leaf, this.settings, Platform.isDesktop);
 		});
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
@@ -148,7 +148,6 @@ export default class Timetracker extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 		const view = this.getView();
-		view?.setFormatInStopwatch();
 		view?.clickReload();
 	}
 

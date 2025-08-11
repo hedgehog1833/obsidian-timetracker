@@ -1,11 +1,9 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
-import React from 'react';
 import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
-import getFormat from '../stopwatch/formatSettings';
 import format from '../stopwatch/momentWrapper';
 import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 
@@ -17,14 +15,19 @@ export class TimetrackerView extends ItemView {
 	private readonly settings: TimetrackerSettings;
 	private root: Root;
 
-	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
+	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings, isDesktop: boolean) {
 		super(leaf);
 		this.settings = settings;
-		this.stopwatchModel = new StopwatchModel(
-			getFormat(this.settings),
-			this.settings.timerValue?.startedAt || 0,
-			this.settings.timerValue?.offset || 0,
-		);
+
+		let startedAt = 0;
+		let offset = 0;
+
+		if (isDesktop && this.settings.timerValue) {
+			startedAt = this.settings.timerValue.startedAt;
+			offset = this.settings.timerValue.offset;
+		}
+
+		this.stopwatchModel = new StopwatchModel(startedAt, offset);
 	}
 
 	getDisplayText(): string {
@@ -81,10 +84,6 @@ export class TimetrackerView extends ItemView {
 	clickReload(): void {
 		const el = this.containerEl.querySelector('button.reload-button');
 		(el as HTMLButtonElement).click();
-	}
-
-	setFormatInStopwatch(): void {
-		this.stopwatchModel.setCurrentFormat(getFormat(this.settings));
 	}
 
 	async onOpen() {
