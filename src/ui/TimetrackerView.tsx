@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { ItemView, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
 import { StopwatchModel } from '../stopwatch/stopwatchModel';
@@ -10,24 +10,31 @@ import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 const VIEW_DISPLAY_TEXT = 'Timetracker sidebar';
 const VIEW_ICON = 'clock';
 
-export class TimetrackerView extends ItemView {
+interface PersistentStopwatchState {
+	startedAt: number;
+	offset: number;
+}
+
+export class TimetrackerView extends ItemView implements PersistentStopwatchState {
 	private readonly stopwatchModel: StopwatchModel;
 	private readonly settings: TimetrackerSettings;
 	private root: Root;
+	startedAt: number;
+	offset: number;
 
 	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings, isDesktop: boolean) {
 		super(leaf);
 		this.settings = settings;
 
-		let startedAt = 0;
-		let offset = 0;
+		// let startedAt = 0;
+		// let offset = 0;
 
-		if (isDesktop && this.settings.timerValue) {
-			startedAt = this.settings.timerValue.startedAt;
-			offset = this.settings.timerValue.offset;
-		}
+		// if (isDesktop && this.settings.timerValue) {
+		// 	startedAt = this.settings.timerValue.startedAt;
+		// 	offset = this.settings.timerValue.offset;
+		// }
 
-		this.stopwatchModel = new StopwatchModel(startedAt, offset);
+		this.stopwatchModel = new StopwatchModel(0, 0);
 	}
 
 	getDisplayText(): string {
@@ -64,6 +71,8 @@ export class TimetrackerView extends ItemView {
 	}
 
 	stop(): StopwatchState {
+		console.log('stopped');
+		this.app.workspace.requestSaveLayout();
 		return this.stopwatchModel.stop();
 	}
 
@@ -108,5 +117,27 @@ export class TimetrackerView extends ItemView {
 
 	format(): string {
 		return format(this.stopwatchModel.getElapsedTime(), COMPLETE_TIME_FORMAT);
+	}
+
+	async setViewState(state: PersistentStopwatchState, result: ViewStateResult): Promise<void> {
+		console.log(`state ${state.startedAt}`);
+		if (state.startedAt) {
+			this.startedAt = state.startedAt;
+		}
+
+		if (state.offset) {
+			this.offset = state.offset;
+		}
+
+		return super.setState(state, result);
+	}
+
+	getViewState(): PersistentStopwatchState {
+		console.log(`TEEEEEST ${this.startedAt}`);
+		console.log(`TEEEEESTasd ${this.offset}`);
+		return {
+			startedAt: this.startedAt,
+			offset: this.offset,
+		};
 	}
 }

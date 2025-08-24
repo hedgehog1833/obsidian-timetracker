@@ -12,6 +12,7 @@ export class StopwatchModel {
 	}
 
 	start(): StopwatchState {
+		console.log('asdfasdfasdfasdf');
 		this.startedAt = Date.now();
 		this.state = StopwatchState.STARTED;
 		return this.state;

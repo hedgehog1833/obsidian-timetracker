@@ -44,14 +44,18 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings;
-	quitListener: EventRef;
+	// quitListener: EventRef;
 
 	async onload() {
+		console.log('pasdfff');
+
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
 			return new TimetrackerView(leaf, this.settings, Platform.isDesktop);
 		});
+
+		console.log('paff');
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
 
@@ -119,22 +123,22 @@ export default class Timetracker extends Plugin {
 
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
 
-		this.quitListener = this.app.workspace.on('quit', () => {
-			const sidebarView = this.getView();
+		// this.quitListener = this.app.workspace.on('quit', () => {
+		// 	const sidebarView = this.getView();
 
-			if (sidebarView) {
-				const stopwatchModelValues = sidebarView.getCurrentStopwatchModelValues();
-				this.settings.timerValue = {
-					startedAt: stopwatchModelValues.startedAt,
-					offset: stopwatchModelValues.offset,
-				};
-				this.saveSettings();
-			}
-		});
+		// 	if (sidebarView) {
+		// 		const stopwatchModelValues = sidebarView.getCurrentStopwatchModelValues();
+		// 		this.settings.timerValue = {
+		// 			startedAt: stopwatchModelValues.startedAt,
+		// 			offset: stopwatchModelValues.offset,
+		// 		};
+		// 		this.saveSettings();
+		// 	}
+		// });
 	}
 
 	onunload() {
-		this.app.metadataCache.offref(this.quitListener);
+		// this.app.metadataCache.offref(this.quitListener);
 	}
 
 	async loadSettings() {
@@ -152,11 +156,14 @@ export default class Timetracker extends Plugin {
 	}
 
 	initLeaf(): void {
+		console.log('iff');
 		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length) {
+			console.log('uff');
 			return;
 		}
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
 		if (rightLeaf) {
+			console.log('aff');
 			rightLeaf.setViewState({
 				type: TIMETRACKER_VIEW_TYPE,
 			});
