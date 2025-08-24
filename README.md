@@ -31,3 +31,8 @@ length for the printed time format is 256 characters.
 <br>
 The print format `Time: ${hours}h ${minutes}m ${seconds}s` will result in `Time: 1h 10m 1s` being pasted for a stopwatch 
 value of `01:10:01` with trimming parameter active.
+
+### Miscellaneous
+
+When closing the desktop app the stopwatch's value will be saved and restored on the next start.
+This does not apply to mobile devices.
