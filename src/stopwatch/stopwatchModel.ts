@@ -1,19 +1,18 @@
 import { StopwatchState } from './stopwatchState';
-import format from './momentWrapper';
-import { COMPLETE_TIME_FORMAT } from './formatSettings';
 
 export class StopwatchModel {
-	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
-	private currentTimeFormat: string;
+	static readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
 
-	constructor(currentFormat: string) {
-		this.currentTimeFormat = currentFormat;
+	constructor(startedAt: number, offset: number) {
+		this.startedAt = startedAt;
+		this.pausedAtOffset = offset;
 	}
 
 	start(): StopwatchState {
+		console.log('asdfasdfasdfasdf');
 		this.startedAt = Date.now();
 		this.state = StopwatchState.STARTED;
 		return this.state;
@@ -32,7 +31,7 @@ export class StopwatchModel {
 		return this.state;
 	}
 
-	getCurrentValue(complete?: boolean): string {
+	getElapsedTime(): number {
 		let elapsedTime: number;
 
 		if (this.state === StopwatchState.STARTED) {
@@ -42,14 +41,13 @@ export class StopwatchModel {
 			elapsedTime = this.pausedAtOffset;
 		}
 
-		if (elapsedTime >= this.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS) {
+		if (elapsedTime >= StopwatchModel.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS) {
 			this.startedAt = Date.now();
 			this.pausedAtOffset = 0;
 			elapsedTime = 0;
 		}
 
-		const currentFormat = complete ? COMPLETE_TIME_FORMAT : this.currentTimeFormat;
-		return format(elapsedTime, currentFormat);
+		return elapsedTime;
 	}
 
 	setCurrentValue(milliseconds: number): void {
@@ -57,7 +55,11 @@ export class StopwatchModel {
 		this.pausedAtOffset = Date.now() - this.startedAt;
 	}
 
-	setCurrentFormat(newFormat: string): void {
-		this.currentTimeFormat = newFormat;
+	getStartedAt(): number {
+		return this.startedAt;
+	}
+
+	getPausedAtOffset(): number {
+		return this.pausedAtOffset;
 	}
 }
