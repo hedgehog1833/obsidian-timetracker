@@ -2,17 +2,17 @@ import { StopwatchState } from './stopwatchState';
 
 export class StopwatchModel {
 	static readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
-	private startedAt: number = 0;
-	private pausedAtOffset: number = 0;
-	private state: StopwatchState = StopwatchState.INITIALIZED;
+	private startedAt: number;
+	private pausedAtOffset: number;
+	private state: StopwatchState;
 
-	constructor(startedAt: number, offset: number) {
+	constructor(startedAt: number, pausedAtOffset: number, state: StopwatchState) {
 		this.startedAt = startedAt;
-		this.pausedAtOffset = offset;
+		this.pausedAtOffset = pausedAtOffset;
+		this.state = state;
 	}
 
 	start(): StopwatchState {
-		console.log('asdfasdfasdfasdf');
 		this.startedAt = Date.now();
 		this.state = StopwatchState.STARTED;
 		return this.state;
@@ -61,5 +61,9 @@ export class StopwatchModel {
 
 	getPausedAtOffset(): number {
 		return this.pausedAtOffset;
+	}
+
+	getState(): StopwatchState {
+		return this.state;
 	}
 }

@@ -13,28 +13,22 @@ const VIEW_ICON = 'clock';
 interface PersistentStopwatchState {
 	startedAt: number;
 	offset: number;
+	state: StopwatchState;
 }
 
 export class TimetrackerView extends ItemView implements PersistentStopwatchState {
-	private readonly stopwatchModel: StopwatchModel;
 	private readonly settings: TimetrackerSettings;
 	private root: Root;
+	private stopwatchModel: StopwatchModel;
 	startedAt: number;
 	offset: number;
+	state: StopwatchState;
 
-	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings, isDesktop: boolean) {
+	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
 		super(leaf);
 		this.settings = settings;
 
-		// let startedAt = 0;
-		// let offset = 0;
-
-		// if (isDesktop && this.settings.timerValue) {
-		// 	startedAt = this.settings.timerValue.startedAt;
-		// 	offset = this.settings.timerValue.offset;
-		// }
-
-		this.stopwatchModel = new StopwatchModel(0, 0);
+		this.stopwatchModel = new StopwatchModel(0, 0, StopwatchState.INITIALIZED);
 	}
 
 	getDisplayText(): string {
@@ -63,21 +57,26 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 	setCurrentStopwatchTime(milliseconds: number): void {
 		this.clickReset();
 		this.stopwatchModel.setCurrentValue(milliseconds);
+		this.app.workspace.requestSaveLayout();
 		this.clickReload();
 	}
 
 	start(): StopwatchState {
-		return this.stopwatchModel.start();
+		const state = this.stopwatchModel.start();
+		this.app.workspace.requestSaveLayout();
+		return state;
 	}
 
 	stop(): StopwatchState {
-		console.log('stopped');
+		const state = this.stopwatchModel.stop();
 		this.app.workspace.requestSaveLayout();
-		return this.stopwatchModel.stop();
+		return state;
 	}
 
 	reset(): StopwatchState {
-		return this.stopwatchModel.reset();
+		const state = this.stopwatchModel.reset();
+		this.app.workspace.requestSaveLayout();
+		return state;
 	}
 
 	clickStartStop(): void {
@@ -119,25 +118,23 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 		return format(this.stopwatchModel.getElapsedTime(), COMPLETE_TIME_FORMAT);
 	}
 
-	async setViewState(state: PersistentStopwatchState, result: ViewStateResult): Promise<void> {
-		console.log(`state ${state.startedAt}`);
-		if (state.startedAt) {
-			this.startedAt = state.startedAt;
-		}
-
-		if (state.offset) {
-			this.offset = state.offset;
+	async setState(state: PersistentStopwatchState, result: ViewStateResult): Promise<void> {
+		if (state.startedAt && state.state) {
+			let adjustedState = state.state;
+			if (state.state == StopwatchState.STARTED) {
+				adjustedState = StopwatchState.STOPPED;
+			}
+			this.stopwatchModel = new StopwatchModel(state.startedAt, state.offset, adjustedState);
 		}
 
 		return super.setState(state, result);
 	}
 
-	getViewState(): PersistentStopwatchState {
-		console.log(`TEEEEEST ${this.startedAt}`);
-		console.log(`TEEEEESTasd ${this.offset}`);
+	getState() {
 		return {
-			startedAt: this.startedAt,
-			offset: this.offset,
+			startedAt: this.stopwatchModel.getStartedAt(),
+			offset: this.stopwatchModel.getPausedAtOffset(),
+			state: this.stopwatchModel.getState(),
 		};
 	}
 }
