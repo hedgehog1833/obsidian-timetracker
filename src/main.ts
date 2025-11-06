@@ -1,7 +1,10 @@
-import { Editor, moment, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, EventRef, moment, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import momentDurationFormatSetup from 'moment-duration-format';
+import format from './stopwatch/momentWrapper';
+import getFormat, { COMPLETE_TIME_FORMAT } from './stopwatch/formatSettings';
+import { StopwatchState } from './stopwatch/stopwatchState';
 
 momentDurationFormatSetup(moment);
 
@@ -35,12 +38,15 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings;
+	timeTrackerView: TimetrackerView;
+	quitListener: EventRef;
 
 	async onload() {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			return new TimetrackerView(leaf, this.settings);
+			this.timeTrackerView = new TimetrackerView(leaf, this.settings);
+			return this.timeTrackerView;
 		});
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
@@ -50,14 +56,12 @@ export default class Timetracker extends Plugin {
 			name: 'Insert timestamp based on current stopwatch value',
 			icon: 'alarm-clock-plus',
 			editorCheckCallback: (checking: boolean, editor: Editor) => {
-				const sidebarView = this.getView();
-
 				if (checking) {
-					return sidebarView !== null;
+					return this.timeTrackerView !== null;
 				}
 
-				if (sidebarView != null) {
-					const formattedStopwatchTime = this.formatPrintValue(sidebarView);
+				if (this.timeTrackerView != null) {
+					const formattedStopwatchTime = this.formatPrintValue(this.timeTrackerView);
 					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
 					return true;
@@ -72,14 +76,12 @@ export default class Timetracker extends Plugin {
 			name: 'Start or stop the stopwatch',
 			icon: 'alarm-clock',
 			checkCallback: (checking: boolean) => {
-				const sidebarView = this.getView();
-
 				if (checking) {
-					return sidebarView != null;
+					return this.timeTrackerView != null;
 				}
 
-				if (sidebarView != null) {
-					sidebarView.clickStartStop();
+				if (this.timeTrackerView != null) {
+					this.timeTrackerView.clickStartStop();
 					return true;
 				} else {
 					return false;
@@ -92,14 +94,12 @@ export default class Timetracker extends Plugin {
 			name: 'Reset the stopwatch',
 			icon: 'alarm-clock-off',
 			checkCallback: (checking: boolean) => {
-				const sidebarView = this.getView();
-
 				if (checking) {
-					return sidebarView != null;
+					return this.timeTrackerView != null;
 				}
 
-				if (sidebarView != null) {
-					sidebarView.clickReset();
+				if (this.timeTrackerView != null) {
+					this.timeTrackerView.clickReset();
 					return true;
 				} else {
 					return false;
@@ -108,9 +108,15 @@ export default class Timetracker extends Plugin {
 		});
 
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
+
+		this.quitListener = this.app.workspace.on('quit', () => {
+			// this.app.workspace.requestSaveLayout();
+		});
 	}
 
-	onunload() {}
+	onunload() {
+		this.app.metadataCache.offref(this.quitListener);
+	}
 
 	async loadSettings() {
 		const loadedSettings: TimetrackerSettings = await this.loadData();
@@ -122,9 +128,7 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		const view = this.getView();
-		view?.setFormatInStopwatch();
-		view?.clickReload();
+		this.timeTrackerView.clickReload();
 	}
 
 	initLeaf(): void {
@@ -136,15 +140,6 @@ export default class Timetracker extends Plugin {
 			rightLeaf.setViewState({
 				type: TIMETRACKER_VIEW_TYPE,
 			});
-		}
-	}
-
-	getView(): TimetrackerView | null {
-		const leaf = this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).first();
-		if (leaf !== null && leaf !== undefined && leaf.view instanceof TimetrackerView) {
-			return leaf.view;
-		} else {
-			return null;
 		}
 	}
 
@@ -162,13 +157,8 @@ export default class Timetracker extends Plugin {
 
 	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
 		if (settings?.textColor?.length == 0) {
-			const sidebarView = this.getView();
-			if (sidebarView) {
-				const style = window.getComputedStyle(sidebarView.containerEl);
-				settings.textColor = style.color;
-			} else {
-				settings.textColor = '#dadada';
-			}
+			const style = window.getComputedStyle(this.timeTrackerView.containerEl);
+			settings.textColor = style.color;
 			return true;
 		}
 		return false;
@@ -190,13 +180,13 @@ export default class Timetracker extends Plugin {
 	formatPrintValue(view: TimetrackerView): string {
 		let printValue: string;
 		if (this.settings.printFormat.length > 0) {
-			const stopwatchValues = this.getCurrentTimeValues(view);
+			const stopwatchValues = this.getCurrentTimeValues(view.getElapsedTime());
 			printValue = this.settings.printFormat
-				.replace('${hours}', stopwatchValues[0])
-				.replace('${minutes}', stopwatchValues[1])
-				.replace('${seconds}', stopwatchValues[2]);
+				.replace('${hours}', stopwatchValues.hours)
+				.replace('${minutes}', stopwatchValues.minutes)
+				.replace('${seconds}', stopwatchValues.seconds);
 		} else {
-			printValue = view.getCurrentStopwatchTime();
+			printValue = format(view.getElapsedTime(), getFormat(this.settings));
 		}
 		const textColor = window.getComputedStyle(view.containerEl)?.color;
 		return this.settings.textColor !== this.rgbToHex(textColor)
@@ -204,11 +194,11 @@ export default class Timetracker extends Plugin {
 			: printValue;
 	}
 
-	getCurrentTimeValues(view: TimetrackerView): [string, string, string] {
-		const stopwatchValues = view.getCurrentStopwatchTime(true).split(':');
+	getCurrentTimeValues(elapsedTime: number): { hours: string; minutes: string; seconds: string } {
+		const stopwatchValues = format(elapsedTime, COMPLETE_TIME_FORMAT).split(':');
 		const [hours, minutes, seconds] = stopwatchValues.map((value) =>
 			this.settings.trimLeadingZeros ? parseInt(value).toString() : value,
 		);
-		return [hours, minutes, seconds];
+		return { hours: hours, minutes: minutes, seconds: seconds };
 	}
 }
