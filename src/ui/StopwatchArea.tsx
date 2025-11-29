@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 import { TimetrackerSettings } from '../main';
 import StopwatchValueContainer from './StopwatchValueContainer';
@@ -13,9 +13,9 @@ export type StopwatchAreaProps = {
 };
 
 export const StopwatchArea = (props: StopwatchAreaProps) => {
-	const [intervalId, setIntervalId] = useState(0);
-	const [stopwatchState, setStopwatchState] = useState(StopwatchState.INITIALIZED);
-	const [, setCurrentValue] = useState(props.getCurrentStopwatchTime);
+	const [intervalId, setIntervalId] = useState<number>(0);
+	const [stopwatchState, setStopwatchState] = useState<StopwatchState>(StopwatchState.INITIALIZED);
+	const [, setCurrentValue] = useState<string>(props.getCurrentStopwatchTime);
 	const STOPWATCH_INTERVAL_IN_MILLISECONDS = 1000;
 
 	const startOrStopStopwatch = () => {

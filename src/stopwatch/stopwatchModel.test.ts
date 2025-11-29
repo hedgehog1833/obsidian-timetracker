@@ -1,90 +1,200 @@
 import { StopwatchModel } from './stopwatchModel';
 import { StopwatchState } from './stopwatchState';
-import format from './momentWrapper';
 
 jest.mock('./momentWrapper', () => ({
 	default: jest.fn(),
 }));
 
 describe('stopwatchModel', () => {
-	let timeFormat: string;
-	let stopwatch: StopwatchModel;
-	let nowSpy: jest.SpyInstance;
+	let underTest: StopwatchModel;
 
 	beforeEach(() => {
-		timeFormat = 'HH:mm:ss';
-		stopwatch = new StopwatchModel(timeFormat);
-		nowSpy = jest.spyOn(Date, 'now');
+		underTest = new StopwatchModel(0, 0);
 	});
 
 	it('start: should set state STARTED', () => {
 		// when
-		const state = stopwatch.start();
+		const state = underTest.start();
 
 		// then
 		expect(state).toBe(StopwatchState.STARTED);
 	});
 
-	it('stop: should set state STOPPED', () => {
+	it('start: should start timer', () => {
 		// given
-		stopwatch.start();
+		jest.useFakeTimers();
+		const currentMilliseconds = Date.now();
 
 		// when
-		const state = stopwatch.stop();
+		underTest.start();
+		jest.setSystemTime(new Date(currentMilliseconds + 1000));
+		const value = underTest.getStartedAt();
+
+		// then
+		expect(value).toBe(currentMilliseconds);
+	});
+
+	it('stop: should set state STOPPED', () => {
+		// when
+		underTest.start();
+		const state = underTest.stop();
 
 		// then
 		expect(state).toBe(StopwatchState.STOPPED);
 	});
 
-	it('reset: should set state INITIALIZED', () => {
+	it('stop: should stop timer', () => {
+		// given
+		jest.useFakeTimers();
+		const currentMilliseconds = Date.now();
+
 		// when
-		stopwatch.start();
-		const state = stopwatch.reset();
+		underTest.start();
+		jest.setSystemTime(new Date(currentMilliseconds + 1000));
+
+		const value1 = underTest.getStartedAt();
+		underTest.stop();
+		const value2 = underTest.getStartedAt();
+
+		jest.setSystemTime(new Date(currentMilliseconds + 2000));
+		const value3 = underTest.getStartedAt();
+
+		// then
+		expect(value1).toBe(currentMilliseconds);
+		expect(value2).toBe(value1);
+		expect(value3).toBe(value2);
+	});
+
+	it('reset: should set state INITIALIZED and clear values', () => {
+		// given
+		underTest = new StopwatchModel(5000, 10000);
+
+		// when
+		const state = underTest.reset();
 
 		// then
 		expect(state).toBe(StopwatchState.INITIALIZED);
+		expect(underTest.getStartedAt()).toBe(0);
+		expect(underTest.getPausedAtOffset()).toBe(0);
 	});
 
-	it('getCurrentValue: should call format and return value', () => {
+	it('getStartedAt: returns startedAt', () => {
 		// given
-		(format as jest.Mock).mockReturnValue('01:02:03');
+		underTest = new StopwatchModel(10000, 0);
 
 		// when
-		const value = stopwatch.getCurrentValue();
+		const value = underTest.getStartedAt();
 
 		// then
-		expect(format).toHaveBeenCalledWith(0, timeFormat);
-
-		// and
-		expect(value).toBe('01:02:03');
+		expect(value).toBe(10000);
 	});
 
-	it('setCurrentValue: should set the current value of the stopwatch', () => {
+	it('getPausedAtOffset: returns offset', () => {
 		// given
-		const elapsedTime = 5000;
-		const now = 10000;
-		nowSpy.mockImplementation(() => now);
+		underTest = new StopwatchModel(0, 10000);
 
 		// when
-		stopwatch.setCurrentValue(elapsedTime);
-		stopwatch.getCurrentValue();
+		const value = underTest.getPausedAtOffset();
 
 		// then
-		expect(format).toHaveBeenCalledWith(now - elapsedTime, timeFormat);
+		expect(value).toBe(10000);
 	});
 
-	it('setCurrentFormat: should set the current format of the stopwatch', () => {
-		// given
-		const currentFormat = 'HH:mm:ss';
-		stopwatch.getCurrentValue();
-		expect(format).toHaveBeenCalledWith(expect.any(Number), currentFormat);
-		const newFormat = 'mm:ss';
-
+	it('getElapsedTime: should return zero when initialized', () => {
 		// when
-		stopwatch.setCurrentFormat(newFormat);
-		stopwatch.getCurrentValue();
+		const value = underTest.getElapsedTime();
 
 		// then
-		expect(format).toHaveBeenCalledWith(expect.any(Number), newFormat);
+		expect(value).toBe(0);
+	});
+
+	it('getElapsedTime: should calculate elapsed time correctly while running', () => {
+		// given
+		jest.useFakeTimers();
+
+		// when
+		underTest.start();
+		jest.setSystemTime(new Date(Date.now() + 1000));
+		const value = underTest.getElapsedTime();
+
+		// then
+		expect(value).toBe(1000);
+	});
+
+	it('getElapsedTime: should include paused offset after stopping', () => {
+		// given
+		jest.useFakeTimers();
+		const currentTimeMillis = Date.now();
+		jest.setSystemTime(new Date(currentTimeMillis + 2000));
+
+		// when
+		underTest.start();
+		jest.setSystemTime(new Date(currentTimeMillis + 3000));
+		underTest.stop();
+		const value = underTest.getElapsedTime();
+
+		// then
+		expect(value).toBe(1000);
+	});
+
+	it('getElapsedTime: should reset elapsed time after reaching threshold', () => {
+		// given
+		jest.useFakeTimers();
+		const valueSlightlyUnderThreshold = StopwatchModel.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS - 100;
+
+		// when
+		underTest.start();
+		jest.setSystemTime(new Date(Date.now() + valueSlightlyUnderThreshold));
+
+		// then
+		const firstValue = underTest.getElapsedTime();
+		expect(firstValue).toBe(valueSlightlyUnderThreshold);
+
+		// when
+		jest.setSystemTime(new Date(Date.now() + 101));
+
+		// then
+		const secondValue = underTest.getElapsedTime();
+		expect(secondValue).toBe(0);
+	});
+
+	it('getElapsedTime: should maintain correct timer value after multiple start/stop cycles', () => {
+		// given
+		jest.useFakeTimers();
+
+		// when
+		underTest.start();
+		jest.setSystemTime(new Date(Date.now() + 1000));
+
+		// then
+		expect(underTest.getElapsedTime()).toBe(1000);
+
+		// when
+		underTest.stop();
+		jest.setSystemTime(new Date(Date.now() + 2000));
+
+		// then
+		expect(underTest.getElapsedTime()).toBe(1000);
+
+		// when
+		underTest.start();
+		jest.setSystemTime(new Date(Date.now() + 500));
+
+		// then
+		expect(underTest.getElapsedTime()).toBe(1500);
+
+		// when
+		underTest.stop();
+		jest.setSystemTime(new Date(Date.now() + 2000));
+
+		// then
+		expect(underTest.getElapsedTime()).toBe(1500);
+
+		// when
+		underTest.start();
+		jest.setSystemTime(new Date(Date.now() + 500));
+
+		// then
+		expect(underTest.getElapsedTime()).toBe(2000);
 	});
 });
