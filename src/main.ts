@@ -39,7 +39,6 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings;
 	timeTrackerView: TimetrackerView;
-	quitListener: EventRef;
 
 	async onload() {
 		await this.loadSettings();
@@ -108,15 +107,9 @@ export default class Timetracker extends Plugin {
 		});
 
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
-
-		this.quitListener = this.app.workspace.on('quit', () => {
-			// this.app.workspace.requestSaveLayout();
-		});
 	}
 
-	onunload() {
-		this.app.metadataCache.offref(this.quitListener);
-	}
+	onunload() {}
 
 	async loadSettings() {
 		const loadedSettings: TimetrackerSettings = await this.loadData();
