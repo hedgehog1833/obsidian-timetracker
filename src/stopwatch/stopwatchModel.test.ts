@@ -9,7 +9,7 @@ describe('stopwatchModel', () => {
 	let underTest: StopwatchModel;
 
 	beforeEach(() => {
-		underTest = new StopwatchModel(0, 0);
+		underTest = new StopwatchModel(0, 0, StopwatchState.INITIALIZED);
 	});
 
 	it('start: should set state STARTED', () => {
@@ -67,7 +67,7 @@ describe('stopwatchModel', () => {
 
 	it('reset: should set state INITIALIZED and clear values', () => {
 		// given
-		underTest = new StopwatchModel(5000, 10000);
+		underTest = new StopwatchModel(5000, 10000, StopwatchState.STARTED);
 
 		// when
 		const state = underTest.reset();
@@ -80,7 +80,7 @@ describe('stopwatchModel', () => {
 
 	it('getStartedAt: returns startedAt', () => {
 		// given
-		underTest = new StopwatchModel(10000, 0);
+		underTest = new StopwatchModel(10000, 0, StopwatchState.INITIALIZED);
 
 		// when
 		const value = underTest.getStartedAt();
@@ -91,7 +91,7 @@ describe('stopwatchModel', () => {
 
 	it('getPausedAtOffset: returns offset', () => {
 		// given
-		underTest = new StopwatchModel(0, 10000);
+		underTest = new StopwatchModel(0, 10000, StopwatchState.INITIALIZED);
 
 		// when
 		const value = underTest.getPausedAtOffset();
@@ -196,5 +196,16 @@ describe('stopwatchModel', () => {
 
 		// then
 		expect(underTest.getElapsedTime()).toBe(2000);
+	});
+
+	it('calculateOffset: should calculate offset correctly', () => {
+		// given
+		underTest = new StopwatchModel(5000, 10000, StopwatchState.STARTED);
+
+		// when
+		const offset = underTest.calculateOffset();
+
+		// then
+		expect(offset).toBe(Date.now() - 5000 + 10000);
 	});
 });
