@@ -19,7 +19,7 @@ export class StopwatchModel {
 	}
 
 	stop(): StopwatchState {
-		this.pausedAtOffset = Date.now() - this.startedAt + this.pausedAtOffset;
+		this.pausedAtOffset = this.calculateOffset();
 		this.state = StopwatchState.STOPPED;
 		return this.state;
 	}
@@ -65,5 +65,9 @@ export class StopwatchModel {
 
 	getState(): StopwatchState {
 		return this.state;
+	}
+
+	calculateOffset(): number {
+		return Date.now() - this.startedAt + this.pausedAtOffset;
 	}
 }

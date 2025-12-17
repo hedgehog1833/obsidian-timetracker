@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 import { TimetrackerSettings } from '../main';
 import StopwatchValueContainer from './StopwatchValueContainer';
@@ -10,13 +10,16 @@ export type StopwatchAreaProps = {
 	reset: () => StopwatchState;
 	getCurrentStopwatchTime: () => string;
 	setCurrentStopwatchTime: (milliseconds: number) => void;
+	saveWorkspace: () => void;
 };
 
 export const StopwatchArea = (props: StopwatchAreaProps) => {
 	const [intervalId, setIntervalId] = useState<number>(0);
 	const [stopwatchState, setStopwatchState] = useState<StopwatchState>(StopwatchState.INITIALIZED);
 	const [, setCurrentValue] = useState<string>(props.getCurrentStopwatchTime);
-	const STOPWATCH_INTERVAL_IN_MILLISECONDS = 1000;
+	const lasteSaveAtRef = useRef<number>(0);
+	const STOPWATCH_INTERVAL_MILLISECONDS = 1000;
+	const SAVE_WORKSPACE_INTERVAL_MILLISECONDS = 60000;
 
 	const startOrStopStopwatch = () => {
 		if (stopwatchState !== StopwatchState.STARTED) {
@@ -47,7 +50,8 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 		}
 		let interValId = window.setInterval(() => {
 			setCurrentValue(props.getCurrentStopwatchTime());
-		}, STOPWATCH_INTERVAL_IN_MILLISECONDS);
+			saveWorkspaceTimed();
+		}, STOPWATCH_INTERVAL_MILLISECONDS);
 		setIntervalId(interValId);
 		return interValId;
 	};
@@ -68,6 +72,17 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 			createInterval();
 		} else {
 			clearInterval(createInterval());
+		}
+	};
+
+	const saveWorkspaceTimed = () => {
+		const now = Date.now();
+		if (lasteSaveAtRef.current === 0) {
+			lasteSaveAtRef.current = now;
+		}
+		if (now - lasteSaveAtRef.current >= SAVE_WORKSPACE_INTERVAL_MILLISECONDS) {
+			props.saveWorkspace();
+			lasteSaveAtRef.current = now;
 		}
 	};
 

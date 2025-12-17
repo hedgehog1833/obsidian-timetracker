@@ -14,6 +14,7 @@ interface PersistentStopwatchState {
 	startedAt: number;
 	offset: number;
 	state: StopwatchState;
+	persistedOffset: number;
 }
 
 export class TimetrackerView extends ItemView implements PersistentStopwatchState {
@@ -23,6 +24,7 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 	startedAt: number;
 	offset: number;
 	state: StopwatchState;
+	persistedOffset: number;
 
 	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
 		super(leaf);
@@ -104,6 +106,7 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 				stop={() => this.stop()}
 				getCurrentStopwatchTime={() => this.format()}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
+				saveWorkspace={() => this.app.workspace.requestSaveLayout()}
 			/>,
 		);
 	}
@@ -124,7 +127,12 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 			if (state.state == StopwatchState.STARTED) {
 				adjustedState = StopwatchState.STOPPED;
 			}
-			this.stopwatchModel = new StopwatchModel(state.startedAt, state.offset, adjustedState);
+			this.stopwatchModel = new StopwatchModel(
+				state.startedAt,
+				state.persistedOffset ? state.persistedOffset : state.offset,
+				adjustedState,
+			);
+			this.persistedOffset = 0;
 		}
 
 		return super.setState(state, result);
@@ -135,6 +143,8 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 			startedAt: this.stopwatchModel.getStartedAt(),
 			offset: this.stopwatchModel.getPausedAtOffset(),
 			state: this.stopwatchModel.getState(),
+			persistedOffset:
+				this.stopwatchModel.getState() == StopwatchState.STARTED ? this.stopwatchModel.calculateOffset() : 0,
 		};
 	}
 }
