@@ -65,7 +65,6 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 
 	start(): StopwatchState {
 		const state = this.stopwatchModel.start();
-		this.app.workspace.requestSaveLayout();
 		return state;
 	}
 
