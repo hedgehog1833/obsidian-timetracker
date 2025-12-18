@@ -123,7 +123,7 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		// this.timeTrackerView.clickReload();
+		this.timeTrackerView?.clickReload();
 	}
 
 	initLeaf(): void {
@@ -152,7 +152,6 @@ export default class Timetracker extends Plugin {
 
 	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
 		if (settings?.textColor?.length == 0) {
-			// const style = window.getComputedStyle(this.timeTrackerView.containerEl);
 			settings.textColor = '#dadada';
 			return true;
 		}
