@@ -34,4 +34,4 @@ value of `01:10:01` with trimming parameter active.
 
 ### Persistence
 
-When closing the app the stopwatch's value can be saved and restored on the next application start. When activated, saving the value takes place once every 60 seconds. Timers for desktop and mobile app are kept separately.
+When closing the app the stopwatch's value can be saved and restored on the next application start. When activated, saving the value takes place once every 60 seconds while the timer is running or if stopped/resetted or the value is changed manually. Timers for desktop and mobile app are kept separately.
