@@ -21,6 +21,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		this.createFormatSetting(containerEl);
 		this.createTrimmingSetting(containerEl);
 		this.createLineBreakSetting(containerEl);
+		this.createPersistenceSetting(containerEl);
 		this.createTextColorSetting(containerEl);
 		this.createPrintFormatSetting(containerEl);
 	}
@@ -109,6 +110,18 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				});
 		});
 		setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
+	}
+
+	private createPersistenceSetting(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName('Persistence')
+			.setDesc('Persist time value and restore after restart.')
+			.addToggle((component) => {
+				component.setValue(this.plugin.settings.persistTimerValue).onChange(async (value) => {
+					this.plugin.settings.persistTimerValue = value;
+					await this.plugin.saveSettings();
+				});
+			});
 	}
 
 	private printFormatIsValid(printFormat: string): boolean {

@@ -14,6 +14,7 @@ describe('StopwatchArea', () => {
 			reset: jest.fn(),
 			getCurrentStopwatchTime: jest.fn(),
 			setCurrentStopwatchTime: jest.fn(),
+			saveWorkspace: jest.fn(),
 		};
 	});
 

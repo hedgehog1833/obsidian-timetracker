@@ -22,6 +22,7 @@ export interface TimetrackerSettings {
 	lineBreakAfterInsert: boolean;
 	textColor: string;
 	printFormat: string;
+	persistTimerValue: boolean;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
@@ -34,6 +35,7 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 	lineBreakAfterInsert: false,
 	textColor: '',
 	printFormat: '',
+	persistTimerValue: false,
 };
 
 export default class Timetracker extends Plugin {
@@ -121,7 +123,7 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		this.timeTrackerView.clickReload();
+		// this.timeTrackerView.clickReload();
 	}
 
 	initLeaf(): void {
@@ -150,8 +152,8 @@ export default class Timetracker extends Plugin {
 
 	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
 		if (settings?.textColor?.length == 0) {
-			const style = window.getComputedStyle(this.timeTrackerView.containerEl);
-			settings.textColor = style.color;
+			// const style = window.getComputedStyle(this.timeTrackerView.containerEl);
+			settings.textColor = '#dadada';
 			return true;
 		}
 		return false;

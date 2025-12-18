@@ -17,7 +17,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	const [intervalId, setIntervalId] = useState<number>(0);
 	const [stopwatchState, setStopwatchState] = useState<StopwatchState>(StopwatchState.INITIALIZED);
 	const [, setCurrentValue] = useState<string>(props.getCurrentStopwatchTime);
-	const lasteSaveAtRef = useRef<number>(0);
+	const lastSaveAtRef = useRef<number>(0);
 	const STOPWATCH_INTERVAL_MILLISECONDS = 1000;
 	const SAVE_WORKSPACE_INTERVAL_MILLISECONDS = 60000;
 
@@ -76,13 +76,16 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	};
 
 	const saveWorkspaceTimed = () => {
-		const now = Date.now();
-		if (lasteSaveAtRef.current === 0) {
-			lasteSaveAtRef.current = now;
+		if (!props.settings.persistTimerValue) {
+			return;
 		}
-		if (now - lasteSaveAtRef.current >= SAVE_WORKSPACE_INTERVAL_MILLISECONDS) {
+		const now = Date.now();
+		if (lastSaveAtRef.current === 0) {
+			lastSaveAtRef.current = now;
+		}
+		if (now - lastSaveAtRef.current >= SAVE_WORKSPACE_INTERVAL_MILLISECONDS) {
 			props.saveWorkspace();
-			lasteSaveAtRef.current = now;
+			lastSaveAtRef.current = now;
 		}
 	};
 

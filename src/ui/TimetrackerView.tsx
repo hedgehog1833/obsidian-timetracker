@@ -59,7 +59,9 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 	setCurrentStopwatchTime(milliseconds: number): void {
 		this.clickReset();
 		this.stopwatchModel.setCurrentValue(milliseconds);
-		this.app.workspace.requestSaveLayout();
+		if (this.settings.persistTimerValue) {
+			this.app.workspace.requestSaveLayout();
+		}
 		this.clickReload();
 	}
 
@@ -70,13 +72,17 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 
 	stop(): StopwatchState {
 		const state = this.stopwatchModel.stop();
-		this.app.workspace.requestSaveLayout();
+		if (this.settings.persistTimerValue) {
+			this.app.workspace.requestSaveLayout();
+		}
 		return state;
 	}
 
 	reset(): StopwatchState {
 		const state = this.stopwatchModel.reset();
-		this.app.workspace.requestSaveLayout();
+		if (this.settings.persistTimerValue) {
+			this.app.workspace.requestSaveLayout();
+		}
 		return state;
 	}
 
@@ -128,7 +134,7 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 			}
 			this.stopwatchModel = new StopwatchModel(
 				state.startedAt,
-				state.persistedOffset ? state.persistedOffset : state.offset,
+				this.settings.persistTimerValue && state.persistedOffset ? state.persistedOffset : state.offset,
 				adjustedState,
 			);
 			this.persistedOffset = 0;
@@ -143,7 +149,9 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 			offset: this.stopwatchModel.getPausedAtOffset(),
 			state: this.stopwatchModel.getState(),
 			persistedOffset:
-				this.stopwatchModel.getState() == StopwatchState.STARTED ? this.stopwatchModel.calculateOffset() : 0,
+				this.settings.persistTimerValue && this.stopwatchModel.getState() == StopwatchState.STARTED
+					? this.stopwatchModel.calculateOffset()
+					: 0,
 		};
 	}
 }
