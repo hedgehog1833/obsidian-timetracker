@@ -1,6 +1,7 @@
 # Obsidian Timetracker plugin
 
-This Obsidian plugin adds a stopwatch to track time of something. Per hotkey the stopwatch's current value can be inserted into the editor, to make notes to 
+This Obsidian plugin adds a stopwatch to track time of something. Per hotkey the stopwatch's current value can be inserted 
+into the editor, to make notes to 
 this precise moment in time. If you forgot to activate the stopwatch, you can set a custom start value.
 The stopwatch functionality is a completely rewritten clone of https://github.com/tokuhirom/obsidian-stopwatch-plugin
 
@@ -8,7 +9,8 @@ The stopwatch functionality is a completely rewritten clone of https://github.co
 
 ### Time format: hours, minutes, seconds
 
-The format for how to print the stopwatch's current value. Default is to display hours, minutes and seconds `00:00:00`. Each can be turned on and off separately. 
+The format for how to print the stopwatch's current value. Default is to display hours, minutes and seconds `00:00:00`. 
+Each can be turned on and off separately. 
 
 ### Trimming
 
@@ -34,4 +36,6 @@ value of `01:10:01` with trimming parameter active.
 
 ### Persistence
 
-When closing the app the stopwatch's value can be saved and restored on the next application start. When activated, saving the value takes place once every 60 seconds while the timer is running or if stopped/resetted or the value is changed manually. Timers for desktop and mobile app are kept separately.
+When closing the app the stopwatch's value can be saved and restored on the next application start. When activated, saving the 
+value takes place once every 60 seconds while the timer is running or if stopped/resetted or the value is changed manually. 
+Timers for desktop and mobile app are kept separately.
