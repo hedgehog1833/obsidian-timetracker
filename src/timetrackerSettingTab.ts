@@ -18,12 +18,15 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		containerEl.createEl('h2', { text: 'Formatting' });
 		this.createFormatSetting(containerEl);
 		this.createTrimmingSetting(containerEl);
 		this.createLineBreakSetting(containerEl);
-		this.createPersistenceSetting(containerEl);
 		this.createTextColorSetting(containerEl);
 		this.createPrintFormatSetting(containerEl);
+
+		containerEl.createEl('h2', { text: 'Miscellaneous' });
+		this.createPersistenceSetting(containerEl);
 	}
 
 	private createFormatSetting(containerEl: HTMLElement): void {
