@@ -57,7 +57,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	};
 
 	const clearInterval = (givenIntervalId?: number) => {
-		if (givenIntervalId) {
+		if (givenIntervalId != null && givenIntervalId !== 0) {
 			window.clearInterval(givenIntervalId);
 		} else if (intervalId !== 0) {
 			window.clearInterval(intervalId);
@@ -76,7 +76,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	};
 
 	const saveWorkspaceTimed = () => {
-		if (!props.settings.persistTimerValue) {
+		if (props.settings.persistTimerValue === false) {
 			return;
 		}
 		const now = Date.now();

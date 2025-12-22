@@ -21,7 +21,7 @@ const TimeInput = (props: TimeInputProps) => {
 	const { doHandleRemoval } = useHandleRemoval(props.focusRef, props.setStopwatchValue);
 
 	useEffect(() => {
-		if (props.focusRef.current) {
+		if (props.focusRef.current != null) {
 			props.focusRef.current.setSelectionRange(cursorPosition, cursorPosition);
 		}
 	}, [cursorPosition]);

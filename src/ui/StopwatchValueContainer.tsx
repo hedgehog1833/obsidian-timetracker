@@ -20,7 +20,10 @@ const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (stopwatchValueWrapperRef.current && !stopwatchValueWrapperRef.current.contains(event.target as Node)) {
+			if (
+				stopwatchValueWrapperRef.current != null &&
+				!stopwatchValueWrapperRef.current.contains(event.target as Node)
+			) {
 				setIsEditing(false);
 			}
 		};
@@ -32,19 +35,19 @@ const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 	}, [stopwatchValueWrapperRef.current]);
 
 	useEffect(() => {
-		if (isEditing) {
-			if (props.settings.showSeconds) {
+		if (isEditing === true) {
+			if (props.settings.showSeconds === true) {
 				inputSecondsRef.current?.focus();
-			} else if (props.settings.showMinutes) {
+			} else if (props.settings.showMinutes === true) {
 				inputMinutesRef.current?.focus();
-			} else if (props.settings.showHours) {
+			} else if (props.settings.showHours === true) {
 				inputHoursRef.current?.focus();
 			}
 		}
 	}, [isEditing]);
 
 	const handleOnButtonClick = () => {
-		if (!isEditing) {
+		if (isEditing === false) {
 			props.stopStopwatch();
 			setIsEditing(true);
 		} else {

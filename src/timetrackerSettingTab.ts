@@ -104,7 +104,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				.setPlaceholder('${hours} hours and ${minutes} minutes')
 				.onChange(async (value) => {
 					if (this.printFormatIsValid(value)) {
-						this.plugin.settings.printFormat = value.trim().length == 0 && value.length != 0 ? '' : value;
+						this.plugin.settings.printFormat = value.trim().length === 0 && value.length !== 0 ? '' : value;
 						setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
 						await this.plugin.saveSettings();
 					} else {
@@ -123,13 +123,16 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				component.setValue(this.plugin.settings.persistTimerValue).onChange(async (value) => {
 					this.plugin.settings.persistTimerValue = value;
 					await this.plugin.saveSettings();
+					if (this.plugin.settings.persistTimerValue === true) {
+						this.app.workspace.requestSaveLayout();
+					}
 				});
 			});
 	}
 
 	private printFormatIsValid(printFormat: string): boolean {
 		return (
-			printFormat.length == 0 ||
+			printFormat.length === 0 ||
 			((printFormat.contains('${hours}') || printFormat.contains('${minutes}') || printFormat.contains('${seconds}')) &&
 				printFormat.length <= TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH)
 		);

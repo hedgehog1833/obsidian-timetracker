@@ -1,10 +1,9 @@
-import { Editor, EventRef, moment, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, moment, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import momentDurationFormatSetup from 'moment-duration-format';
 import format from './stopwatch/momentWrapper';
 import getFormat, { COMPLETE_TIME_FORMAT } from './stopwatch/formatSettings';
-import { StopwatchState } from './stopwatch/stopwatchState';
 
 momentDurationFormatSetup(moment);
 
@@ -57,11 +56,11 @@ export default class Timetracker extends Plugin {
 			name: 'Insert timestamp based on current stopwatch value',
 			icon: 'alarm-clock-plus',
 			editorCheckCallback: (checking: boolean, editor: Editor) => {
-				if (checking) {
+				if (checking === true) {
 					return this.timeTrackerView !== null;
 				}
 
-				if (this.timeTrackerView != null) {
+				if (this.timeTrackerView !== null) {
 					const formattedStopwatchTime = this.formatPrintValue(this.timeTrackerView);
 					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
@@ -77,11 +76,11 @@ export default class Timetracker extends Plugin {
 			name: 'Start or stop the stopwatch',
 			icon: 'alarm-clock',
 			checkCallback: (checking: boolean) => {
-				if (checking) {
-					return this.timeTrackerView != null;
+				if (checking === true) {
+					return this.timeTrackerView !== null;
 				}
 
-				if (this.timeTrackerView != null) {
+				if (this.timeTrackerView !== null) {
 					this.timeTrackerView.clickStartStop();
 					return true;
 				} else {
@@ -95,11 +94,11 @@ export default class Timetracker extends Plugin {
 			name: 'Reset the stopwatch',
 			icon: 'alarm-clock-off',
 			checkCallback: (checking: boolean) => {
-				if (checking) {
-					return this.timeTrackerView != null;
+				if (checking === true) {
+					return this.timeTrackerView !== null;
 				}
 
-				if (this.timeTrackerView != null) {
+				if (this.timeTrackerView !== null) {
 					this.timeTrackerView.clickReset();
 					return true;
 				} else {
@@ -127,11 +126,11 @@ export default class Timetracker extends Plugin {
 	}
 
 	initLeaf(): void {
-		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length) {
+		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length > 0) {
 			return;
 		}
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
-		if (rightLeaf) {
+		if (rightLeaf != null) {
 			rightLeaf.setViewState({
 				type: TIMETRACKER_VIEW_TYPE,
 			});
@@ -139,7 +138,7 @@ export default class Timetracker extends Plugin {
 	}
 
 	migrateFormat(settings: TimetrackerSettings | null): boolean {
-		if (settings?.format) {
+		if (settings?.format != null && settings.format.length > 0) {
 			settings.showHours = settings.format.contains('H') || settings.format.contains('h');
 			settings.showMinutes = settings.format.contains('M') || settings.format.contains('m');
 			settings.showSeconds = settings.format.contains('S') || settings.format.contains('s');
@@ -151,7 +150,7 @@ export default class Timetracker extends Plugin {
 	}
 
 	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
-		if (settings?.textColor?.length == 0) {
+		if (settings?.textColor?.length === 0) {
 			settings.textColor = '#dadada';
 			return true;
 		}
@@ -159,7 +158,7 @@ export default class Timetracker extends Plugin {
 	}
 
 	rgbToHex(rgbColor: string): string {
-		if (rgbColor) {
+		if (rgbColor.length > 0) {
 			const rgbValues = rgbColor.slice(4, -1);
 			const [r, g, b] = rgbValues.split(',').map((value) => parseInt(value));
 			const componentToHex = (c: number) => {
