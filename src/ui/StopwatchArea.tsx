@@ -57,7 +57,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	};
 
 	const clearInterval = (givenIntervalId?: number) => {
-		if (givenIntervalId != null && givenIntervalId !== 0) {
+		if (givenIntervalId !== undefined && givenIntervalId !== 0) {
 			window.clearInterval(givenIntervalId);
 		} else if (intervalId !== 0) {
 			window.clearInterval(intervalId);

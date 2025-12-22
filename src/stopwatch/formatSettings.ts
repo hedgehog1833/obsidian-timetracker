@@ -4,7 +4,7 @@ export const COMPLETE_TIME_FORMAT: string = 'HH:mm:ss';
 
 const getFormat = (settings: TimetrackerSettings, complete?: boolean): string => {
 	if (
-		(complete != null && complete === true) ||
+		complete === true ||
 		(settings.showHours === true && settings.showMinutes === true && settings.showSeconds === true)
 	) {
 		return COMPLETE_TIME_FORMAT;
