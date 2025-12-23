@@ -1,24 +1,36 @@
-import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { ItemView, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
-import React from 'react';
 import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
-import getFormat from '../stopwatch/formatSettings';
+import format from '../stopwatch/momentWrapper';
+import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 
 const VIEW_DISPLAY_TEXT = 'Timetracker sidebar';
 const VIEW_ICON = 'clock';
 
-export class TimetrackerView extends ItemView {
-	private readonly stopwatchModel: StopwatchModel;
+interface PersistentStopwatchState {
+	startedAt: number;
+	offset: number;
+	state: StopwatchState;
+	persistedOffset: number;
+}
+
+export class TimetrackerView extends ItemView implements PersistentStopwatchState {
 	private readonly settings: TimetrackerSettings;
 	private root: Root;
+	private stopwatchModel: StopwatchModel;
+	startedAt: number;
+	offset: number;
+	state: StopwatchState;
+	persistedOffset: number;
 
 	constructor(leaf: WorkspaceLeaf, settings: TimetrackerSettings) {
 		super(leaf);
 		this.settings = settings;
-		this.stopwatchModel = new StopwatchModel(getFormat(this.settings));
+
+		this.stopwatchModel = new StopwatchModel(0, 0, StopwatchState.INITIALIZED);
 	}
 
 	getDisplayText(): string {
@@ -33,26 +45,45 @@ export class TimetrackerView extends ItemView {
 		return VIEW_ICON;
 	}
 
-	getCurrentStopwatchTime(complete?: boolean): string {
-		return this.stopwatchModel.getCurrentValue(complete);
+	getElapsedTime(): number {
+		return this.stopwatchModel.getElapsedTime();
+	}
+
+	getCurrentStopwatchModelValues(): { startedAt: number; offset: number } {
+		return {
+			startedAt: this.stopwatchModel.getStartedAt(),
+			offset: this.stopwatchModel.getPausedAtOffset(),
+		};
 	}
 
 	setCurrentStopwatchTime(milliseconds: number): void {
 		this.clickReset();
 		this.stopwatchModel.setCurrentValue(milliseconds);
+		if (this.settings.persistTimerValue === true) {
+			this.app.workspace.requestSaveLayout();
+		}
 		this.clickReload();
 	}
 
 	start(): StopwatchState {
-		return this.stopwatchModel.start();
+		const state = this.stopwatchModel.start();
+		return state;
 	}
 
 	stop(): StopwatchState {
-		return this.stopwatchModel.stop();
+		const state = this.stopwatchModel.stop();
+		if (this.settings.persistTimerValue === true) {
+			this.app.workspace.requestSaveLayout();
+		}
+		return state;
 	}
 
 	reset(): StopwatchState {
-		return this.stopwatchModel.reset();
+		const state = this.stopwatchModel.reset();
+		if (this.settings.persistTimerValue === true) {
+			this.app.workspace.requestSaveLayout();
+		}
+		return state;
 	}
 
 	clickStartStop(): void {
@@ -70,10 +101,6 @@ export class TimetrackerView extends ItemView {
 		(el as HTMLButtonElement).click();
 	}
 
-	setFormatInStopwatch(): void {
-		this.stopwatchModel.setCurrentFormat(getFormat(this.settings));
-	}
-
 	async onOpen() {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
@@ -82,15 +109,57 @@ export class TimetrackerView extends ItemView {
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
-				getCurrentStopwatchTime={() => this.getCurrentStopwatchTime(true)}
+				getCurrentStopwatchTime={() => this.format()}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
+				saveWorkspace={() => this.app.workspace.requestSaveLayout()}
 			/>,
 		);
 	}
 
 	async onClose() {
-		if (this.root !== null && this.root !== undefined) {
+		if (this.root != null) {
 			this.root.unmount();
 		}
+	}
+
+	format(): string {
+		return format(this.stopwatchModel.getElapsedTime(), COMPLETE_TIME_FORMAT);
+	}
+
+	async setState(state: PersistentStopwatchState, result: ViewStateResult): Promise<void> {
+		if (state.startedAt > 0 && state.state != null) {
+			let adjustedState = state.state;
+			if (state.state === StopwatchState.STARTED) {
+				adjustedState = StopwatchState.STOPPED;
+			}
+			let startedAtToUse = state.startedAt;
+			let offsetToUse;
+			if (this.settings.persistTimerValue === false) {
+				startedAtToUse = 0;
+				offsetToUse = 0;
+				adjustedState = StopwatchState.INITIALIZED;
+			} else {
+				if (this.settings.persistTimerValue === true && state.persistedOffset > 0) {
+					offsetToUse = state.persistedOffset;
+				} else {
+					offsetToUse = state.offset;
+				}
+			}
+			this.stopwatchModel = new StopwatchModel(startedAtToUse, offsetToUse, adjustedState);
+		}
+
+		return super.setState(state, result);
+	}
+
+	getState() {
+		return {
+			startedAt: this.stopwatchModel.getStartedAt(),
+			offset: this.stopwatchModel.getPausedAtOffset(),
+			state: this.stopwatchModel.getState(),
+			persistedOffset:
+				this.settings.persistTimerValue === true && this.stopwatchModel.getState() === StopwatchState.STARTED
+					? this.stopwatchModel.calculateOffset()
+					: 0,
+		};
 	}
 }

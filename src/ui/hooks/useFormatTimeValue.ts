@@ -6,7 +6,7 @@ const useFormatTimeValue = (settings: TimetrackerSettings) => {
 		const parts = stopwatchValue.split(':');
 		let value = parts[timeUnit.valueOf()];
 
-		if (!isEditing && settings.trimLeadingZeros && value.startsWith('0')) {
+		if (isEditing === false && settings.trimLeadingZeros === true && value.startsWith('0')) {
 			value = value.slice(1);
 		}
 
@@ -22,11 +22,15 @@ const useFormatTimeValue = (settings: TimetrackerSettings) => {
 	};
 
 	const satisfiesHourConditions = (minutes: string, seconds: string): boolean => {
-		return !settings.showMinutes && !settings.showSeconds && (parseInt(minutes) > 0 || parseInt(seconds) > 0);
+		return (
+			settings.showMinutes === false &&
+			settings.showSeconds === false &&
+			(parseInt(minutes) > 0 || parseInt(seconds) > 0)
+		);
 	};
 
 	const satisfiesMinuteConditions = (hours: string, seconds: string): boolean => {
-		return parseInt(hours) > 0 || (!settings.showSeconds && parseInt(seconds) > 0);
+		return parseInt(hours) > 0 || (settings.showSeconds === false && parseInt(seconds) > 0);
 	};
 
 	const satisfiesSecondsConditions = (hours: string, minutes: string): boolean => {
@@ -34,7 +38,7 @@ const useFormatTimeValue = (settings: TimetrackerSettings) => {
 	};
 
 	const satisfiesDefaultConditions = (value: string, isEditing: boolean): boolean => {
-		return (value !== '0' && value !== '00') || isEditing;
+		return (value !== '0' && value !== '00') || isEditing === true;
 	};
 
 	return { doFormatTimeValue };

@@ -78,7 +78,7 @@ const useHandleRemoval = (
 		newValue: number | null,
 		timeUnit: TimeUnit,
 	) => {
-		if (newValue != null) {
+		if (newValue !== null) {
 			switch (timeUnit) {
 				case TimeUnit.HOURS:
 					doSetStopwatchValue(newValue, minutes, seconds);

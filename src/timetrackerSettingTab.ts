@@ -4,6 +4,9 @@ import StopwatchPlugin from './main';
 export class TimetrackerSettingTab extends PluginSettingTab {
 	plugin: StopwatchPlugin;
 	colorPickerInstance?: ColorComponent;
+	static PRINT_FORMAT_MAX_LENGTH = 255;
+	static PRINT_FORMAT_DESCRIPTION =
+		'Use the following placeholders: ${hours}, ${minutes}, ${seconds}.<br/>Trimming still applies.';
 
 	constructor(app: App, plugin: StopwatchPlugin) {
 		super(app, plugin);
@@ -15,11 +18,15 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		containerEl.createEl('h2', { text: 'Formatting' });
 		this.createFormatSetting(containerEl);
 		this.createTrimmingSetting(containerEl);
 		this.createLineBreakSetting(containerEl);
 		this.createTextColorSetting(containerEl);
 		this.createPrintFormatSetting(containerEl);
+
+		containerEl.createEl('h2', { text: 'Miscellaneous' });
+		this.createPersistenceSetting(containerEl);
 	}
 
 	private createFormatSetting(containerEl: HTMLElement): void {
@@ -91,23 +98,43 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	}
 
 	private createPrintFormatSetting(containerEl: HTMLElement): void {
-		const descriptionText =
-			'Use the following placeholders: ${hours}, ${minutes}, ${seconds}.<br/>Trimming still applies.';
-		const maxLength = 256;
 		const setting = new Setting(containerEl).setName('Printed time format').addText((component) => {
 			component
 				.setValue(this.plugin.settings.printFormat)
 				.setPlaceholder('${hours} hours and ${minutes} minutes')
 				.onChange(async (value) => {
-					if (value.length <= maxLength) {
-						this.plugin.settings.printFormat = value.trim().length == 0 && value.length != 0 ? '' : value;
-						setting.descEl.innerHTML = descriptionText;
+					if (this.printFormatIsValid(value)) {
+						this.plugin.settings.printFormat = value.trim().length === 0 && value.length !== 0 ? '' : value;
+						setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
 						await this.plugin.saveSettings();
 					} else {
-						setting.descEl.innerHTML = `Value is too long. Maximum length is ${maxLength} characters.`;
+						setting.descEl.innerHTML = `Invalid print format! Max length is ${TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH} and at least one placeholder has to be in use.`;
 					}
 				});
 		});
-		setting.descEl.innerHTML = descriptionText;
+		setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
+	}
+
+	private createPersistenceSetting(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName('Persistence')
+			.setDesc('Persist time value and restore after restart.')
+			.addToggle((component) => {
+				component.setValue(this.plugin.settings.persistTimerValue).onChange(async (value) => {
+					this.plugin.settings.persistTimerValue = value;
+					await this.plugin.saveSettings();
+					if (this.plugin.settings.persistTimerValue === true) {
+						this.app.workspace.requestSaveLayout();
+					}
+				});
+			});
+	}
+
+	private printFormatIsValid(printFormat: string): boolean {
+		return (
+			printFormat.length === 0 ||
+			((printFormat.contains('${hours}') || printFormat.contains('${minutes}') || printFormat.contains('${seconds}')) &&
+				printFormat.length <= TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH)
+		);
 	}
 }

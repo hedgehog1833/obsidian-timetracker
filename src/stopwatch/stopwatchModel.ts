@@ -1,16 +1,15 @@
 import { StopwatchState } from './stopwatchState';
-import format from './momentWrapper';
-import { COMPLETE_TIME_FORMAT } from './formatSettings';
 
 export class StopwatchModel {
-	private readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
-	private currentTimeFormat: string;
-	private startedAt: number = 0;
-	private pausedAtOffset: number = 0;
-	private state: StopwatchState = StopwatchState.INITIALIZED;
+	static readonly SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS: number = 100 * 60 * 60 * 1000 - 500;
+	private startedAt: number;
+	private pausedAtOffset: number;
+	private state: StopwatchState;
 
-	constructor(currentFormat: string) {
-		this.currentTimeFormat = currentFormat;
+	constructor(startedAt: number, pausedAtOffset: number, state: StopwatchState) {
+		this.startedAt = startedAt;
+		this.pausedAtOffset = pausedAtOffset;
+		this.state = state;
 	}
 
 	start(): StopwatchState {
@@ -20,7 +19,7 @@ export class StopwatchModel {
 	}
 
 	stop(): StopwatchState {
-		this.pausedAtOffset = Date.now() - this.startedAt + this.pausedAtOffset;
+		this.pausedAtOffset = this.calculateOffset();
 		this.state = StopwatchState.STOPPED;
 		return this.state;
 	}
@@ -32,7 +31,7 @@ export class StopwatchModel {
 		return this.state;
 	}
 
-	getCurrentValue(complete?: boolean): string {
+	getElapsedTime(): number {
 		let elapsedTime: number;
 
 		if (this.state === StopwatchState.STARTED) {
@@ -42,14 +41,13 @@ export class StopwatchModel {
 			elapsedTime = this.pausedAtOffset;
 		}
 
-		if (elapsedTime >= this.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS) {
+		if (elapsedTime >= StopwatchModel.SLIGHTLY_UNDER_ONE_HUNDRED_HOURS_MILLISECONDS) {
 			this.startedAt = Date.now();
 			this.pausedAtOffset = 0;
 			elapsedTime = 0;
 		}
 
-		const currentFormat = complete ? COMPLETE_TIME_FORMAT : this.currentTimeFormat;
-		return format(elapsedTime, currentFormat);
+		return elapsedTime;
 	}
 
 	setCurrentValue(milliseconds: number): void {
@@ -57,7 +55,19 @@ export class StopwatchModel {
 		this.pausedAtOffset = Date.now() - this.startedAt;
 	}
 
-	setCurrentFormat(newFormat: string): void {
-		this.currentTimeFormat = newFormat;
+	getStartedAt(): number {
+		return this.startedAt;
+	}
+
+	getPausedAtOffset(): number {
+		return this.pausedAtOffset;
+	}
+
+	getState(): StopwatchState {
+		return this.state;
+	}
+
+	calculateOffset(): number {
+		return Date.now() - this.startedAt + this.pausedAtOffset;
 	}
 }

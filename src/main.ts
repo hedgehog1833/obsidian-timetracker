@@ -2,6 +2,8 @@ import { Editor, moment, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import momentDurationFormatSetup from 'moment-duration-format';
+import format from './stopwatch/momentWrapper';
+import getFormat, { COMPLETE_TIME_FORMAT } from './stopwatch/formatSettings';
 
 momentDurationFormatSetup(moment);
 
@@ -19,6 +21,7 @@ export interface TimetrackerSettings {
 	lineBreakAfterInsert: boolean;
 	textColor: string;
 	printFormat: string;
+	persistTimerValue: boolean;
 }
 
 const DEFAULT_SETTINGS: TimetrackerSettings = {
@@ -31,16 +34,19 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 	lineBreakAfterInsert: false,
 	textColor: '',
 	printFormat: '',
+	persistTimerValue: false,
 };
 
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings;
+	timeTrackerView: TimetrackerView;
 
 	async onload() {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			return new TimetrackerView(leaf, this.settings);
+			this.timeTrackerView = new TimetrackerView(leaf, this.settings);
+			return this.timeTrackerView;
 		});
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
@@ -50,14 +56,12 @@ export default class Timetracker extends Plugin {
 			name: 'Insert timestamp based on current stopwatch value',
 			icon: 'alarm-clock-plus',
 			editorCheckCallback: (checking: boolean, editor: Editor) => {
-				const sidebarView = this.getView();
-
-				if (checking) {
-					return sidebarView !== null;
+				if (checking === true) {
+					return this.timeTrackerView !== null;
 				}
 
-				if (sidebarView != null) {
-					const formattedStopwatchTime = this.formatPrintValue(sidebarView);
+				if (this.timeTrackerView !== null) {
+					const formattedStopwatchTime = this.formatPrintValue(this.timeTrackerView);
 					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
 					return true;
@@ -72,14 +76,12 @@ export default class Timetracker extends Plugin {
 			name: 'Start or stop the stopwatch',
 			icon: 'alarm-clock',
 			checkCallback: (checking: boolean) => {
-				const sidebarView = this.getView();
-
-				if (checking) {
-					return sidebarView != null;
+				if (checking === true) {
+					return this.timeTrackerView !== null;
 				}
 
-				if (sidebarView != null) {
-					sidebarView.clickStartStop();
+				if (this.timeTrackerView !== null) {
+					this.timeTrackerView.clickStartStop();
 					return true;
 				} else {
 					return false;
@@ -92,14 +94,12 @@ export default class Timetracker extends Plugin {
 			name: 'Reset the stopwatch',
 			icon: 'alarm-clock-off',
 			checkCallback: (checking: boolean) => {
-				const sidebarView = this.getView();
-
-				if (checking) {
-					return sidebarView != null;
+				if (checking === true) {
+					return this.timeTrackerView !== null;
 				}
 
-				if (sidebarView != null) {
-					sidebarView.clickReset();
+				if (this.timeTrackerView !== null) {
+					this.timeTrackerView.clickReset();
 					return true;
 				} else {
 					return false;
@@ -122,34 +122,23 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		const view = this.getView();
-		view?.setFormatInStopwatch();
-		view?.clickReload();
+		this.timeTrackerView?.clickReload();
 	}
 
 	initLeaf(): void {
-		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length) {
+		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length > 0) {
 			return;
 		}
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
-		if (rightLeaf) {
+		if (rightLeaf != null) {
 			rightLeaf.setViewState({
 				type: TIMETRACKER_VIEW_TYPE,
 			});
 		}
 	}
 
-	getView(): TimetrackerView | null {
-		const leaf = this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).first();
-		if (leaf !== null && leaf !== undefined && leaf.view instanceof TimetrackerView) {
-			return leaf.view;
-		} else {
-			return null;
-		}
-	}
-
 	migrateFormat(settings: TimetrackerSettings | null): boolean {
-		if (settings?.format) {
+		if (settings?.format != null && settings.format.length > 0) {
 			settings.showHours = settings.format.contains('H') || settings.format.contains('h');
 			settings.showMinutes = settings.format.contains('M') || settings.format.contains('m');
 			settings.showSeconds = settings.format.contains('S') || settings.format.contains('s');
@@ -161,21 +150,15 @@ export default class Timetracker extends Plugin {
 	}
 
 	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
-		if (settings?.textColor?.length == 0) {
-			const sidebarView = this.getView();
-			if (sidebarView) {
-				const style = window.getComputedStyle(sidebarView.containerEl);
-				settings.textColor = style.color;
-			} else {
-				settings.textColor = '#dadada';
-			}
+		if (settings?.textColor?.length === 0) {
+			settings.textColor = '#dadada';
 			return true;
 		}
 		return false;
 	}
 
 	rgbToHex(rgbColor: string): string {
-		if (rgbColor) {
+		if (rgbColor.length > 0) {
 			const rgbValues = rgbColor.slice(4, -1);
 			const [r, g, b] = rgbValues.split(',').map((value) => parseInt(value));
 			const componentToHex = (c: number) => {
@@ -190,13 +173,13 @@ export default class Timetracker extends Plugin {
 	formatPrintValue(view: TimetrackerView): string {
 		let printValue: string;
 		if (this.settings.printFormat.length > 0) {
-			const stopwatchValues = this.getCurrentTimeValues(view);
+			const stopwatchValues = this.getCurrentTimeValues(view.getElapsedTime());
 			printValue = this.settings.printFormat
-				.replace('${hours}', stopwatchValues[0])
-				.replace('${minutes}', stopwatchValues[1])
-				.replace('${seconds}', stopwatchValues[2]);
+				.replace('${hours}', stopwatchValues.hours)
+				.replace('${minutes}', stopwatchValues.minutes)
+				.replace('${seconds}', stopwatchValues.seconds);
 		} else {
-			printValue = view.getCurrentStopwatchTime();
+			printValue = format(view.getElapsedTime(), getFormat(this.settings));
 		}
 		const textColor = window.getComputedStyle(view.containerEl)?.color;
 		return this.settings.textColor !== this.rgbToHex(textColor)
@@ -204,11 +187,11 @@ export default class Timetracker extends Plugin {
 			: printValue;
 	}
 
-	getCurrentTimeValues(view: TimetrackerView): [string, string, string] {
-		const stopwatchValues = view.getCurrentStopwatchTime(true).split(':');
+	getCurrentTimeValues(elapsedTime: number): { hours: string; minutes: string; seconds: string } {
+		const stopwatchValues = format(elapsedTime, COMPLETE_TIME_FORMAT).split(':');
 		const [hours, minutes, seconds] = stopwatchValues.map((value) =>
 			this.settings.trimLeadingZeros ? parseInt(value).toString() : value,
 		);
-		return [hours, minutes, seconds];
+		return { hours: hours, minutes: minutes, seconds: seconds };
 	}
 }
