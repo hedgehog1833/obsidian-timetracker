@@ -1,4 +1,4 @@
-import { Editor, moment, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Editor, moment, Plugin, Tasks, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import momentDurationFormatSetup from 'moment-duration-format';
@@ -108,6 +108,12 @@ export default class Timetracker extends Plugin {
 		});
 
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
+
+		this.app.workspace.on('quit', (tasks: Tasks) => {
+			tasks.add(async () => {
+				await this.app.workspace.requestSaveLayout().run();
+			});
+		});
 	}
 
 	onunload() {}
