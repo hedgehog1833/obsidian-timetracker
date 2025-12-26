@@ -111,7 +111,6 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 				stop={() => this.stop()}
 				getCurrentStopwatchTime={() => this.format()}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
-				saveWorkspace={() => this.app.workspace.requestSaveLayout()}
 			/>,
 		);
 	}
