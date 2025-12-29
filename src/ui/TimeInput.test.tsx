@@ -3,12 +3,12 @@ import TimeInput, { TimeInputProps } from './TimeInput';
 import { TimeUnit } from './timeUnit';
 import { createRef, useState } from 'react';
 import useAdjustTimeInputOnChange from './hooks/useAdjustTimeInputOnChange';
-import useHandleRemoval from './hooks/useHandleRemoval';
+import useAdjustTimeInputOnRemoval from './hooks/useAdjustTimeInputOnRemoval';
 import useSetStopwatchValue from './hooks/useSetStopwatchValue';
 import { TimetrackerSettings } from '../main';
 
 jest.mock('./hooks/useAdjustTimeInputOnChange');
-jest.mock('./hooks/useHandleRemoval');
+jest.mock('./hooks/useAdjustTimeInputOnRemoval');
 jest.mock('./hooks/useSetStopwatchValue');
 jest.mock('react', () => ({
 	...jest.requireActual('react'),
@@ -17,7 +17,7 @@ jest.mock('react', () => ({
 
 describe('TimeInput', () => {
 	const mockDoAdjustTimeInputOnChange = jest.fn();
-	const mockDoHandleRemoval = jest.fn();
+	const mockDoAdjustTimeInputOnRemoval = jest.fn();
 	const mockDoSetStopwatchValue = jest.fn();
 	const mockSetCursorPosition = jest.fn();
 
@@ -25,7 +25,9 @@ describe('TimeInput', () => {
 		(useAdjustTimeInputOnChange as jest.Mock).mockReturnValue({
 			doAdjustTimeInputOnChange: mockDoAdjustTimeInputOnChange,
 		});
-		(useHandleRemoval as jest.Mock).mockReturnValue({ doHandleRemoval: mockDoHandleRemoval });
+		(useAdjustTimeInputOnRemoval as jest.Mock).mockReturnValue({
+			doAdjustTimeInputOnRemoval: mockDoAdjustTimeInputOnRemoval,
+		});
 		(useSetStopwatchValue as jest.Mock).mockReturnValue({ doSetStopwatchValue: mockDoSetStopwatchValue });
 		(useState as jest.Mock).mockReturnValue([[], mockSetCursorPosition]);
 	});
@@ -106,8 +108,13 @@ describe('TimeInput', () => {
 		expect(mockSetCursorPosition).toHaveBeenCalledWith(selectionStart);
 	});
 
-	it('onKeyDown: should call doHandleRemoval on backspace key', () => {
+	it('onKeyDown: doAdjustTimeInputOnRemoval provides adjusted input values for doSetStopwatchValue on backspace key', () => {
 		// given
+		mockDoAdjustTimeInputOnRemoval.mockReturnValue({
+			tempHours: 3,
+			tempMinutes: 2,
+			tempSeconds: 1,
+		});
 		const { getByTestId } = render(<TimeInput {...defaultProps} />);
 		const input = getByTestId('time-input') as HTMLInputElement;
 
@@ -115,11 +122,14 @@ describe('TimeInput', () => {
 		fireEvent.keyDown(input, { key: 'Backspace' });
 
 		// then
-		expect(mockDoHandleRemoval).toHaveBeenCalledWith(
-			expect.any(Object),
-			defaultProps.stopwatchValue,
-			defaultProps.timeUnit,
-		);
+		expect(mockDoAdjustTimeInputOnRemoval).toHaveBeenCalled();
+		const returned = mockDoAdjustTimeInputOnRemoval.mock.results[0].value;
+		expect(returned).toEqual({
+			tempHours: 3,
+			tempMinutes: 2,
+			tempSeconds: 1,
+		});
+		expect(mockDoSetStopwatchValue).toHaveBeenCalledWith(3, 2, 1);
 	});
 
 	it('onKeyDown: should call setCursorPosition on backspace key', () => {
@@ -137,8 +147,13 @@ describe('TimeInput', () => {
 		expect(mockSetCursorPosition).toHaveBeenCalledWith(selectionStart + 1);
 	});
 
-	it('onKeyDown: should call doHandleRemoval on delete key', () => {
+	it('onKeyDown: doAdjustTimeInputOnRemoval provides adjusted input values for doSetStopwatchValue on delete key', () => {
 		// given
+		mockDoAdjustTimeInputOnRemoval.mockReturnValue({
+			tempHours: 3,
+			tempMinutes: 2,
+			tempSeconds: 1,
+		});
 		const { getByTestId } = render(<TimeInput {...defaultProps} />);
 		const input = getByTestId('time-input') as HTMLInputElement;
 
@@ -146,11 +161,14 @@ describe('TimeInput', () => {
 		fireEvent.keyDown(input, { key: 'Delete' });
 
 		// then
-		expect(mockDoHandleRemoval).toHaveBeenCalledWith(
-			expect.any(Object),
-			defaultProps.stopwatchValue,
-			defaultProps.timeUnit,
-		);
+		expect(mockDoAdjustTimeInputOnRemoval).toHaveBeenCalled();
+		const returned = mockDoAdjustTimeInputOnRemoval.mock.results[0].value;
+		expect(returned).toEqual({
+			tempHours: 3,
+			tempMinutes: 2,
+			tempSeconds: 1,
+		});
+		expect(mockDoSetStopwatchValue).toHaveBeenCalledWith(3, 2, 1);
 	});
 
 	it('onKeyDown: should call setCursorPosition on delete key', () => {
@@ -178,7 +196,7 @@ describe('TimeInput', () => {
 
 		// then
 		expect(mockSetCursorPosition).toHaveBeenCalledTimes(0);
-		expect(mockDoHandleRemoval).toHaveBeenCalledTimes(0);
+		expect(mockDoAdjustTimeInputOnRemoval).toHaveBeenCalledTimes(0);
 	});
 
 	it('onFocus: should set selectionRange on ref to zero', () => {

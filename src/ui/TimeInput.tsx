@@ -3,7 +3,7 @@ import { TimetrackerSettings } from '../main';
 import { TimeUnit } from './timeUnit';
 import useFormatTimeValue from './hooks/useFormatTimeValue';
 import useAdjustTimeInputOnChange from './hooks/useAdjustTimeInputOnChange';
-import useHandleRemoval from './hooks/useHandleRemoval';
+import useAdjustTimeInputOnRemoval from './hooks/useAdjustTimeInputOnRemoval';
 import useSetStopwatchValue from './hooks/useSetStopwatchValue';
 
 export type TimeInputProps = {
@@ -19,7 +19,7 @@ const TimeInput = (props: TimeInputProps) => {
 	const [cursorPosition, setCursorPosition] = useState<number | null>(null);
 	const { doFormatTimeValue } = useFormatTimeValue(props.settings);
 	const { doAdjustTimeInputOnChange } = useAdjustTimeInputOnChange();
-	const { doHandleRemoval } = useHandleRemoval(props.focusRef, props.setStopwatchValue);
+	const { doAdjustTimeInputOnRemoval } = useAdjustTimeInputOnRemoval(props.focusRef);
 	const { doSetStopwatchValue } = useSetStopwatchValue(props.setStopwatchValue);
 
 	useEffect(() => {
@@ -47,7 +47,10 @@ const TimeInput = (props: TimeInputProps) => {
 
 			if (cursorPosition != null) {
 				setCursorPosition(cursorPosition + 1);
-				doHandleRemoval(event, props.stopwatchValue, props.timeUnit);
+				const adjustedTimes = doAdjustTimeInputOnRemoval(event, props.stopwatchValue, props.timeUnit);
+				if (adjustedTimes != null) {
+					doSetStopwatchValue(adjustedTimes.tempHours, adjustedTimes.tempMinutes, adjustedTimes.tempSeconds);
+				}
 			}
 		}
 	};

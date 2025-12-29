@@ -1,14 +1,8 @@
 import React from 'react';
 import { TimeUnit } from '../timeUnit';
-import useSetStopwatchValue from './useSetStopwatchValue';
 
-const useHandleRemoval = (
-	focusRef: React.RefObject<HTMLInputElement | null>,
-	setStopwatchValue: (milliseconds: number) => void,
-) => {
-	const { doSetStopwatchValue } = useSetStopwatchValue(setStopwatchValue);
-
-	const doHandleRemoval = (
+const useAdjustTimeInputOnRemoval = (focusRef: React.RefObject<HTMLInputElement | null>) => {
+	const doAdjustTimeInputOnRemoval = (
 		event: React.KeyboardEvent<HTMLInputElement>,
 		stopwatchValue: string,
 		timeUnit: TimeUnit,
@@ -18,7 +12,7 @@ const useHandleRemoval = (
 		if (cursorPosition != null) {
 			const stopwatchValues = fetchStopwatchValues(stopwatchValue, timeUnit);
 			const newValue = buildNewValueOnRemoval(event, stopwatchValues.currentValue, cursorPosition);
-			setStopwatchValueOnRemoval(
+			return fetchNewValuesOnRemoval(
 				stopwatchValues.hours,
 				stopwatchValues.minutes,
 				stopwatchValues.seconds,
@@ -35,12 +29,12 @@ const useHandleRemoval = (
 	) => {
 		let newValue = null;
 		if ((cursorPosition === 0 && event.key === 'Delete') || (cursorPosition === 1 && event.key === 'Backspace')) {
-			newValue = parseInt(currentValue.toString().substring(1)) || 0;
+			newValue = parseInt(currentValue.toString().substring(1));
 		} else if (
 			(cursorPosition === 1 && event.key === 'Delete') ||
 			(cursorPosition === 2 && event.key === 'Backspace')
 		) {
-			newValue = parseInt(currentValue.toString().slice(0, -1)) || 0;
+			newValue = parseInt(currentValue.toString().slice(0, -1));
 		}
 		return newValue;
 	};
@@ -71,7 +65,7 @@ const useHandleRemoval = (
 		};
 	};
 
-	const setStopwatchValueOnRemoval = (
+	const fetchNewValuesOnRemoval = (
 		hours: number,
 		minutes: number,
 		seconds: number,
@@ -81,19 +75,28 @@ const useHandleRemoval = (
 		if (newValue !== null) {
 			switch (timeUnit) {
 				case TimeUnit.HOURS:
-					doSetStopwatchValue(newValue, minutes, seconds);
-					break;
+					return {
+						tempHours: newValue,
+						tempMinutes: minutes,
+						tempSeconds: seconds,
+					};
 				case TimeUnit.MINUTES:
-					doSetStopwatchValue(hours, newValue, seconds);
-					break;
+					return {
+						tempHours: hours,
+						tempMinutes: newValue,
+						tempSeconds: seconds,
+					};
 				case TimeUnit.SECONDS:
-					doSetStopwatchValue(hours, minutes, newValue);
-					break;
+					return {
+						tempHours: hours,
+						tempMinutes: minutes,
+						tempSeconds: newValue,
+					};
 			}
 		}
 	};
 
-	return { doHandleRemoval };
+	return { doAdjustTimeInputOnRemoval };
 };
 
-export default useHandleRemoval;
+export default useAdjustTimeInputOnRemoval;
