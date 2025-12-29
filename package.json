@@ -9,7 +9,8 @@
 		"format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
 		"lint": "npx eslint ./src",
 		"lint:fix": "npm run lint -- --fix",
-		"test": "jest"
+		"test": "jest",
+		"test:coverage": "jest --coverage"
 	},
 	"keywords": [],
 	"author": "Nils Dammenhayn",
