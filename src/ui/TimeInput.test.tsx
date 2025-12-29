@@ -2,25 +2,31 @@ import { render, fireEvent } from '@testing-library/react';
 import TimeInput, { TimeInputProps } from './TimeInput';
 import { TimeUnit } from './timeUnit';
 import { createRef, useState } from 'react';
-import useHandleTimeChange from './hooks/useHandleTimeChange';
+import useAdjustTimeInputOnChange from './hooks/useAdjustTimeInputOnChange';
 import useHandleRemoval from './hooks/useHandleRemoval';
+import useSetStopwatchValue from './hooks/useSetStopwatchValue';
 import { TimetrackerSettings } from '../main';
 
-jest.mock('./hooks/useHandleTimeChange');
+jest.mock('./hooks/useAdjustTimeInputOnChange');
 jest.mock('./hooks/useHandleRemoval');
+jest.mock('./hooks/useSetStopwatchValue');
 jest.mock('react', () => ({
 	...jest.requireActual('react'),
 	useState: jest.fn(),
 }));
 
 describe('TimeInput', () => {
-	const mockDoHandleTimeChange = jest.fn();
+	const mockDoAdjustTimeInputOnChange = jest.fn();
 	const mockDoHandleRemoval = jest.fn();
+	const mockDoSetStopwatchValue = jest.fn();
 	const mockSetCursorPosition = jest.fn();
 
 	beforeEach(() => {
-		(useHandleTimeChange as jest.Mock).mockReturnValue({ doHandleTimeChange: mockDoHandleTimeChange });
+		(useAdjustTimeInputOnChange as jest.Mock).mockReturnValue({
+			doAdjustTimeInputOnChange: mockDoAdjustTimeInputOnChange,
+		});
 		(useHandleRemoval as jest.Mock).mockReturnValue({ doHandleRemoval: mockDoHandleRemoval });
+		(useSetStopwatchValue as jest.Mock).mockReturnValue({ doSetStopwatchValue: mockDoSetStopwatchValue });
 		(useState as jest.Mock).mockReturnValue([[], mockSetCursorPosition]);
 	});
 
@@ -45,21 +51,46 @@ describe('TimeInput', () => {
 		expect(getByTestId('time-input') as HTMLInputElement).toBeDefined();
 	});
 
-	it('onChange: should call doHandleTimeChange on value change', () => {
+	it('onChange: doAdjustTimeInputOnChange provides adjusted input values for doSetStopwatchValue', () => {
 		// given
+		mockDoAdjustTimeInputOnChange.mockReturnValue({
+			tempHours: 3,
+			tempMinutes: 2,
+			tempSeconds: 1,
+		});
 		const { getByTestId } = render(<TimeInput {...defaultProps} />);
 		const input = getByTestId('time-input') as HTMLInputElement;
 
 		// when
-		fireEvent.change(input, { target: { value: '02' } });
+		fireEvent.change(input, { target: { value: '02', selectionStart: 2 } });
 
 		// then
-		expect(mockDoHandleTimeChange).toHaveBeenCalledWith(
-			expect.any(Object),
-			defaultProps.stopwatchValue,
-			defaultProps.timeUnit,
-		);
+		expect(mockDoAdjustTimeInputOnChange).toHaveBeenCalled();
+		const returned = mockDoAdjustTimeInputOnChange.mock.results[0].value;
+		expect(returned).toEqual({
+			tempHours: 3,
+			tempMinutes: 2,
+			tempSeconds: 1,
+		});
+		expect(mockDoSetStopwatchValue).toHaveBeenCalledWith(3, 2, 1);
 	});
+
+	it.each([null, undefined])(
+		'onChange: does not call doSetStopwatchValue when doAdjustTimeInputOnChange returns %p',
+		(returned) => {
+			// given
+			mockDoAdjustTimeInputOnChange.mockReturnValue(returned);
+			const { getByTestId } = render(<TimeInput {...defaultProps} />);
+			const input = getByTestId('time-input') as HTMLInputElement;
+
+			// when
+			fireEvent.change(input, { target: { value: '02', selectionStart: 2 } });
+
+			// then
+			expect(mockDoAdjustTimeInputOnChange).toHaveBeenCalled();
+			expect(mockDoSetStopwatchValue).not.toHaveBeenCalled();
+		},
+	);
 
 	it('onChange: should call setCursorPosition on value change', () => {
 		// given

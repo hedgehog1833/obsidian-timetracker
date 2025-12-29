@@ -1,14 +1,12 @@
 import React from 'react';
 import { TimeUnit } from '../timeUnit';
-import useSetStopwatchValue from './useSetStopwatchValue';
 
-const useHandleTimeChange = (setStopwatchValue: (milliseconds: number) => void) => {
-	const doHandleTimeChange = (
+const useAdjustTimeInputOnChange = () => {
+	const doAdjustTimeInputOnChange = (
 		event: React.ChangeEvent<HTMLInputElement>,
 		stopwatchValue: string,
 		timeUnit: TimeUnit,
 	) => {
-		const { doSetStopwatchValue } = useSetStopwatchValue(setStopwatchValue);
 		const newValue = parseInt(adjustInput(event));
 		const parts = stopwatchValue.split(':');
 		let tempHours = parseInt(parts[TimeUnit.HOURS.valueOf()]);
@@ -36,7 +34,11 @@ const useHandleTimeChange = (setStopwatchValue: (milliseconds: number) => void) 
 				break;
 		}
 
-		doSetStopwatchValue(tempHours, tempMinutes, tempSeconds);
+		return {
+			tempHours: tempHours,
+			tempMinutes: tempMinutes,
+			tempSeconds: tempSeconds,
+		};
 	};
 
 	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
@@ -50,7 +52,7 @@ const useHandleTimeChange = (setStopwatchValue: (milliseconds: number) => void) 
 		return value;
 	};
 
-	return { doHandleTimeChange };
+	return { doAdjustTimeInputOnChange };
 };
 
-export default useHandleTimeChange;
+export default useAdjustTimeInputOnChange;
