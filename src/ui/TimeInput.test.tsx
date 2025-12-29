@@ -53,6 +53,26 @@ describe('TimeInput', () => {
 		expect(getByTestId('time-input') as HTMLInputElement).toBeDefined();
 	});
 
+	it('placeholder is "0" when trimLeadingZeros is true', () => {
+		// given
+		const props = { ...defaultProps, settings: { trimLeadingZeros: true } as TimetrackerSettings };
+		const { getByTestId } = render(<TimeInput {...props} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
+
+		// then
+		expect(input.placeholder).toBe('0');
+	});
+
+	it('placeholder is "00" when trimLeadingZeros is false', () => {
+		// given
+		const props = { ...defaultProps, settings: { trimLeadingZeros: false } as TimetrackerSettings };
+		const { getByTestId } = render(<TimeInput {...props} />);
+		const input = getByTestId('time-input') as HTMLInputElement;
+
+		// then
+		expect(input.placeholder).toBe('00');
+	});
+
 	it('onChange: doAdjustTimeInputOnChange provides adjusted input values for doSetStopwatchValue', () => {
 		// given
 		mockDoAdjustTimeInputOnChange.mockReturnValue({
