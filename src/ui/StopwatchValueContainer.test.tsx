@@ -60,29 +60,39 @@ describe('StopwatchValueContainer', () => {
 	});
 
 	it(`clicking outside the wrapper changes button text back to 'Set'`, () => {
+		// given
 		const { getByTestId } = render(<StopwatchValueContainer {...defaultProps} />);
 		const button = getByTestId('stopwatch-edit-button') as HTMLButtonElement;
 
-		// enter edit mode
+		// when
 		fireEvent.click(button);
+
+		// then
 		expect(button.textContent).toBe('Return');
 
-		// click outside → should close
+		// when
 		fireEvent.mouseDown(document.body);
+
+		// then
 		expect(button.textContent).toBe('Set');
 	});
 
 	it('clicking inside the wrapper does not close editing', () => {
+		// given
 		const { getByTestId } = render(<StopwatchValueContainer {...defaultProps} />);
 		const container = getByTestId('stopwatch-value-container') as HTMLElement;
 		const button = getByTestId('stopwatch-edit-button') as HTMLButtonElement;
 
-		// enter edit mode
+		// when
 		fireEvent.click(button);
+
+		// then
 		expect(button.textContent).toBe('Return');
 
-		// click inside → should remain editing
+		// when
 		fireEvent.mouseDown(container);
+
+		// then
 		expect(button.textContent).toBe('Return');
 	});
 });
