@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TimeInput from './TimeInput';
 import { TimetrackerSettings } from '../main';
 import { TimeUnit } from './timeUnit';
@@ -10,7 +10,7 @@ export type StopwatchValueContainerProps = {
 	settings: TimetrackerSettings;
 };
 
-const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
+export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const inputHoursRef = useRef<HTMLInputElement>(null);
 	const inputMinutesRef = useRef<HTMLInputElement>(null);
@@ -94,11 +94,9 @@ const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 				)}
 			</div>
 
-			<button className="stopwatch-function-button" onClick={handleOnButtonClick}>
+			<button className="stopwatch-function-button" onClick={handleOnButtonClick} data-testid="stopwatch-edit-button">
 				{isEditing ? 'Return' : 'Set'}
 			</button>
 		</div>
 	);
 };
-
-export default StopwatchValueContainer;
