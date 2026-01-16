@@ -9,6 +9,8 @@ The stopwatch functionality is a completely rewritten clone of https://github.co
 
 ### Time format: hours, minutes, seconds
 
+asdfasdfasdf
+
 The format for how to print the stopwatch's current value. Default is to display hours, minutes and seconds `00:00:00`. 
 Each can be turned on and off separately. 
 
