@@ -5,7 +5,7 @@
 	"minAppVersion": "0.15.0",
 	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey.",
 	"author": "Nils Dammenhayn",
-	"authorUrl": "https://www.metal-detector.rocks",
+	"authorUrl": "https://codeberg.org/hedgehog1833",
 	"fundingUrl": "https://paypal.me/NilsDammenhayn",
 	"isDesktopOnly": false
 }
