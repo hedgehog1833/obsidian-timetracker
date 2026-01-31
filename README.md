@@ -1,5 +1,13 @@
 # Obsidian Timetracker plugin
 
+--------------
+This plugin's code moved to Codeberg: https://codeberg.org/hedgehog1833/obsidian-timetracker
+
+This repository will no longer receive updates and only contains tags and releases mirrored from Codeberg for releasing 
+to Obsidian. Please create any new issues or feature requests in the Codeberg repository.
+
+--------------
+
 This Obsidian plugin adds a stopwatch to track time of something. Per hotkey the stopwatch's current value can be inserted 
 into the editor, to make notes to 
 this precise moment in time. If you forgot to activate the stopwatch, you can set a custom start value.
