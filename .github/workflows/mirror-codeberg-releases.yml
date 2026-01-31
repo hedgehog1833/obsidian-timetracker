@@ -1,0 +1,112 @@
+name: Mirror tags & releases from Codeberg
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # 6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Add Codeberg remote and fetch tags
+        env:
+          CODEBERG_URL: https://codeberg.org/hedgehog1833/obsidian-timetracker.git
+        run: |
+          git remote add codeberg "$CODEBERG_URL" || true
+          git fetch codeberg --tags --prune
+
+      - name: Push tags to GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} --tags
+
+      - name: Create GitHub releases for tags and upload assets
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # 8.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const execSync = require('child_process').execSync;
+            const files = ['main.js', 'styles.css', 'manifest.json'];
+
+            const tagsOutput = execSync('git tag --list', { encoding: 'utf8' }).trim();
+            if (!tagsOutput) {
+              console.log('no tags found');
+              return;
+            }
+
+            const tags = tagsOutput.split('\n').filter(Boolean);
+
+            for (const tag of tags) {
+              let release;
+              try {
+                const resp = await github.rest.repos.getReleaseByTag({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag
+                });
+                release = resp.data;
+                console.log(`found existing release for ${tag} (id: ${release.id})`);
+              } catch (err) {
+                if (err.status === 404) {
+                  console.log(`creating release for ${tag}`);
+                  const createResp = await github.rest.repos.createRelease({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    tag_name: tag,
+                    name: tag,
+                    body: `Mirror release for ${tag} from Codeberg`,
+                    draft: false,
+                    prerelease: false
+                  });
+                  release = createResp.data;
+                } else {
+                  throw err;
+                }
+              }
+
+              const assetsResp = await github.rest.repos.listReleaseAssets({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                per_page: 100
+              });
+              const existingAssets = assetsResp.data.map(a => a.name);
+
+              for (const f of files) {
+                if (existingAssets.includes(f)) {
+                  console.log(`asset ${f} already present for ${tag}`);
+                  continue;
+                }
+
+                try {
+                  try {
+                    execSync(`git fetch codeberg refs/tags/${tag}:refs/tags/${tag}`, { stdio: 'ignore' });
+                  } catch (fetchErr) {
+                    execSync('git fetch codeberg --tags', { stdio: 'ignore' });
+                  }
+
+                  const blob = execSync(`git show refs/tags/${tag}:${f}`, { encoding: null });
+                  console.log(`uploading ${f} for ${tag} (size: ${blob.length})`);
+
+                  await github.rest.repos.uploadReleaseAsset({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    release_id: release.id,
+                    name: f,
+                    data: blob,
+                    headers: {
+                      'content-type': 'application/octet-stream',
+                      'content-length': blob.length
+                    }
+                  });
+                } catch (e) {
+                  console.log(`could not read ${f} at ${tag}: ${e.message}`);
+                }
+              }
+            }
