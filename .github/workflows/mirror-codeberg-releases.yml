@@ -61,7 +61,7 @@ jobs:
                   tag
                 });
                 console.log(`found existing release for ${tag} (id: ${resp.data.id})`);
-                continue;
+                // continue; test nilsd
               } catch (err) {
                 if (err.status === 404) {
                   console.log(`creating release for ${tag}`);
@@ -100,8 +100,10 @@ jobs:
                 } else {
                   console.log('no package.json, skipping build');
                 }
+                continue; // test nilsd
               } catch (buildErr) {
                 console.log(`build failed for ${tag}: ${buildErr.message}`);
+                continue;
               }
 
               const assetsResp = await github.rest.repos.listReleaseAssets({
