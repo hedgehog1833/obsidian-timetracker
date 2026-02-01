@@ -120,13 +120,12 @@ jobs:
                 }
 
                 try {
-                  try {
-                    execSync(`git fetch codeberg refs/tags/${tag}:refs/tags/${tag}`, { stdio: 'ignore' });
-                  } catch (fetchErr) {
-                    execSync('git fetch codeberg --tags', { stdio: 'ignore' });
+                  if (!fs.existsSync(f)) {
+                    console.log(`${f} not present in workspace for ${tag}, skipping`);
+                    continue;
                   }
 
-                  const blob = execSync(`git show refs/tags/${tag}:${f}`, { encoding: null });
+                  const blob = fs.readFileSync(f);
                   console.log(`uploading ${f} for ${tag} (size: ${blob.length})`);
 
                   await github.rest.repos.uploadReleaseAsset({
