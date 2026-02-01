@@ -29,12 +29,19 @@ jobs:
         run: |
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} --tags
 
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
+        with:
+          node-version: 24
+          cache: 'npm'
+
       - name: Create GitHub releases for tags and upload assets
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # 8.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const execSync = require('child_process').execSync;
+            const fs = require('fs');
             const files = ['main.js', 'styles.css', 'manifest.json'];
 
             const tagsOutput = execSync('git tag --list', { encoding: 'utf8' }).trim();
@@ -53,8 +60,8 @@ jobs:
                   repo: context.repo.repo,
                   tag
                 });
-                release = resp.data;
                 console.log(`found existing release for ${tag} (id: ${release.id})`);
+                continue;
               } catch (err) {
                 if (err.status === 404) {
                   console.log(`creating release for ${tag}`);
@@ -71,6 +78,30 @@ jobs:
                 } else {
                   throw err;
                 }
+              }
+
+              try {
+                console.log(`fetching and checking out ${tag}`);
+                try {
+                  execSync(`git fetch codeberg refs/tags/${tag}:refs/tags/${tag}`, { stdio: 'inherit' });
+                } catch (fetchErr) {
+                  execSync('git fetch codeberg --tags', { stdio: 'inherit' });
+                }
+              
+                // checkout the tag into detached HEAD and clean workspace
+                execSync(`git checkout -f refs/tags/${tag}`, { stdio: 'inherit' });
+                execSync('git clean -fdx', { stdio: 'inherit' });
+                                        
+                if (fs.existsSync('package.json')) {
+                  console.log('installing dependencies');
+                  execSync('npm ci', { stdio: 'inherit' });
+                  console.log('running build');
+                  execSync('npm run build', { stdio: 'inherit' });
+                } else {
+                  console.log('no package.json, skipping build');
+                }
+              } catch (buildErr) {
+                console.log(`build failed for ${tag}: ${buildErr.message}`);
               }
 
               const assetsResp = await github.rest.repos.listReleaseAssets({
