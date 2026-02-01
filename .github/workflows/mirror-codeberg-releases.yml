@@ -60,7 +60,7 @@ jobs:
                   repo: context.repo.repo,
                   tag
                 });
-                console.log(`found existing release for ${tag} (id: ${release.id})`);
+                console.log(`found existing release for ${tag} (id: ${resp.data.id})`);
                 continue;
               } catch (err) {
                 if (err.status === 404) {
