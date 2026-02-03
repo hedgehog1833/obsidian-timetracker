@@ -1,4 +1,4 @@
-name: Mirror tags & releases from Codeberg
+name: Mirror tags from Codeberg & create release for latest tag
 
 permissions:
   contents: write
@@ -11,7 +11,7 @@ jobs:
   mirror:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (full history)
+      - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # 6.0.1
         with:
           fetch-depth: 0
@@ -35,7 +35,7 @@ jobs:
           node-version: 24
           cache: 'npm'
 
-      - name: Create GitHub releases for tags and upload assets
+      - name: Create GitHub release for latest tag and upload assets
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # 8.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -53,39 +53,39 @@ jobs:
               console.log(`latest tag is ${latestTag}`);
             }
 
-            // let release;
-            // try {
-            //   const resp = await github.rest.repos.getReleaseByTag({
-            //     owner: context.repo.owner,
-            //     repo: context.repo.repo,
-            //     latestTag
-            //   });
-            //   console.log(`found existing release for ${latestTag} (id: ${resp.data.id})`);
-            //   return;
-            // } catch (err) {
-            //   if (err.status === 404) {
-            //     console.log(`creating draft release for ${latestTag}`);
-            //     const createResp = await github.rest.repos.createRelease({
-            //       owner: context.repo.owner,
-            //       repo: context.repo.repo,
-            //       tag_name: latestTag,
-            //       name: latestTag,
-            //       body: `Mirror release for ${latestTag} from Codeberg`,
-            //       draft: true,
-            //       prerelease: false
-            //     });
-            //     release = createResp.data;
-            //   } else {
-            //     console.log(`creating draft release for ${latestTag} failed: ${err.message}`);
-            //     return;
-            //   }
-            // }
+            let release;
+            try {
+              const response = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                latestTag
+              });
+              console.log(`found existing release for ${latestTag} (id: ${response.data.id})`);
+              return;
+            } catch (e) {
+              if (e.status === 404) {
+                console.log(`creating draft release for ${latestTag}`);
+                const createResp = await github.rest.repos.createRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag_name: latestTag,
+                  name: latestTag,
+                  body: `Mirror release for ${latestTag} from Codeberg`,
+                  draft: true,
+                  prerelease: false
+                });
+                release = createResp.data;
+              } else {
+                console.log(`creating draft release for ${latestTag} failed: ${e.message}`);
+                return;
+              }
+            }
 
             try {
               console.log(`fetching and checking out ${latestTag}`);
               try {
                 execSync(`git fetch codeberg refs/tags/${latestTag}:refs/tags/${latestTag}`, { stdio: 'inherit' });
-              } catch (fetchErr) {
+              } catch (e) {
                 execSync('git fetch codeberg --tags', { stdio: 'inherit' });
               }
             
@@ -98,76 +98,64 @@ jobs:
                 console.log('running build');
                 execSync('npm run build', { stdio: 'inherit' });
               } else {
-                console.log('no package.json, skipping build');
+                console.log('no package.json found, aborting');
+                return;
               }
-            } catch (buildErr) {
-              console.log(`build failed for ${latestTag}: ${buildErr.message}`);
+            } catch (e) {
+              console.log(`build failed for ${latestTag}: ${e.message}`);
               return;
             }
 
-            // const assetsResp = await github.rest.repos.listReleaseAssets({
-            //   owner: context.repo.owner,
-            //   repo: context.repo.repo,
-            //   release_id: release.id,
-            //   per_page: 100
-            // });
-            // const existingAssets = assetsResp.data.map(a => a.name);
+            for (const f of filesForRelease) {
+              try {
+                if (!fs.existsSync(f)) {
+                  console.log(`${f} not present in workspace for ${latestTag}, aborting`);
+                  return;
+                }
 
-            // for (const f of filesForRelease) {
-            //   if (existingAssets.includes(f)) {
-            //     console.log(`asset ${f} already present for ${latestTag}`);
-            //     continue;
-            //   }
+                const blob = fs.readFileSync(f);
+                console.log(`uploading ${f} for ${latestTag} (size: ${blob.length})`);
 
-            //   try {
-            //     if (!fs.existsSync(f)) {
-            //       console.log(`${f} not present in workspace for ${latestTag}, aborting`);
-            //       return;
-            //     }
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.id,
+                  name: f,
+                  data: blob,
+                  headers: {
+                    'content-type': 'application/octet-stream',
+                    'content-length': blob.length
+                  }
+                });
+              } catch (e) {
+                console.log(`could not read ${f} at ${latestTag}: ${e.message}`);
+              }
+            }
 
-            //     const blob = fs.readFileSync(f);
-            //     console.log(`uploading ${f} for ${latestTag} (size: ${blob.length})`);
+            try {
+              await github.rest.repos.updateRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                draft: false
+              });
+              console.log(`published release for ${latestTag} (id: ${release.id})`);
+            } catch (e) {
+              console.log(`failed to publish release for ${latestTag}: ${e.message}`);
+              // await github.rest.repos.deleteRelease({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.id });
+            }
 
-            //     await github.rest.repos.uploadReleaseAsset({
-            //       owner: context.repo.owner,
-            //       repo: context.repo.repo,
-            //       release_id: release.id,
-            //       name: f,
-            //       data: blob,
-            //       headers: {
-            //         'content-type': 'application/octet-stream',
-            //         'content-length': blob.length
-            //       }
-            //     });
-            //   } catch (e) {
-            //     console.log(`could not read ${f} at ${latestTag}: ${e.message}`);
-            //   }
-            // }
-
-            // try {
-            //   await github.rest.repos.updateRelease({
-            //     owner: context.repo.owner,
-            //     repo: context.repo.repo,
-            //     release_id: release.id,
-            //     draft: false
-            //   });
-            //   console.log(`published release for ${latestTag} (id: ${release.id})`);
-            // } catch (e) {
-            //   console.log(`failed to publish release for ${latestTag}: ${e.message}`);
-            //   // await github.rest.repos.deleteRelease({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.id });
-            // }
-            
             try {
               const filesToPush = ['manifest.json', 'versions.json'];
-              const targetBranch = 'test';
-            
+              const targetBranch = 'main';
+
               for (const filePath of filesToPush) {
                 if (!fs.existsSync(filePath)) {
                   console.log(`${filePath} not present in workspace for ${latestTag}, aborting`);
                   return;
                 }
               }
-            
+
               const refResponse = await github.rest.git.getRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -208,7 +196,7 @@ jobs:
                 base_tree: baseTreeSha,
                 tree
               });
-            
+
               const message = `chore(release): update ${filesToPush.join(', ')} from ${latestTag}`;
               const newCommitResponse = await github.rest.git.createCommit({
                 owner: context.repo.owner,
@@ -217,14 +205,14 @@ jobs:
                 tree: newTreeResponse.data.sha,
                 parents: [baseCommitSha]
               });
-            
+
               await github.rest.git.updateRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 ref: `heads/${targetBranch}`,
                 sha: newCommitResponse.data.sha
               });
-            
+
               console.log(`committed ${filesToPush.join(', ')} to ${targetBranch} (commit: ${newCommitResponse.data.sha})`);
             } catch (e) {
               console.log(`failed to update files on ${targetBranch}: ${e.message}`);
