@@ -44,14 +44,13 @@ jobs:
             const fs = require('fs');
             const filesForRelease = ['main.js', 'styles.css', 'manifest.json'];
 
-            const lastTag = execSync('git tag --list --sort=-creatordate | head -n 1', { encoding: 'utf8' }).trim();
+            const latestTag = execSync('git tag --list --sort=-creatordate | head -n 1', { encoding: 'utf8' }).trim();
 
-            if (!lastTag) {
+            if (!latestTag) {
               console.log('no tags found');
               return;
             } else {
-              console.log(`latest tag is ${lastTag}`);
-              return;
+              console.log(`latest tag is ${latestTag}`);
             }
 
             let release;
@@ -59,19 +58,19 @@ jobs:
               const resp = await github.rest.repos.getReleaseByTag({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                lastTag
+                latestTag
               });
-              console.log(`found existing release for ${lastTag} (id: ${resp.data.id})`);
+              console.log(`found existing release for ${latestTag} (id: ${resp.data.id})`);
               return;
             } catch (err) {
               if (err.status === 404) {
-                console.log(`creating draft release for ${lastTag}`);
+                console.log(`creating draft release for ${latestTag}`);
                 const createResp = await github.rest.repos.createRelease({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  tag_name: lastTag,
-                  name: lastTag,
-                  body: `Mirror release for ${lastTag} from Codeberg`,
+                  tag_name: latestTag,
+                  name: latestTag,
+                  body: `Mirror release for ${latestTag} from Codeberg`,
                   draft: true,
                   prerelease: false
                 });
@@ -82,14 +81,14 @@ jobs:
             }
 
             try {
-              console.log(`fetching and checking out ${lastTag}`);
+              console.log(`fetching and checking out ${latestTag}`);
               try {
-                execSync(`git fetch codeberg refs/tags/${lastTag}:refs/tags/${lastTag}`, { stdio: 'inherit' });
+                execSync(`git fetch codeberg refs/tags/${latestTag}:refs/tags/${latestTag}`, { stdio: 'inherit' });
               } catch (fetchErr) {
                 execSync('git fetch codeberg --tags', { stdio: 'inherit' });
               }
             
-              execSync(`git checkout -f refs/tags/${lastTag}`, { stdio: 'inherit' });
+              execSync(`git checkout -f refs/tags/${latestTag}`, { stdio: 'inherit' });
               execSync('git clean -fdx', { stdio: 'inherit' });
                                       
               if (fs.existsSync('package.json')) {
@@ -101,7 +100,7 @@ jobs:
                 console.log('no package.json, skipping build');
               }
             } catch (buildErr) {
-              console.log(`build failed for ${lastTag}: ${buildErr.message}`);
+              console.log(`build failed for ${latestTag}: ${buildErr.message}`);
               return;
             }
 
@@ -115,18 +114,18 @@ jobs:
 
             for (const f of filesForRelease) {
               if (existingAssets.includes(f)) {
-                console.log(`asset ${f} already present for ${lastTag}`);
+                console.log(`asset ${f} already present for ${latestTag}`);
                 continue;
               }
 
               try {
                 if (!fs.existsSync(f)) {
-                  console.log(`${f} not present in workspace for ${lastTag}, skipping`);
+                  console.log(`${f} not present in workspace for ${latestTag}, skipping`);
                   continue;
                 }
 
                 const blob = fs.readFileSync(f);
-                console.log(`uploading ${f} for ${lastTag} (size: ${blob.length})`);
+                console.log(`uploading ${f} for ${latestTag} (size: ${blob.length})`);
 
                 await github.rest.repos.uploadReleaseAsset({
                   owner: context.repo.owner,
@@ -140,7 +139,7 @@ jobs:
                   }
                 });
               } catch (e) {
-                console.log(`could not read ${f} at ${lastTag}: ${e.message}`);
+                console.log(`could not read ${f} at ${latestTag}: ${e.message}`);
               }
             }
 
@@ -151,8 +150,8 @@ jobs:
                 release_id: release.id,
                 draft: false
               });
-              console.log(`published release for ${lastTag} (id: ${release.id})`);
+              console.log(`published release for ${latestTag} (id: ${release.id})`);
             } catch (e) {
-              console.log(`failed to publish release for ${lastTag}: ${e.message}`);
+              console.log(`failed to publish release for ${latestTag}: ${e.message}`);
               // await github.rest.repos.deleteRelease({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.id });
             }
