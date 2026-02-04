@@ -29,191 +29,35 @@ jobs:
         run: |
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} --tags
 
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
+
+      - name: Checkout latest tag
+        run: |
+          git checkout -f "refs/tags/${{ steps.get_tag.outputs.tag }}"
+          git clean -fdx
+
       - name: Setup Node
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
         with:
           node-version: 24
 
-      - name: Create GitHub release for latest tag and upload assets
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # 8.0.0
+      - name: Build assets
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build
+          else
+            echo "No package.json found, aborting."
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const execSync = require('child_process').execSync;
-            const fs = require('fs');
-            const filesForRelease = ['main.js', 'styles.css', 'manifest.json'];
-
-            const latestTag = execSync('git tag --list --sort=-creatordate | head -n 1', { encoding: 'utf8' }).trim();
-
-            if (!latestTag) {
-              console.log('no tags found');
-              return;
-            } else {
-              console.log(`latest tag is ${latestTag}`);
-            }
-
-            let release;
-            try {
-              const response = await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                latestTag
-              });
-              console.log(`found existing release for ${latestTag} (id: ${response.data.id})`);
-              return;
-            } catch (e) {
-              if (e.status === 404) {
-                console.log(`creating draft release for ${latestTag}`);
-                const createResp = await github.rest.repos.createRelease({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  tag_name: latestTag,
-                  name: latestTag,
-                  body: `Mirror release for ${latestTag} from Codeberg`,
-                  draft: true,
-                  prerelease: false
-                });
-                release = createResp.data;
-              } else {
-                console.log(`creating draft release for ${latestTag} failed: ${e.message}`);
-                return;
-              }
-            }
-
-            try {
-              console.log(`fetching and checking out ${latestTag}`);
-              try {
-                execSync(`git fetch codeberg refs/tags/${latestTag}:refs/tags/${latestTag}`, { stdio: 'inherit' });
-              } catch (e) {
-                execSync('git fetch codeberg --tags', { stdio: 'inherit' });
-              }
-            
-              execSync(`git checkout -f refs/tags/${latestTag}`, { stdio: 'inherit' });
-              execSync('git clean -fdx', { stdio: 'inherit' });
-
-              if (fs.existsSync('package.json')) {
-                console.log('installing dependencies');
-                execSync('npm ci', { stdio: 'inherit' });
-                console.log('running build');
-                execSync('npm run build', { stdio: 'inherit' });
-              } else {
-                console.log('no package.json found, aborting');
-                return;
-              }
-            } catch (e) {
-              console.log(`build failed for ${latestTag}: ${e.message}`);
-              return;
-            }
-
-            for (const f of filesForRelease) {
-              try {
-                if (!fs.existsSync(f)) {
-                  console.log(`${f} not present in workspace for ${latestTag}, aborting`);
-                  return;
-                }
-
-                const blob = fs.readFileSync(f);
-                console.log(`uploading ${f} for ${latestTag} (size: ${blob.length})`);
-
-                await github.rest.repos.uploadReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  release_id: release.id,
-                  name: f,
-                  data: blob,
-                  headers: {
-                    'content-type': 'application/octet-stream',
-                    'content-length': blob.length
-                  }
-                });
-              } catch (e) {
-                console.log(`could not read ${f} at ${latestTag}: ${e.message}`);
-              }
-            }
-
-            try {
-              await github.rest.repos.updateRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: release.id,
-                draft: false
-              });
-              console.log(`published release for ${latestTag} (id: ${release.id})`);
-            } catch (e) {
-              console.log(`failed to publish release for ${latestTag}: ${e.message}`);
-              // await github.rest.repos.deleteRelease({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.id });
-            }
-
-            try {
-              const filesToPush = ['manifest.json', 'versions.json'];
-              const targetBranch = 'main';
-
-              for (const filePath of filesToPush) {
-                if (!fs.existsSync(filePath)) {
-                  console.log(`${filePath} not present in workspace for ${latestTag}, aborting`);
-                  return;
-                }
-              }
-
-              const refResponse = await github.rest.git.getRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `heads/${targetBranch}`
-              });
-              const baseCommitSha = refResponse.data.object.sha;
-
-              const commitResponse = await github.rest.git.getCommit({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: baseCommitSha
-              });
-              const baseTreeSha = commitResponse.data.tree.sha;
-
-              const tree = [];
-              for (const filePath of filesToPush) {
-                const content = fs.readFileSync(filePath);
-                const base64Content = Buffer.from(content).toString('base64');
-
-                const blobResponse = await github.rest.git.createBlob({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  content: base64Content,
-                  encoding: 'base64'
-                });
-
-                tree.push({
-                  path: filePath,
-                  mode: '100644',
-                  type: 'blob',
-                  sha: blobResponse.data.sha
-                });
-              }
-
-              const newTreeResponse = await github.rest.git.createTree({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                base_tree: baseTreeSha,
-                tree
-              });
-
-              const message = `chore(release): update ${filesToPush.join(', ')} from ${latestTag}`;
-              const newCommitResponse = await github.rest.git.createCommit({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                message,
-                tree: newTreeResponse.data.sha,
-                parents: [baseCommitSha]
-              });
-
-              await github.rest.git.updateRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `heads/${targetBranch}`,
-                sha: newCommitResponse.data.sha
-              });
-
-              console.log(`committed ${filesToPush.join(', ')} to ${targetBranch} (commit: ${newCommitResponse.data.sha})`);
-            } catch (e) {
-              console.log(`failed to update files on ${targetBranch}: ${e.message}`);
-              return;
-            }
+          files: |
+            main.js
+            manifest.json
+            styles.css
