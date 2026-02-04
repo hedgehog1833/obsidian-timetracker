@@ -57,6 +57,9 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
         with:
+          name: ${{ steps.get_tag.outputs.tag }}
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          body: ${{ format('Mirror release for tag {0} from Codeberg.', steps.get_tag.outputs.tag) }}
           files: |
             main.js
             manifest.json
