@@ -1,4 +1,4 @@
-name: Mirror tags from Codeberg & create release for latest tag
+name: Mirror latest tag from Codeberg & create release
 
 permissions:
   contents: write
