@@ -34,6 +34,14 @@ jobs:
         run: |
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
 
+      - name: Abort if latest Codeberg tag matches GitHub
+        run: |
+          latest_github_tag=$(git ls-remote --tags origin | awk '{print $2}' | grep -o 'refs/tags/[^{}]*$' | sed 's|refs/tags/||' | sort -V -r | head -n 1)
+          if [ "$latest_github_tag" = ${{ steps.get_tag.outputs.tag }} ]; then
+            echo "No new tag to mirror. Exiting."
+            exit 0
+          fi
+
       - name: Checkout latest tag
         run: |
           git checkout -f "refs/tags/${{ steps.get_tag.outputs.tag }}"
