@@ -39,43 +39,43 @@ jobs:
         run: |
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
 
-#      - name: Abort if latest Codeberg tag matches GitHub
-#        run: |
-#          if [ ${{ steps.get_codeberg_tag.outputs.tag }} = ${{ steps.get_github_tag.outputs.tag }} ]; then
-#            echo "No new tag to mirror. Current is: ${{ steps.get_codeberg_tag.outputs.tag }}"
-#            exit 0
-#          fi
+      - name: Abort if latest Codeberg tag matches GitHub
+        run: |
+          if [ ${{ steps.get_codeberg_tag.outputs.tag }} = ${{ steps.get_github_tag.outputs.tag }} ]; then
+            echo "No new tag to mirror. Current is: ${{ steps.get_codeberg_tag.outputs.tag }}"
+            exit 0
+          fi
 
-#      - name: Checkout latest tag
-#        run: |
-#          git checkout -f "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}"
-#          git clean -fdx
+      - name: Checkout latest tag
+        run: |
+          git checkout -f "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}"
+          git clean -fdx
 
-#      - name: Setup Node
-#        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
-#        with:
-#          node-version: 24
-#
-#      - name: Build assets
-#        run: |
-#          if [ -f package.json ]; then
-#            npm ci
-#            npm run build
-#          else
-#            echo "No package.json found, aborting."
-#            exit 1
-#          fi
-#
-#      - name: Create GitHub release
-#        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
-#        with:
-#          name: ${{ steps.get_codeberg_tag.outputs.tag }}
-#          tag_name: ${{ steps.get_codeberg_tag.outputs.tag }}
-#          body: "Mirror release for tag ${{ steps.get_codeberg_tag.outputs.tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ steps.get_codeberg_tag.outputs.tag }})."
-#          files: |
-#            main.js
-#            manifest.json
-#            styles.css
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
+        with:
+          node-version: 24
+
+      - name: Build assets
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build
+          else
+            echo "No package.json found, aborting."
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
+        with:
+          name: ${{ steps.get_codeberg_tag.outputs.tag }}
+          tag_name: ${{ steps.get_codeberg_tag.outputs.tag }}
+          body: "Mirror release for tag ${{ steps.get_codeberg_tag.outputs.tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ steps.get_codeberg_tag.outputs.tag }})."
+          files: |
+            main.js
+            manifest.json
+            styles.css
 
       - name: Update manifest and versions on main
         env:
