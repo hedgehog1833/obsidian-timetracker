@@ -34,59 +34,57 @@ jobs:
         run: |
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} --tags
 
-      - name: Get latest codeberg tag
+      - name: Get latest Codeberg tag
         id: get_codeberg_tag
         run: |
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
 
       - name: Abort if latest Codeberg tag matches GitHub
         run: |
-          latest_github_tag=$(git ls-remote --tags origin | awk '{print $2}' | grep -o 'refs/tags/[^{}]*$' | sed 's|refs/tags/||' | sort -V -r | head -n 1)
           if [ ${{ steps.get_codeberg_tag.outputs.tag }} = ${{ steps.get_github_tag.outputs.tag }} ]; then
-            echo "No new tag to mirror. Exiting. GitHub latest tag: ${{ steps.get_codeberg_tag.outputs.tag }}, Codeberg latest tag: ${{ steps.get_codeberg_tag.outputs.tag }}"
-            echo "Other git command latest tag: $latest_github_tag"
+            echo "No new tag to mirror. Current is: ${{ steps.get_codeberg_tag.outputs.tag }}"
             exit 0
           fi
 
-#      - name: Checkout latest tag
-#        run: |
-#          git checkout -f "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}"
-#          git clean -fdx
-#
-#      - name: Setup Node
-#        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
-#        with:
-#          node-version: 24
-#
-#      - name: Build assets
-#        run: |
-#          if [ -f package.json ]; then
-#            npm ci
-#            npm run build
-#          else
-#            echo "No package.json found, aborting."
-#            exit 1
-#          fi
-#
-#      - name: Create GitHub release
-#        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
-#        with:
-#          name: ${{ steps.get_codeberg_tag.outputs.tag }}
-#          tag_name: ${{ steps.get_codeberg_tag.outputs.tag }}
-#          body: "Mirror release for tag ${{ steps.get_codeberg_tag.outputs.tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ steps.get_codeberg_tag.outputs.tag }})."
-#          files: |
-#            main.js
-#            manifest.json
-#            styles.css
-#
-#      - name: Update manifest and versions on main
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          git fetch origin main
-#          git checkout main
-#          git pull
-#          git checkout "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}" -- manifest.json versions.json
-#          git add manifest.json versions.json
-#          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ steps.get_codeberg_tag.outputs.tag }}"
-#          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} main
+      - name: Checkout latest tag
+        run: |
+          git checkout -f "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}"
+          git clean -fdx
+
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
+        with:
+          node-version: 24
+
+      - name: Build assets
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build
+          else
+            echo "No package.json found, aborting."
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
+        with:
+          name: ${{ steps.get_codeberg_tag.outputs.tag }}
+          tag_name: ${{ steps.get_codeberg_tag.outputs.tag }}
+          body: "Mirror release for tag ${{ steps.get_codeberg_tag.outputs.tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ steps.get_codeberg_tag.outputs.tag }})."
+          files: |
+            main.js
+            manifest.json
+            styles.css
+
+      - name: Update manifest and versions on main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull
+          git checkout "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}" -- manifest.json versions.json
+          git add manifest.json versions.json
+          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ steps.get_codeberg_tag.outputs.tag }}"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} main
