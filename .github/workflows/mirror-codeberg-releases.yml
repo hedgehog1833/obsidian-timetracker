@@ -46,6 +46,11 @@ jobs:
     if: needs.fetch-tags.outputs.codeberg_tag == needs.fetch-tags.outputs.github_tag
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          fetch-depth: 0
+
       - name: Checkout latest tag
         run: |
           echo "Checking out tag ${{ needs.fetch-tags.outputs.codeberg_tag }}"
