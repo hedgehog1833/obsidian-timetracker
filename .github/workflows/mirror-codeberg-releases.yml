@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
-        with:
-          fetch-depth: 0
 
       - name: Get latest github tag
         id: get_github_tag
@@ -48,12 +46,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
-        with:
-          fetch-depth: 0
 
       - name: Checkout latest tag
         run: |
-          echo "Checking out tag ${{ needs.fetch-tags.outputs.codeberg_tag }}"
           git checkout -f "refs/tags/${{ needs.fetch-tags.outputs.codeberg_tag }}"
           git clean -fdx
 
