@@ -43,12 +43,13 @@ jobs:
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
   release:
     needs: fetch-tags
-    if: needs.fetch-tags.outputs.codeberg_tag != needs.fetch-tags.outputs.github_tag
+    if: needs.fetch-tags.outputs.codeberg_tag == needs.fetch-tags.outputs.github_tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout latest tag
         run: |
-          git checkout -f "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}"
+          echo "Checking out tag ${{ needs.fetch-tags.outputs.codeberg_tag }}"
+          git checkout -f "refs/tags/${{ needs.fetch-tags.outputs.codeberg_tag }}"
           git clean -fdx
 
       - name: Setup Node
@@ -69,9 +70,9 @@ jobs:
 #      - name: Create GitHub release
 #        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
 #        with:
-#          name: ${{ steps.get_codeberg_tag.outputs.tag }}
-#          tag_name: ${{ steps.get_codeberg_tag.outputs.tag }}
-#          body: "Mirror release for tag ${{ steps.get_codeberg_tag.outputs.tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ steps.get_codeberg_tag.outputs.tag }})."
+#          name: ${{ needs.fetch-tags.outputs.codeberg_tag }}
+#          tag_name: ${{ needs.fetch-tags.outputs.codeberg_tag }}
+#          body: "Mirror release for tag ${{ needs.fetch-tags.outputs.codeberg_tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ needs.fetch-tags.outputs.codeberg_tag }})."
 #          files: |
 #            main.js
 #            manifest.json
@@ -86,7 +87,7 @@ jobs:
 #          git fetch origin main
 #          git checkout main
 #          git pull
-#          git checkout "refs/tags/${{ steps.get_codeberg_tag.outputs.tag }}" -- manifest.json versions.json
+#          git checkout "refs/tags/${{ needs.fetch-tags.outputs.codeberg_tag }}" -- manifest.json versions.json
 #          git add manifest.json versions.json
-#          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ steps.get_codeberg_tag.outputs.tag }}"
+#          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ needs.fetch-tags.outputs.codeberg_tag }}"
 #          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} main
