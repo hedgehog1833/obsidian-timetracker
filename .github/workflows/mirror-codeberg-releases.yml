@@ -46,6 +46,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          fetch-depth: 0
 
       - name: Checkout latest tag
         run: |
@@ -67,27 +69,27 @@ jobs:
             exit 1
           fi
 
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
-        with:
-          name: ${{ needs.fetch-tags.outputs.codeberg_tag }}
-          tag_name: ${{ needs.fetch-tags.outputs.codeberg_tag }}
-          body: "Mirror release for tag ${{ needs.fetch-tags.outputs.codeberg_tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ needs.fetch-tags.outputs.codeberg_tag }})."
-          files: |
-            main.js
-            manifest.json
-            styles.css
-
-      - name: Update manifest and versions on main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git checkout main
-          git pull
-          git checkout "refs/tags/${{ needs.fetch-tags.outputs.codeberg_tag }}" -- manifest.json versions.json
-          git add manifest.json versions.json
-          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ needs.fetch-tags.outputs.codeberg_tag }}"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} main
+#      - name: Create GitHub release
+#        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
+#        with:
+#          name: ${{ needs.fetch-tags.outputs.codeberg_tag }}
+#          tag_name: ${{ needs.fetch-tags.outputs.codeberg_tag }}
+#          body: "Mirror release for tag ${{ needs.fetch-tags.outputs.codeberg_tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ needs.fetch-tags.outputs.codeberg_tag }})."
+#          files: |
+#            main.js
+#            manifest.json
+#            styles.css
+#
+#      - name: Update manifest and versions on main
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          git config --global user.name "github-actions[bot]"
+#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#          git fetch origin main
+#          git checkout main
+#          git pull
+#          git checkout "refs/tags/${{ needs.fetch-tags.outputs.codeberg_tag }}" -- manifest.json versions.json
+#          git add manifest.json versions.json
+#          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ needs.fetch-tags.outputs.codeberg_tag }}"
+#          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} main
