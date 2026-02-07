@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
   release:
-    if: steps.get_codeberg_tag.outputs.tag != steps.get_github_tag.outputs.tag
+    if: "${{ steps.get_codeberg_tag.outputs.tag != steps.get_github_tag.outputs.tag }}"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout latest tag
