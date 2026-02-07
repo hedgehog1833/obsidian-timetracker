@@ -43,7 +43,7 @@ jobs:
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
   release:
     needs: fetch-tags
-    if: needs.fetch-tags.outputs.codeberg_tag == needs.fetch-tags.outputs.github_tag
+    if: needs.fetch-tags.outputs.codeberg_tag != needs.fetch-tags.outputs.github_tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
