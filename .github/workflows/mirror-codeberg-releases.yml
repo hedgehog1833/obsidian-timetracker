@@ -10,6 +10,9 @@ on:
 jobs:
   fetch-tags:
     runs-on: ubuntu-latest
+    outputs:
+      github_tag: ${{ steps.get_github_tag.outputs.tag }}
+      codeberg_tag: ${{ steps.get_codeberg_tag.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
@@ -39,7 +42,8 @@ jobs:
         run: |
           echo "tag=$(git tag --list --sort=-creatordate | head -n 1)" >> $GITHUB_OUTPUT
   release:
-    if: "${{ steps.get_codeberg_tag.outputs.tag != steps.get_github_tag.outputs.tag }}"
+    needs: fetch-tags
+    if: needs.fetch-tags.outputs.codeberg_tag != needs.fetch-tags.outputs.github_tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout latest tag
