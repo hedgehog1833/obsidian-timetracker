@@ -63,13 +63,8 @@ jobs:
 
       - name: Build assets
         run: |
-          if [ -f package.json ]; then
-            npm ci
-            npm run build
-          else
-            echo "No package.json found, aborting."
-            exit 1
-          fi
+          npm ci
+          npm run build
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
