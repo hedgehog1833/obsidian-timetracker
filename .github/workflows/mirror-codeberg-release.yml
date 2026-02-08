@@ -31,6 +31,7 @@ jobs:
         env:
           CODEBERG_URL: https://codeberg.org/hedgehog1833/obsidian-timetracker.git
         run: |
+          echo "github tags: ${{ steps.get_github_tags.outputs.tags }}"
           git remote add codeberg "$CODEBERG_URL" || true
           git fetch codeberg --tags --prune
 
@@ -41,7 +42,7 @@ jobs:
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} --tags
   release:
     needs: fetch-tags
-    if: "!contains(needs.fetch-tags.outputs.github_tags, inputs.release_tag)"
+    if: "contains(needs.fetch-tags.outputs.github_tags, inputs.release_tag)"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
