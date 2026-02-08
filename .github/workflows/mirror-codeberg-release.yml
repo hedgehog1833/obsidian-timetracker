@@ -1,0 +1,91 @@
+name: Mirror given tag from Codeberg & create release
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Tag to release"
+        required: true
+        type: string
+
+jobs:
+  fetch-tags:
+    runs-on: ubuntu-latest
+    outputs:
+      github_tags: ${{ steps.get_github_tags.outputs.tags }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Get github tags
+        id: get_github_tags
+        run: |
+          echo "tags=$(git tag --list | sort -V | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+
+      - name: Add Codeberg remote and fetch tags
+        env:
+          CODEBERG_URL: https://codeberg.org/hedgehog1833/obsidian-timetracker.git
+        run: |
+          git remote add codeberg "$CODEBERG_URL" || true
+          git fetch codeberg --tags --prune
+
+      - name: Push tags to GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} --tags
+  release:
+    needs: fetch-tags
+    if: !contains(needs.fetch-tags.outputs.github_tags, inputs.release_tag)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Checkout given tag
+        run: |
+          echo "Checking out tag ${{ inputs.release_tag }}"
+          git checkout -f "refs/tags/${{ inputs.release_tag }}"
+          git clean -fdx
+
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
+        with:
+          node-version: 24
+
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
+
+#      - name: Create GitHub release
+#        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
+#        with:
+#          name: ${{ inputs.release_tag }}
+#          tag_name: ${{ inputs.release_tag }}
+#          body: "Mirror release for tag ${{ inputs.release_tag }} from [Codeberg](https://codeberg.org/hedgehog1833/obsidian-timetracker/releases/tag/${{ inputs.release_tag }})."
+#          files: |
+#            main.js
+#            manifest.json
+#            styles.css
+#
+#      - name: Update manifest and versions on main
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          git config --global user.name "github-actions[bot]"
+#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#          git fetch origin main
+#          git checkout main
+#          git pull
+#          git checkout "refs/tags/${{ inputs.release_tag }}" -- manifest.json versions.json
+#          git add manifest.json versions.json
+#          git commit -m "chore(release): update manifest.json and versions.json from tag ${{ inputs.release_tag }}"
+#          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} main
