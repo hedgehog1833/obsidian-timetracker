@@ -41,7 +41,7 @@ jobs:
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} --tags
   release:
     needs: fetch-tags
-    if: !contains(needs.fetch-tags.outputs.github_tags, inputs.release_tag)
+    if: "!contains(needs.fetch-tags.outputs.github_tags, inputs.release_tag)"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
