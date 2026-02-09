@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Trigger Github release action
         run: |
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUBACTIONPAT }}" \
+          curl -X POST https://api.github.com/repos/hedgehog1833/obsidian-timetracker/actions/workflows/mirror-codeberg-release.yml/dispatches \
+            -H "Authorization: Bearer ${{ secrets.GITHUBACTIONPAT }" \
             -H "Content-Type:application/json" \
-            https://api.github.com/repos/hedgehog1833/obsidian-timetracker/actions/workflows/mirror-codeberg-release.yml/dispatches \ 
             -d '{"ref": "main", "inputs": {"release_tag": "1.6.5"}}'
