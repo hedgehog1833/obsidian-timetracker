@@ -3,7 +3,7 @@ name: Release current version on GitHub
 on: release
 
 jobs:
-  ci:
+  trigger-github-release:
     runs-on: codeberg-tiny
     timeout-minutes: 5
     steps:
