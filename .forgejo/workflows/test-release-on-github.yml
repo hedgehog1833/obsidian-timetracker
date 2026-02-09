@@ -1,9 +1,6 @@
 name: Test release current version on GitHub
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   trigger-github-release:
