@@ -16,7 +16,7 @@ jobs:
           node-version: 24
           cache: 'npm'
       - name: Install npm-check-update
-        run: npm install -g npm-check-update
+        run: npm install -g npm-check-updates
       - name: Update dependencies in package.json
         run: ncu -u
       - name: Install updated dependencies
