@@ -19,8 +19,8 @@ jobs:
         run: npm install -g npm-check-updates
       - name: Update dependencies in package.json
         run: ncu -u
-      - name: Install updated dependencies
-        run: npm install
+#      - name: Install updated dependencies
+#        run: npm install
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # 8.1.0
 
