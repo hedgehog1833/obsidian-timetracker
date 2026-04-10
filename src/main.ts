@@ -1,4 +1,4 @@
-import { Editor, moment, Plugin, WorkspaceLeaf } from 'obsidian';
+import { moment, Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import momentDurationFormatSetup from 'moment-duration-format';
@@ -55,12 +55,14 @@ export default class Timetracker extends Plugin {
 			id: 'insert-timestamp',
 			name: 'Insert timestamp based on current stopwatch value',
 			icon: 'alarm-clock-plus',
-			editorCheckCallback: (checking: boolean, editor: Editor) => {
+			checkCallback: (checking: boolean) => {
+				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				const editor = markdownView?.editor ?? null;
 				if (checking === true) {
-					return this.timeTrackerView !== null;
+					return this.timeTrackerView !== null && editor !== null;
 				}
 
-				if (this.timeTrackerView !== null) {
+				if (this.timeTrackerView !== null && editor !== null) {
 					const formattedStopwatchTime = this.formatPrintValue(this.timeTrackerView);
 					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
