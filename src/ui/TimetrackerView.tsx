@@ -7,7 +7,7 @@ import { StopwatchState } from '../stopwatch/stopwatchState';
 import format from '../stopwatch/momentWrapper';
 import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 
-const VIEW_DISPLAY_TEXT = 'Timetracker sidebar';
+const VIEW_DISPLAY_TEXT = 'Timetracker';
 const VIEW_ICON = 'clock';
 
 interface PersistentStopwatchState {
