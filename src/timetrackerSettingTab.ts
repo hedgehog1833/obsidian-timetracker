@@ -123,7 +123,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				component.setValue(this.plugin.settings.persistTimerValue).onChange(async (value) => {
 					this.plugin.settings.persistTimerValue = value;
 					await this.plugin.saveSettings();
-					if (this.plugin.settings.persistTimerValue === true) {
+					if (this.plugin.settings.persistTimerValue) {
 						this.app.workspace.requestSaveLayout();
 					}
 				});

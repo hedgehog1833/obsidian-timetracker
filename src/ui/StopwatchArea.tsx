@@ -76,7 +76,7 @@ export const StopwatchArea = (props: StopwatchAreaProps) => {
 	};
 
 	const saveWorkspaceTimed = () => {
-		if (props.settings.persistTimerValue === false) {
+		if (!props.settings.persistTimerValue) {
 			return;
 		}
 		const now = Date.now();

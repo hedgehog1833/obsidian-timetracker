@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
 		"allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
 		"jsx": "react-jsx",
-    "module": "ESNext",
+    "module": "nodenext",
     "target": "ES6",
     "allowJs": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "importHelpers": true,
     "isolatedModules": true,
-	"strictNullChecks": true,
+    "strictNullChecks": true,
+		"rootDir": ".",
+    "types": ["node", "jest"],
     "lib": [
       "DOM",
       "ES5",

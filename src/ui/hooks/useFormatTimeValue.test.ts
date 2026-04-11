@@ -1,4 +1,4 @@
-import { TimetrackerSettings } from 'src/main';
+import { TimetrackerSettings } from '../../main';
 import useFormatTimeValue from './useFormatTimeValue';
 import { TimeUnit } from '../timeUnit';
 

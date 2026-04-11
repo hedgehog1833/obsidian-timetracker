@@ -35,19 +35,19 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 	}, [stopwatchValueWrapperRef.current]);
 
 	useEffect(() => {
-		if (isEditing === true) {
-			if (props.settings.showSeconds === true) {
+		if (isEditing) {
+			if (props.settings.showSeconds) {
 				inputSecondsRef.current?.focus();
-			} else if (props.settings.showMinutes === true) {
+			} else if (props.settings.showMinutes) {
 				inputMinutesRef.current?.focus();
-			} else if (props.settings.showHours === true) {
+			} else if (props.settings.showHours) {
 				inputHoursRef.current?.focus();
 			}
 		}
 	}, [isEditing]);
 
 	const handleOnButtonClick = () => {
-		if (isEditing === false) {
+		if (!isEditing) {
 			props.stopStopwatch();
 			setIsEditing(true);
 		} else {

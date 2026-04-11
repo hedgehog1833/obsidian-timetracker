@@ -5,7 +5,7 @@ import momentDurationFormatSetup from 'moment-duration-format';
 import format from './stopwatch/momentWrapper';
 import getFormat, { COMPLETE_TIME_FORMAT } from './stopwatch/formatSettings';
 
-momentDurationFormatSetup(moment);
+momentDurationFormatSetup(moment as any);
 
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
@@ -38,8 +38,8 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 };
 
 export default class Timetracker extends Plugin {
-	settings: TimetrackerSettings;
-	timeTrackerView: TimetrackerView;
+	settings: TimetrackerSettings = DEFAULT_SETTINGS;
+	timeTrackerView: TimetrackerView | null = null;
 
 	async onload() {
 		await this.loadSettings();
@@ -58,7 +58,7 @@ export default class Timetracker extends Plugin {
 			checkCallback: (checking: boolean) => {
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 				const editor = markdownView?.editor ?? null;
-				if (checking === true) {
+				if (checking) {
 					return this.timeTrackerView !== null && editor !== null;
 				}
 
@@ -67,9 +67,8 @@ export default class Timetracker extends Plugin {
 					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
 					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
 					return true;
-				} else {
-					return false;
 				}
+				return false;
 			},
 		});
 
@@ -78,16 +77,15 @@ export default class Timetracker extends Plugin {
 			name: 'Start or stop the stopwatch',
 			icon: 'alarm-clock',
 			checkCallback: (checking: boolean) => {
-				if (checking === true) {
+				if (checking) {
 					return this.timeTrackerView !== null;
 				}
 
 				if (this.timeTrackerView !== null) {
 					this.timeTrackerView.clickStartStop();
 					return true;
-				} else {
-					return false;
 				}
+				return false;
 			},
 		});
 
@@ -96,16 +94,15 @@ export default class Timetracker extends Plugin {
 			name: 'Reset the stopwatch',
 			icon: 'alarm-clock-off',
 			checkCallback: (checking: boolean) => {
-				if (checking === true) {
+				if (checking) {
 					return this.timeTrackerView !== null;
 				}
 
 				if (this.timeTrackerView !== null) {
 					this.timeTrackerView.clickReset();
 					return true;
-				} else {
-					return false;
 				}
+				return false;
 			},
 		});
 
