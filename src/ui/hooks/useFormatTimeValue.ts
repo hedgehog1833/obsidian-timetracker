@@ -22,7 +22,7 @@ const useFormatTimeValue = (settings: TimetrackerSettings) => {
 	};
 
 	const satisfiesHourConditions = (minutes: string, seconds: string): boolean => {
-		return (!settings.showMinutes && !settings.showSeconds && (parseInt(minutes) > 0 || parseInt(seconds) > 0));
+		return !settings.showMinutes && !settings.showSeconds && (parseInt(minutes) > 0 || parseInt(seconds) > 0);
 	};
 
 	const satisfiesMinuteConditions = (hours: string, seconds: string): boolean => {

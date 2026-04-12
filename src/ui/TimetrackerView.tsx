@@ -4,7 +4,7 @@ import ReactDOM, { Root } from 'react-dom/client';
 import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
-import format from '../stopwatch/momentWrapper';
+import format from '../stopwatch/formatter';
 import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 
 const VIEW_DISPLAY_TEXT = 'Timetracker';

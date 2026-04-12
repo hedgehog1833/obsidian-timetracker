@@ -1,7 +1,7 @@
 import { StopwatchModel } from './stopwatchModel';
 import { StopwatchState } from './stopwatchState';
 
-jest.mock('./momentWrapper', () => ({
+jest.mock('./formatter', () => ({
 	default: jest.fn(),
 }));
 

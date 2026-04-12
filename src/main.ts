@@ -1,11 +1,8 @@
-import { moment, Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
+import { Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
-import momentDurationFormatSetup from 'moment-duration-format';
-import format from './stopwatch/momentWrapper';
+import format from './stopwatch/formatter';
 import getFormat, { COMPLETE_TIME_FORMAT } from './stopwatch/formatSettings';
-
-momentDurationFormatSetup(moment as any);
 
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 

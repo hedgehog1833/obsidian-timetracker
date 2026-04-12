@@ -5,23 +5,23 @@ export const COMPLETE_TIME_FORMAT: string = 'HH:mm:ss';
 const getFormat = (settings: TimetrackerSettings, complete?: boolean): string => {
 	if (
 		complete === true ||
-		(settings.showHours === true && settings.showMinutes === true && settings.showSeconds === true)
+		(settings.showHours && settings.showMinutes && settings.showSeconds)
 	) {
 		return COMPLETE_TIME_FORMAT;
 	}
-	if (settings.showHours === true && settings.showMinutes === true && settings.showSeconds === false) {
+	if (settings.showHours && settings.showMinutes && !settings.showSeconds) {
 		return 'HH:mm';
 	}
-	if (settings.showHours === true && settings.showMinutes === false && settings.showSeconds === true) {
+	if (settings.showHours && !settings.showMinutes && settings.showSeconds) {
 		return 'HH:ss';
 	}
-	if (settings.showHours === true && settings.showMinutes === false && settings.showSeconds === false) {
+	if (settings.showHours && !settings.showMinutes && !settings.showSeconds) {
 		return 'HH';
 	}
-	if (settings.showHours === false && settings.showMinutes === true && settings.showSeconds === true) {
+	if (!settings.showHours && settings.showMinutes && settings.showSeconds) {
 		return 'mm:ss';
 	}
-	if (settings.showHours === false && settings.showMinutes === true && settings.showSeconds === false) {
+	if (!settings.showHours && settings.showMinutes && !settings.showSeconds) {
 		return 'mm';
 	}
 	return 'ss';
