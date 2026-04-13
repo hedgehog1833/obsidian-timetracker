@@ -29,7 +29,7 @@ describe('formatSettings', () => {
 		expect(format).toBe(COMPLETE_TIME_FORMAT);
 	});
 
-	it('showHours, showMinutes returns "HH:mm"', () => {
+	it('showHours, showMinutes returns "hh:mm"', () => {
 		// given
 		settings.showSeconds = false;
 
@@ -37,10 +37,10 @@ describe('formatSettings', () => {
 		const format = getFormat(settings, false);
 
 		// then
-		expect(format).toBe('HH:mm');
+		expect(format).toBe('hh:mm');
 	});
 
-	it('showHours, showSeconds returns "HH:ss"', () => {
+	it('showHours, showSeconds returns "hh:ss"', () => {
 		// given
 		settings.showMinutes = false;
 
@@ -48,10 +48,10 @@ describe('formatSettings', () => {
 		const format = getFormat(settings, false);
 
 		// then
-		expect(format).toBe('HH:ss');
+		expect(format).toBe('hh:ss');
 	});
 
-	it('showHours returns "HH"', () => {
+	it('showHours returns "hh"', () => {
 		// given
 		settings.showMinutes = false;
 		settings.showSeconds = false;
@@ -60,7 +60,7 @@ describe('formatSettings', () => {
 		const format = getFormat(settings, false);
 
 		// then
-		expect(format).toBe('HH');
+		expect(format).toBe('hh');
 	});
 
 	it('showMinutes, showSeconds returns "mm:ss"', () => {
