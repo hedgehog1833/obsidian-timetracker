@@ -49,13 +49,6 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 		return this.stopwatchModel.getElapsedTime();
 	}
 
-	getCurrentStopwatchModelValues(): { startedAt: number; offset: number } {
-		return {
-			startedAt: this.stopwatchModel.getStartedAt(),
-			offset: this.stopwatchModel.getPausedAtOffset(),
-		};
-	}
-
 	setCurrentStopwatchTime(milliseconds: number): void {
 		this.clickReset();
 		this.stopwatchModel.setCurrentValue(milliseconds);
@@ -66,8 +59,7 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 	}
 
 	start(): StopwatchState {
-		const state = this.stopwatchModel.start();
-		return state;
+		return this.stopwatchModel.start();
 	}
 
 	stop(): StopwatchState {
