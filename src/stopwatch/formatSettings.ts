@@ -1,22 +1,19 @@
 import { TimetrackerSettings } from '../main';
 
-export const COMPLETE_TIME_FORMAT: string = 'HH:mm:ss';
+export const COMPLETE_TIME_FORMAT: string = 'hh:mm:ss';
 
 const getFormat = (settings: TimetrackerSettings, complete?: boolean): string => {
-	if (
-		complete === true ||
-		(settings.showHours && settings.showMinutes && settings.showSeconds)
-	) {
+	if (complete === true || (settings.showHours && settings.showMinutes && settings.showSeconds)) {
 		return COMPLETE_TIME_FORMAT;
 	}
 	if (settings.showHours && settings.showMinutes && !settings.showSeconds) {
-		return 'HH:mm';
+		return 'hh:mm';
 	}
 	if (settings.showHours && !settings.showMinutes && settings.showSeconds) {
-		return 'HH:ss';
+		return 'hh:ss';
 	}
 	if (settings.showHours && !settings.showMinutes && !settings.showSeconds) {
-		return 'HH';
+		return 'hh';
 	}
 	if (!settings.showHours && settings.showMinutes && settings.showSeconds) {
 		return 'mm:ss';
