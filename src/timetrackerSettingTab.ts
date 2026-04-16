@@ -2,11 +2,16 @@ import { App, ColorComponent, PluginSettingTab, Setting } from 'obsidian';
 import StopwatchPlugin from './main';
 
 export class TimetrackerSettingTab extends PluginSettingTab {
-	plugin: StopwatchPlugin;
-	colorPickerInstance?: ColorComponent;
 	static PRINT_FORMAT_MAX_LENGTH = 255;
 	static PRINT_FORMAT_DESCRIPTION =
 		'Use the following placeholders: ${hours}, ${minutes}, ${seconds}.<br/>Trimming still applies.';
+	static FORMAT_ERROR_MESSAGE = 'At least one of hours, minutes or seconds must be enabled.';
+
+	plugin: StopwatchPlugin;
+	colorPickerInstance?: ColorComponent;
+	hoursSetting?: Setting;
+	minutesSetting?: Setting;
+	secondsSetting?: Setting;
 
 	constructor(app: App, plugin: StopwatchPlugin) {
 		super(app, plugin);
@@ -14,44 +19,90 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		const { containerEl } = this;
+		this.containerEl.empty();
 
-		containerEl.empty();
+		this.containerEl.createEl('h2', { text: 'Formatting' });
+		this.createFormatSetting();
+		this.createTrimmingSetting();
+		this.createLineBreakSetting();
+		this.createTextColorSetting();
+		this.createPrintFormatSetting();
 
-		containerEl.createEl('h2', { text: 'Formatting' });
-		this.createFormatSetting(containerEl);
-		this.createTrimmingSetting(containerEl);
-		this.createLineBreakSetting(containerEl);
-		this.createTextColorSetting(containerEl);
-		this.createPrintFormatSetting(containerEl);
-
-		containerEl.createEl('h2', { text: 'Miscellaneous' });
-		this.createPersistenceSetting(containerEl);
+		this.containerEl.createEl('h2', { text: 'Miscellaneous' });
+		this.createPersistenceSetting();
 	}
 
-	private createFormatSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl).setName('Show hours').addToggle((component) => {
-			component.setValue(this.plugin.settings.showHours).onChange(async (value) => {
-				this.plugin.settings.showHours = value;
-				await this.plugin.saveSettings();
-			});
+	private createFormatSetting(): void {
+		const hoursSetting = new Setting(this.containerEl).setName('Show hours').addToggle((component) => {
+			component
+				.setValue(this.plugin.settings.showHours)
+				.setDisabled(this.plugin.settings.printFormat.length > 0)
+				.onChange(async (value) => {
+					if (!value && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+						component.setValue(true);
+						hoursSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+					} else {
+						this.clearFormatErrorMessages();
+						this.plugin.settings.showHours = value;
+						await this.plugin.saveSettings();
+					}
+				});
 		});
-		new Setting(containerEl).setName('Show minutes').addToggle((component) => {
-			component.setValue(this.plugin.settings.showMinutes).onChange(async (value) => {
-				this.plugin.settings.showMinutes = value;
-				await this.plugin.saveSettings();
-			});
+		this.hoursSetting = hoursSetting;
+
+		const minutesSetting = new Setting(this.containerEl).setName('Show minutes').addToggle((component) => {
+			component
+				.setValue(this.plugin.settings.showMinutes)
+				.setDisabled(this.plugin.settings.printFormat.length > 0)
+				.onChange(async (value) => {
+					if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showSeconds) {
+						component.setValue(true);
+						minutesSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+					} else {
+						this.clearFormatErrorMessages();
+						this.plugin.settings.showMinutes = value;
+						await this.plugin.saveSettings();
+					}
+				});
 		});
-		new Setting(containerEl).setName('Show seconds').addToggle((component) => {
-			component.setValue(this.plugin.settings.showSeconds).onChange(async (value) => {
-				this.plugin.settings.showSeconds = value;
-				await this.plugin.saveSettings();
-			});
+		this.minutesSetting = minutesSetting;
+
+		const secondsSetting = new Setting(this.containerEl).setName('Show seconds').addToggle((component) => {
+			component
+				.setValue(this.plugin.settings.showSeconds)
+				.setDisabled(this.plugin.settings.printFormat.length > 0)
+				.onChange(async (value) => {
+					if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showMinutes) {
+						component.setValue(true);
+						secondsSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+					} else {
+						this.clearFormatErrorMessages();
+						this.plugin.settings.showSeconds = value;
+						await this.plugin.saveSettings();
+					}
+				});
 		});
+		this.secondsSetting = secondsSetting;
+
+		if (this.plugin.settings.printFormat.length > 0) {
+			hoursSetting.nameEl.style.opacity = '0.5';
+			hoursSetting.controlEl.style.opacity = '0.5';
+			minutesSetting.nameEl.style.opacity = '0.5';
+			minutesSetting.controlEl.style.opacity = '0.5';
+			secondsSetting.nameEl.style.opacity = '0.5';
+			secondsSetting.controlEl.style.opacity = '0.5';
+		} else {
+			hoursSetting.nameEl.style.opacity = '1';
+			hoursSetting.controlEl.style.opacity = '1';
+			minutesSetting.nameEl.style.opacity = '1';
+			minutesSetting.controlEl.style.opacity = '1';
+			secondsSetting.nameEl.style.opacity = '1';
+			secondsSetting.controlEl.style.opacity = '1';
+		}
 	}
 
-	private createTrimmingSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl)
+	private createTrimmingSetting(): void {
+		new Setting(this.containerEl)
 			.setName('Trimming')
 			.setDesc('Remove leading zeros.')
 			.addToggle((component) => {
@@ -62,8 +113,8 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			});
 	}
 
-	private createLineBreakSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl)
+	private createLineBreakSetting(): void {
+		new Setting(this.containerEl)
 			.setName('Line break')
 			.setDesc('Add a line break after the inserted timestamp.')
 			.addToggle((component) => {
@@ -74,8 +125,8 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			});
 	}
 
-	private createTextColorSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl)
+	private createTextColorSetting(): void {
+		new Setting(this.containerEl)
 			.setName('Text color')
 			.setDesc("Set the inserted timestamp's text color.")
 			.addColorPicker((component) => {
@@ -88,7 +139,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			.addButton((component) => {
 				component.setButtonText('Reset to default');
 				component.onClick(async (_) => {
-					const style = window.getComputedStyle(containerEl);
+					const style = window.getComputedStyle(this.containerEl);
 					const defaultColor = this.plugin.rgbToHex(style?.color);
 					this.colorPickerInstance?.setValue(defaultColor);
 					this.plugin.settings.textColor = defaultColor;
@@ -97,8 +148,8 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			});
 	}
 
-	private createPrintFormatSetting(containerEl: HTMLElement): void {
-		const setting = new Setting(containerEl).setName('Printed time format').addText((component) => {
+	private createPrintFormatSetting(): void {
+		const setting = new Setting(this.containerEl).setName('Printed time format').addText((component) => {
 			component
 				.setValue(this.plugin.settings.printFormat)
 				.setPlaceholder('${hours} hours and ${minutes} minutes')
@@ -107,6 +158,39 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 						this.plugin.settings.printFormat = value.trim().length === 0 && value.length !== 0 ? '' : value;
 						setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
 						await this.plugin.saveSettings();
+
+						const disabled = this.plugin.settings.printFormat.length > 0;
+						this.hoursSetting?.components.first()?.setDisabled(disabled);
+						this.minutesSetting?.components.first()?.setDisabled(disabled);
+						this.secondsSetting?.components.first()?.setDisabled(disabled);
+
+						if (disabled) {
+							if (this.hoursSetting) {
+								this.hoursSetting.nameEl.style.opacity = '0.5';
+								this.hoursSetting.controlEl.style.opacity = '0.5';
+							}
+							if (this.minutesSetting) {
+								this.minutesSetting.nameEl.style.opacity = '0.5';
+								this.minutesSetting.controlEl.style.opacity = '0.5';
+							}
+							if (this.secondsSetting) {
+								this.secondsSetting.nameEl.style.opacity = '0.5';
+								this.secondsSetting.controlEl.style.opacity = '0.5';
+							}
+						} else {
+							if (this.hoursSetting) {
+								this.hoursSetting.nameEl.style.opacity = '1';
+								this.hoursSetting.controlEl.style.opacity = '1';
+							}
+							if (this.minutesSetting) {
+								this.minutesSetting.nameEl.style.opacity = '1';
+								this.minutesSetting.controlEl.style.opacity = '1';
+							}
+							if (this.secondsSetting) {
+								this.secondsSetting.nameEl.style.opacity = '1';
+								this.secondsSetting.controlEl.style.opacity = '1';
+							}
+						}
 					} else {
 						setting.descEl.innerHTML = `Invalid print format! Max length is ${TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH} and at least one placeholder has to be in use.`;
 					}
@@ -115,14 +199,15 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
 	}
 
-	private createPersistenceSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl)
+	private createPersistenceSetting(): void {
+		new Setting(this.containerEl)
 			.setName('Persistence')
 			.setDesc('Persist time value and restore after restart.')
 			.addToggle((component) => {
 				component.setValue(this.plugin.settings.persistTimerValue).onChange(async (value) => {
 					this.plugin.settings.persistTimerValue = value;
 					await this.plugin.saveSettings();
+
 					if (this.plugin.settings.persistTimerValue) {
 						this.app.workspace.requestSaveLayout();
 					}
@@ -136,5 +221,17 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			((printFormat.contains('${hours}') || printFormat.contains('${minutes}') || printFormat.contains('${seconds}')) &&
 				printFormat.length <= TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH)
 		);
+	}
+
+	private clearFormatErrorMessages(): void {
+		if (this.hoursSetting) {
+			this.hoursSetting.descEl.innerHTML = '';
+		}
+		if (this.minutesSetting) {
+			this.minutesSetting.descEl.innerHTML = '';
+		}
+		if (this.secondsSetting) {
+			this.secondsSetting.descEl.innerHTML = '';
+		}
 	}
 }
