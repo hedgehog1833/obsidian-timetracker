@@ -22,7 +22,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		this.containerEl.empty();
 
 		this.containerEl.createEl('h2', { text: 'Formatting' });
-		this.createFormatSetting();
+		this.createStopwatchFormatSetting();
 		this.createTrimmingSetting();
 		this.createLineBreakSetting();
 		this.createTextColorSetting();
@@ -32,7 +32,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		this.createPersistenceSetting();
 	}
 
-	private createFormatSetting(): void {
+	private createStopwatchFormatSetting(): void {
 		const hoursSetting = new Setting(this.containerEl).setName('Show hours').addToggle((component) => {
 			component
 				.setValue(this.plugin.settings.showHours)
@@ -84,21 +84,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		});
 		this.secondsSetting = secondsSetting;
 
-		if (this.plugin.settings.printFormat.length > 0) {
-			hoursSetting.nameEl.style.opacity = '0.5';
-			hoursSetting.controlEl.style.opacity = '0.5';
-			minutesSetting.nameEl.style.opacity = '0.5';
-			minutesSetting.controlEl.style.opacity = '0.5';
-			secondsSetting.nameEl.style.opacity = '0.5';
-			secondsSetting.controlEl.style.opacity = '0.5';
-		} else {
-			hoursSetting.nameEl.style.opacity = '1';
-			hoursSetting.controlEl.style.opacity = '1';
-			minutesSetting.nameEl.style.opacity = '1';
-			minutesSetting.controlEl.style.opacity = '1';
-			secondsSetting.nameEl.style.opacity = '1';
-			secondsSetting.controlEl.style.opacity = '1';
-		}
+		this.toggleStopwatchFormatSettings(this.plugin.settings.printFormat.length <= 0);
 	}
 
 	private createTrimmingSetting(): void {
@@ -159,38 +145,11 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 						setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
 						await this.plugin.saveSettings();
 
-						const disabled = this.plugin.settings.printFormat.length > 0;
-						this.hoursSetting?.components.first()?.setDisabled(disabled);
-						this.minutesSetting?.components.first()?.setDisabled(disabled);
-						this.secondsSetting?.components.first()?.setDisabled(disabled);
-
-						if (disabled) {
-							if (this.hoursSetting) {
-								this.hoursSetting.nameEl.style.opacity = '0.5';
-								this.hoursSetting.controlEl.style.opacity = '0.5';
-							}
-							if (this.minutesSetting) {
-								this.minutesSetting.nameEl.style.opacity = '0.5';
-								this.minutesSetting.controlEl.style.opacity = '0.5';
-							}
-							if (this.secondsSetting) {
-								this.secondsSetting.nameEl.style.opacity = '0.5';
-								this.secondsSetting.controlEl.style.opacity = '0.5';
-							}
-						} else {
-							if (this.hoursSetting) {
-								this.hoursSetting.nameEl.style.opacity = '1';
-								this.hoursSetting.controlEl.style.opacity = '1';
-							}
-							if (this.minutesSetting) {
-								this.minutesSetting.nameEl.style.opacity = '1';
-								this.minutesSetting.controlEl.style.opacity = '1';
-							}
-							if (this.secondsSetting) {
-								this.secondsSetting.nameEl.style.opacity = '1';
-								this.secondsSetting.controlEl.style.opacity = '1';
-							}
-						}
+						const formatTogglesEnabled = this.plugin.settings.printFormat.length <= 0;
+						this.hoursSetting?.components.first()?.setDisabled(!formatTogglesEnabled);
+						this.minutesSetting?.components.first()?.setDisabled(!formatTogglesEnabled);
+						this.secondsSetting?.components.first()?.setDisabled(!formatTogglesEnabled);
+						this.toggleStopwatchFormatSettings(formatTogglesEnabled);
 					} else {
 						setting.descEl.innerHTML = `Invalid print format! Max length is ${TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH} and at least one placeholder has to be in use.`;
 					}
@@ -221,6 +180,36 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			((printFormat.contains('${hours}') || printFormat.contains('${minutes}') || printFormat.contains('${seconds}')) &&
 				printFormat.length <= TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH)
 		);
+	}
+
+	private toggleStopwatchFormatSettings(formatTogglesEnabled: boolean): void {
+		if (formatTogglesEnabled) {
+			if (this.hoursSetting) {
+				this.hoursSetting.nameEl.style.opacity = '1';
+				this.hoursSetting.controlEl.style.opacity = '1';
+			}
+			if (this.minutesSetting) {
+				this.minutesSetting.nameEl.style.opacity = '1';
+				this.minutesSetting.controlEl.style.opacity = '1';
+			}
+			if (this.secondsSetting) {
+				this.secondsSetting.nameEl.style.opacity = '1';
+				this.secondsSetting.controlEl.style.opacity = '1';
+			}
+		} else {
+			if (this.hoursSetting) {
+				this.hoursSetting.nameEl.style.opacity = '0.5';
+				this.hoursSetting.controlEl.style.opacity = '0.5';
+			}
+			if (this.minutesSetting) {
+				this.minutesSetting.nameEl.style.opacity = '0.5';
+				this.minutesSetting.controlEl.style.opacity = '0.5';
+			}
+			if (this.secondsSetting) {
+				this.secondsSetting.nameEl.style.opacity = '0.5';
+				this.secondsSetting.controlEl.style.opacity = '0.5';
+			}
+		}
 	}
 
 	private clearFormatErrorMessages(): void {
