@@ -7,7 +7,11 @@ const useAdjustTimeInputOnChange = () => {
 		stopwatchValue: string,
 		timeUnit: TimeUnit,
 	) => {
-		const newValue = parseInt(adjustInput(event));
+		const raw = adjustInput(event);
+		if (raw.length <= 0) {
+			return null;
+		}
+		const newValue = parseInt(raw);
 		const parts = stopwatchValue.split(':');
 		let tempHours = parseInt(parts[TimeUnit.HOURS.valueOf()]);
 		let tempMinutes = parseInt(parts[TimeUnit.MINUTES.valueOf()]);
@@ -43,7 +47,7 @@ const useAdjustTimeInputOnChange = () => {
 
 	const adjustInput = (event: React.ChangeEvent<HTMLInputElement>): string => {
 		const cursorPosition = event.target.selectionStart;
-		let value = event.target.value;
+		let value = event.target.value.replace(/\D/g, '');
 		if (cursorPosition === 1) {
 			return value.slice(0, 1) + value.slice(2);
 		} else if (cursorPosition === 2) {
