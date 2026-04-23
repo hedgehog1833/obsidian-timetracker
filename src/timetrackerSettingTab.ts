@@ -36,7 +36,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		const hoursSetting = new Setting(this.containerEl).setName('Show hours').addToggle((component) => {
 			component
 				.setValue(this.plugin.settings.showHours)
-				.setDisabled(this.plugin.settings.printFormat.length > 0)
 				.onChange(async (value) => {
 					if (!value && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
 						component.setValue(true);
@@ -53,7 +52,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		const minutesSetting = new Setting(this.containerEl).setName('Show minutes').addToggle((component) => {
 			component
 				.setValue(this.plugin.settings.showMinutes)
-				.setDisabled(this.plugin.settings.printFormat.length > 0)
 				.onChange(async (value) => {
 					if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showSeconds) {
 						component.setValue(true);
@@ -70,7 +68,6 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 		const secondsSetting = new Setting(this.containerEl).setName('Show seconds').addToggle((component) => {
 			component
 				.setValue(this.plugin.settings.showSeconds)
-				.setDisabled(this.plugin.settings.printFormat.length > 0)
 				.onChange(async (value) => {
 					if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showMinutes) {
 						component.setValue(true);
