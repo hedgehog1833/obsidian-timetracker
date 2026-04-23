@@ -95,4 +95,22 @@ describe('StopwatchValueContainer', () => {
 		// then
 		expect(button.textContent).toBe('Return');
 	});
+
+	it('pressing escape key changes button text back to "Set"', () => {
+		// given
+		const { getByTestId } = render(<StopwatchValueContainer {...defaultProps} />);
+		const button = getByTestId('stopwatch-edit-button') as HTMLButtonElement;
+
+		// when
+		fireEvent.click(button);
+
+		// then
+		expect(button.textContent).toBe('Return');
+
+		// when
+		fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+
+		// then
+		expect(button.textContent).toBe('Set');
+	});
 });
