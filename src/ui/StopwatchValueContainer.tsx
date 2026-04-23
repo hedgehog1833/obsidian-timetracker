@@ -28,9 +28,17 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 			}
 		};
 
+		const handleEscapeKey = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setIsEditing(false);
+			}
+		}
+
 		document.addEventListener('mousedown', handleClickOutside);
+		document.addEventListener('keydown', handleEscapeKey);
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
+			document.removeEventListener('keydown', handleEscapeKey);
 		};
 	}, [stopwatchValueWrapperRef.current]);
 
