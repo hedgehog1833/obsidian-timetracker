@@ -63,7 +63,7 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 	return (
 		<div ref={stopwatchValueWrapperRef} className="stopwatch-value-wrapper" data-testid="stopwatch-value-container">
 			<div className="stopwatch-value-container">
-				{props.settings.showHours && (
+				{(isEditing || props.settings.showHours) && (
 					<TimeInput
 						timeUnit={TimeUnit.HOURS}
 						settings={props.settings}
@@ -73,8 +73,8 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 						setStopwatchValue={props.setStopwatchValue}
 					/>
 				)}
-				{props.settings.showHours && props.settings.showMinutes && separatorElement}
-				{props.settings.showMinutes && (
+				{(isEditing || (props.settings.showHours && props.settings.showMinutes)) && separatorElement}
+				{(isEditing || props.settings.showMinutes) && (
 					<TimeInput
 						timeUnit={TimeUnit.MINUTES}
 						settings={props.settings}
@@ -84,10 +84,11 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 						setStopwatchValue={props.setStopwatchValue}
 					/>
 				)}
-				{((props.settings.showHours && !props.settings.showMinutes) || props.settings.showMinutes) &&
-					props.settings.showSeconds &&
+				{(isEditing ||
+					(((props.settings.showHours && !props.settings.showMinutes) || props.settings.showMinutes) &&
+						props.settings.showSeconds)) &&
 					separatorElement}
-				{props.settings.showSeconds && (
+				{(isEditing || props.settings.showSeconds) && (
 					<TimeInput
 						timeUnit={TimeUnit.SECONDS}
 						settings={props.settings}
