@@ -19,21 +19,6 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 	const separatorElement = <p className={'separator'}>:</p>;
 
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				stopwatchValueWrapperRef.current != null &&
-				!stopwatchValueWrapperRef.current.contains(event.target as Node)
-			) {
-				setIsEditing(false);
-			}
-		};
-
-		const handleEscapeKey = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				setIsEditing(false);
-			}
-		}
-
 		document.addEventListener('mousedown', handleClickOutside);
 		document.addEventListener('keydown', handleEscapeKey);
 		return () => {
@@ -53,6 +38,21 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 			}
 		}
 	}, [isEditing]);
+
+	const handleClickOutside = (event: MouseEvent) => {
+		if (
+			stopwatchValueWrapperRef.current != null &&
+			!stopwatchValueWrapperRef.current.contains(event.target as Node)
+		) {
+			setIsEditing(false);
+		}
+	};
+
+	const handleEscapeKey = (event: KeyboardEvent) => {
+		if (event.key === 'Escape') {
+			setIsEditing(false);
+		}
+	};
 
 	const handleOnButtonClick = () => {
 		if (!isEditing) {
