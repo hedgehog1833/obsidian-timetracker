@@ -40,10 +40,7 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 	}, [isEditing]);
 
 	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			stopwatchValueWrapperRef.current != null &&
-			!stopwatchValueWrapperRef.current.contains(event.target as Node)
-		) {
+		if (stopwatchValueWrapperRef.current != null && !stopwatchValueWrapperRef.current.contains(event.target as Node)) {
 			setIsEditing(false);
 		}
 	};

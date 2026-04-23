@@ -34,50 +34,44 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 	private createStopwatchFormatSetting(): void {
 		const hoursSetting = new Setting(this.containerEl).setName('Show hours').addToggle((component) => {
-			component
-				.setValue(this.plugin.settings.showHours)
-				.onChange(async (value) => {
-					if (!value && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
-						component.setValue(true);
-						hoursSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
-					} else {
-						this.clearFormatErrorMessages();
-						this.plugin.settings.showHours = value;
-						await this.plugin.saveSettings();
-					}
-				});
+			component.setValue(this.plugin.settings.showHours).onChange(async (value) => {
+				if (!value && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
+					component.setValue(true);
+					hoursSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+				} else {
+					this.clearFormatErrorMessages();
+					this.plugin.settings.showHours = value;
+					await this.plugin.saveSettings();
+				}
+			});
 		});
 		this.hoursSetting = hoursSetting;
 
 		const minutesSetting = new Setting(this.containerEl).setName('Show minutes').addToggle((component) => {
-			component
-				.setValue(this.plugin.settings.showMinutes)
-				.onChange(async (value) => {
-					if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showSeconds) {
-						component.setValue(true);
-						minutesSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
-					} else {
-						this.clearFormatErrorMessages();
-						this.plugin.settings.showMinutes = value;
-						await this.plugin.saveSettings();
-					}
-				});
+			component.setValue(this.plugin.settings.showMinutes).onChange(async (value) => {
+				if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showSeconds) {
+					component.setValue(true);
+					minutesSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+				} else {
+					this.clearFormatErrorMessages();
+					this.plugin.settings.showMinutes = value;
+					await this.plugin.saveSettings();
+				}
+			});
 		});
 		this.minutesSetting = minutesSetting;
 
 		const secondsSetting = new Setting(this.containerEl).setName('Show seconds').addToggle((component) => {
-			component
-				.setValue(this.plugin.settings.showSeconds)
-				.onChange(async (value) => {
-					if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showMinutes) {
-						component.setValue(true);
-						secondsSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
-					} else {
-						this.clearFormatErrorMessages();
-						this.plugin.settings.showSeconds = value;
-						await this.plugin.saveSettings();
-					}
-				});
+			component.setValue(this.plugin.settings.showSeconds).onChange(async (value) => {
+				if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showMinutes) {
+					component.setValue(true);
+					secondsSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+				} else {
+					this.clearFormatErrorMessages();
+					this.plugin.settings.showSeconds = value;
+					await this.plugin.saveSettings();
+				}
+			});
 		});
 		this.secondsSetting = secondsSetting;
 	}
