@@ -171,9 +171,9 @@ export default class Timetracker extends Plugin {
 		let printValue: string;
 		if (this.settings.printFormat.length > 0) {
 			printValue = this.settings.printFormat
-				.replace('${hours}', stopwatchValues.hours)
-				.replace('${minutes}', stopwatchValues.minutes)
-				.replace('${seconds}', stopwatchValues.seconds);
+				.replaceAll('${hours}', stopwatchValues.hours)
+				.replaceAll('${minutes}', stopwatchValues.minutes)
+				.replaceAll('${seconds}', stopwatchValues.seconds);
 		} else {
 			printValue = getFormat(this.settings)
 				.replace('hh', stopwatchValues.hours)
