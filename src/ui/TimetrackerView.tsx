@@ -5,7 +5,6 @@ import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 import format from '../stopwatch/formatter';
-import { COMPLETE_TIME_FORMAT } from '../stopwatch/formatSettings';
 
 const VIEW_DISPLAY_TEXT = 'Timetracker';
 const VIEW_ICON = 'clock';
@@ -115,7 +114,7 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 	}
 
 	format(): string {
-		return format(this.stopwatchModel.getElapsedTime(), COMPLETE_TIME_FORMAT);
+		return format(this.stopwatchModel.getElapsedTime());
 	}
 
 	async setState(state: PersistentStopwatchState, result: ViewStateResult): Promise<void> {

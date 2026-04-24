@@ -20,13 +20,6 @@ const getFormat = (settings: TimetrackerSettings, complete?: boolean): string =>
 		format = 'ss';
 	}
 
-	if (settings.trimLeadingZeros) {
-		format = format
-			.split(':')
-			.map((part) => part.slice(1))
-			.join(':');
-	}
-
 	return format;
 };
 

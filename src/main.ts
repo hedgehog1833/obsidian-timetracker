@@ -2,7 +2,7 @@ import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import format from './stopwatch/formatter';
-import getFormat, { COMPLETE_TIME_FORMAT } from './stopwatch/formatSettings';
+import getFormat from './stopwatch/formatSettings';
 
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
@@ -167,15 +167,18 @@ export default class Timetracker extends Plugin {
 	}
 
 	formatPrintValue(view: TimetrackerView): string {
+		const stopwatchValues = this.getCurrentTimeValues(view.getElapsedTime());
 		let printValue: string;
 		if (this.settings.printFormat.length > 0) {
-			const stopwatchValues = this.getCurrentTimeValues(view.getElapsedTime());
 			printValue = this.settings.printFormat
 				.replace('${hours}', stopwatchValues.hours)
 				.replace('${minutes}', stopwatchValues.minutes)
 				.replace('${seconds}', stopwatchValues.seconds);
 		} else {
-			printValue = format(view.getElapsedTime(), getFormat(this.settings));
+			printValue = getFormat(this.settings)
+				.replace('hh', stopwatchValues.hours)
+				.replace('mm', stopwatchValues.minutes)
+				.replace('ss', stopwatchValues.seconds);
 		}
 		const textColor = window.getComputedStyle(view.containerEl)?.color;
 		return this.settings.textColor !== this.rgbToHex(textColor)
@@ -184,7 +187,7 @@ export default class Timetracker extends Plugin {
 	}
 
 	getCurrentTimeValues(elapsedTime: number): { hours: string; minutes: string; seconds: string } {
-		const stopwatchValues = format(elapsedTime, COMPLETE_TIME_FORMAT).split(':');
+		const stopwatchValues = format(elapsedTime).split(':');
 		const [hours, minutes, seconds] = stopwatchValues.map((value) =>
 			this.settings.trimLeadingZeros ? parseInt(value).toString() : value,
 		);
