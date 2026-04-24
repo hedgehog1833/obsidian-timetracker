@@ -1,5 +1,5 @@
 import { StopwatchArea, StopwatchAreaProps } from './StopwatchArea';
-import { fireEvent, getByTestId, render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
 
@@ -12,7 +12,7 @@ describe('StopwatchArea', () => {
 			start: jest.fn(),
 			stop: jest.fn(),
 			reset: jest.fn(),
-			getCurrentStopwatchTime: jest.fn(),
+			getCurrentStopwatchTime: jest.fn().mockReturnValue('00:00:00'),
 			setCurrentStopwatchTime: jest.fn(),
 			saveWorkspace: jest.fn(),
 		};
@@ -48,6 +48,49 @@ describe('StopwatchArea', () => {
 
 		// then
 		expect(getByTestId('reload-button') as HTMLButtonElement).toBeDefined();
+	});
+
+	it("onClick 'reload-button': should call setCurrentStopwatchTime and manage intervals when not started", () => {
+		// given
+		const setIntervalSpy = jest.spyOn(window, 'setInterval').mockImplementation((..._args: any[]): any => 123);
+		const clearIntervalSpy = jest.spyOn(window, 'clearInterval').mockImplementation(() => {});
+		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+
+		// when
+		const reloadButton = getByTestId('reload-button') as HTMLButtonElement;
+		fireEvent.click(reloadButton);
+
+		// then
+		expect(defaultProps.getCurrentStopwatchTime).toHaveBeenCalled();
+		expect(setIntervalSpy).toHaveBeenCalled();
+		expect(clearIntervalSpy).toHaveBeenCalledWith(123);
+
+		// cleanup
+		setIntervalSpy.mockRestore();
+		clearIntervalSpy.mockRestore();
+	});
+
+	it("onClick 'reload-button' when started: should restart the interval", () => {
+		// given
+		(defaultProps.start as jest.Mock).mockReturnValue(StopwatchState.STARTED);
+		const setIntervalSpy = jest.spyOn(window, 'setInterval').mockImplementation((..._args: any[]): any => 111);
+		const clearIntervalSpy = jest.spyOn(window, 'clearInterval').mockImplementation(() => {});
+		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+		const startButton = getByTestId('start-stop-button') as HTMLButtonElement;
+		fireEvent.click(startButton);
+
+		// when
+		const reloadButton = getByTestId('reload-button') as HTMLButtonElement;
+		fireEvent.click(reloadButton);
+
+		// then
+		expect(defaultProps.getCurrentStopwatchTime).toHaveBeenCalled();
+		expect(setIntervalSpy).toHaveBeenCalledTimes(2); // once on start, once on reload
+		expect(clearIntervalSpy).toHaveBeenCalled();
+
+		// cleanup
+		setIntervalSpy.mockRestore();
+		clearIntervalSpy.mockRestore();
 	});
 
 	it('should render stopwatch-value-container correctly', () => {
@@ -90,6 +133,28 @@ describe('StopwatchArea', () => {
 
 		// then
 		expect(button.textContent).toBe('Start');
+	});
+
+	it("`onClick 'start-stop-button': clicking the child's edit button should call parent's stopStopwatch", () => {
+		// given
+		(defaultProps.start as jest.Mock).mockReturnValue(StopwatchState.STARTED);
+		const clearIntervalSpy = jest.spyOn(window, 'clearInterval').mockImplementation(() => {});
+		const stopSpy = defaultProps.stop as jest.Mock;
+
+		const { getByTestId } = render(<StopwatchArea {...defaultProps} />);
+		const startButton = getByTestId('start-stop-button') as HTMLButtonElement;
+
+		// when
+		fireEvent.click(startButton);
+
+		const editButton = getByTestId('stopwatch-edit-button') as HTMLButtonElement;
+		fireEvent.click(editButton);
+
+		// then
+		expect(stopSpy).toHaveBeenCalled();
+		expect(clearIntervalSpy).toHaveBeenCalled();
+
+		clearIntervalSpy.mockRestore();
 	});
 
 	it(`onClick 'reset-button': clicking button after clicking start changes start button back text to 'Start'`, () => {
