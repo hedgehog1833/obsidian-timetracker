@@ -100,7 +100,7 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
-				getCurrentStopwatchTime={() => this.format()}
+				getCurrentStopwatchTime={() => format(this.stopwatchModel.getElapsedTime())}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
 				saveWorkspace={() => this.app.workspace.requestSaveLayout()}
 			/>,
@@ -111,10 +111,6 @@ export class TimetrackerView extends ItemView implements PersistentStopwatchStat
 		if (this.root != null) {
 			this.root.unmount();
 		}
-	}
-
-	format(): string {
-		return format(this.stopwatchModel.getElapsedTime());
 	}
 
 	async setState(state: PersistentStopwatchState, result: ViewStateResult): Promise<void> {
