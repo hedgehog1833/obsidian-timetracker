@@ -1,5 +1,6 @@
 import { App, ColorComponent, PluginSettingTab, Setting } from 'obsidian';
 import StopwatchPlugin from './main';
+import { rgbToHex } from './mainHelpers';
 
 export class TimetrackerSettingTab extends PluginSettingTab {
 	static PRINT_FORMAT_MAX_LENGTH = 255;
@@ -115,7 +116,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				component.setButtonText('Reset to default');
 				component.onClick(async (_) => {
 					const style = window.getComputedStyle(this.containerEl);
-					const defaultColor = this.plugin.rgbToHex(style?.color);
+					const defaultColor = rgbToHex(style?.color);
 					this.colorPickerInstance?.setValue(defaultColor);
 					this.plugin.settings.textColor = defaultColor;
 					await this.plugin.saveSettings();

@@ -1,8 +1,16 @@
 import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
-import format from './stopwatch/formatter';
 import getFormat from './stopwatch/formatSettings';
+import replaceTokens, { TimeValues } from './stopwatch/printHelpers';
+import {
+	migrateFormat,
+	rgbToHex,
+	loadFirstTextColor,
+	getCurrentTimeValues,
+	buildPrintValue,
+	applyTextColor,
+} from './mainHelpers';
 
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
@@ -110,10 +118,12 @@ export default class Timetracker extends Plugin {
 
 	async loadSettings() {
 		const loadedSettings: TimetrackerSettings = await this.loadData();
-		const isFormatMigrated: boolean = this.migrateFormat(loadedSettings);
-		const isFirstTextColorLoaded: boolean = this.loadFirstTextColor(loadedSettings);
+		const isFormatMigrated = migrateFormat(loadedSettings);
+		const isFirstTextColorLoaded = loadFirstTextColor(loadedSettings);
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
-		(isFormatMigrated || isFirstTextColorLoaded) && (await this.saveSettings());
+		if (isFormatMigrated || isFirstTextColorLoaded) {
+			await this.saveSettings();
+		}
 	}
 
 	async saveSettings() {
@@ -133,64 +143,9 @@ export default class Timetracker extends Plugin {
 		}
 	}
 
-	migrateFormat(settings: TimetrackerSettings | null): boolean {
-		if (settings?.format != null && settings.format.length > 0) {
-			settings.showHours = settings.format.contains('H') || settings.format.contains('h');
-			settings.showMinutes = settings.format.contains('M') || settings.format.contains('m');
-			settings.showSeconds = settings.format.contains('S') || settings.format.contains('s');
-			settings.format = null;
-			settings.interval = null;
-			return true;
-		}
-		return false;
-	}
-
-	loadFirstTextColor(settings: TimetrackerSettings | null): boolean {
-		if (settings?.textColor?.length === 0) {
-			settings.textColor = '#dadada';
-			return true;
-		}
-		return false;
-	}
-
-	rgbToHex(rgbColor: string): string {
-		if (rgbColor.length > 0) {
-			const rgbValues = rgbColor.slice(4, -1);
-			const [r, g, b] = rgbValues.split(',').map((value) => parseInt(value));
-			const componentToHex = (c: number) => {
-				const hex = c.toString(16);
-				return hex.length === 1 ? '0' + hex : hex;
-			};
-			return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
-		}
-		return '#dadada';
-	}
-
 	formatPrintValue(view: TimetrackerView): string {
-		const stopwatchValues = this.getCurrentTimeValues(view.getElapsedTime());
-		let printValue: string;
-		if (this.settings.printFormat.length > 0) {
-			printValue = this.settings.printFormat
-				.replaceAll('${hours}', stopwatchValues.hours)
-				.replaceAll('${minutes}', stopwatchValues.minutes)
-				.replaceAll('${seconds}', stopwatchValues.seconds);
-		} else {
-			printValue = getFormat(this.settings)
-				.replace('hh', stopwatchValues.hours)
-				.replace('mm', stopwatchValues.minutes)
-				.replace('ss', stopwatchValues.seconds);
-		}
-		const textColor = window.getComputedStyle(view.containerEl)?.color;
-		return this.settings.textColor !== this.rgbToHex(textColor)
-			? `<span style="color:${this.settings.textColor};">${printValue}</span>`
-			: printValue;
-	}
-
-	getCurrentTimeValues(elapsedTime: number): { hours: string; minutes: string; seconds: string } {
-		const stopwatchValues = format(elapsedTime).split(':');
-		const [hours, minutes, seconds] = stopwatchValues.map((value) =>
-			this.settings.trimLeadingZeros ? parseInt(value).toString() : value,
-		);
-		return { hours: hours, minutes: minutes, seconds: seconds };
+		const stopwatchValues = getCurrentTimeValues(view.getElapsedTime(), this.settings.trimLeadingZeros);
+		const printValue = buildPrintValue(this.settings, stopwatchValues);
+		return applyTextColor(printValue, this.settings.textColor, view.containerEl);
 	}
 }
