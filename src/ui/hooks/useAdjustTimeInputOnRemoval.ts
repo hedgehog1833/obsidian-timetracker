@@ -27,16 +27,16 @@ const useAdjustTimeInputOnRemoval = (focusRef: React.RefObject<HTMLInputElement 
 		currentValue: number,
 		cursorPosition: number,
 	) => {
-		let newValue = null;
+		let parsed: number = 0;
 		if ((cursorPosition === 0 && event.key === 'Delete') || (cursorPosition === 1 && event.key === 'Backspace')) {
-			newValue = parseInt(currentValue.toString().substring(1));
+			parsed = parseInt(currentValue.toString().substring(1));
 		} else if (
 			(cursorPosition === 1 && event.key === 'Delete') ||
 			(cursorPosition === 2 && event.key === 'Backspace')
 		) {
-			newValue = parseInt(currentValue.toString().slice(0, -1));
+			parsed = parseInt(currentValue.toString().slice(0, -1));
 		}
-		return newValue;
+		return Number.isNaN(parsed) ? 0 : parsed;
 	};
 
 	const fetchStopwatchValues = (stopwatchValue: string, timeUnit: TimeUnit) => {
