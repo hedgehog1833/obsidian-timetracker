@@ -109,7 +109,7 @@ describe('useAdjustTimeInputOnRemoval', () => {
 		expect(result).toEqual({ tempHours: 12, tempMinutes: 34, tempSeconds: 5 });
 	});
 
-	it('returns undefined when key/position do not match any removal rule', () => {
+	it('returns 0 when key/position do not match any removal rule', () => {
 		// given
 		const focusRef = { current: { selectionStart: 0 } } as React.RefObject<HTMLInputElement | null>;
 		const { doAdjustTimeInputOnRemoval } = useAdjustTimeInputOnRemoval(focusRef);
@@ -119,6 +119,6 @@ describe('useAdjustTimeInputOnRemoval', () => {
 		const result = doAdjustTimeInputOnRemoval(event, baseStopwatch, TimeUnit.HOURS);
 
 		// then
-		expect(result).toBeUndefined();
+		expect(result).toEqual({ tempHours: 0, tempMinutes: 34, tempSeconds: 56 });
 	});
 });
