@@ -1,6 +1,6 @@
 import React from 'react';
-import useAdjustTimeInputOnRemoval from './useAdjustTimeInputOnRemoval';
 import { TimeUnit } from '../timeUnit';
+import useAdjustTimeInputOnRemoval from './useAdjustTimeInputOnRemoval';
 
 describe('useAdjustTimeInputOnRemoval', () => {
 	const baseStopwatch = '12:34:56';

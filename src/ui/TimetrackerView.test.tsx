@@ -1,6 +1,6 @@
-import { TimetrackerView } from './TimetrackerView';
-import { StopwatchState } from '../stopwatch/stopwatchState';
 import { TIMETRACKER_VIEW_TYPE } from '../main';
+import { StopwatchState } from '../stopwatch/stopwatchState';
+import { TimetrackerView } from './TimetrackerView';
 
 describe('TimetrackerView (unit tests)', () => {
 	let view: TimetrackerView;

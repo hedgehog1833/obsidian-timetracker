@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { TimetrackerSettings } from '../main';
-import { TimeUnit } from './timeUnit';
-import useFormatTimeValue from './hooks/useFormatTimeValue';
 import useAdjustTimeInputOnChange from './hooks/useAdjustTimeInputOnChange';
 import useAdjustTimeInputOnRemoval from './hooks/useAdjustTimeInputOnRemoval';
+import useFormatTimeValue from './hooks/useFormatTimeValue';
 import useSetStopwatchValue from './hooks/useSetStopwatchValue';
+import { TimeUnit } from './timeUnit';
 
 export type TimeInputProps = {
 	timeUnit: TimeUnit;

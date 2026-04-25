@@ -1,7 +1,7 @@
-import { StopwatchArea, StopwatchAreaProps } from './StopwatchArea';
 import { fireEvent, render } from '@testing-library/react';
 import { TimetrackerSettings } from '../main';
 import { StopwatchState } from '../stopwatch/stopwatchState';
+import { StopwatchArea, StopwatchAreaProps } from './StopwatchArea';
 
 describe('StopwatchArea', () => {
 	let defaultProps: StopwatchAreaProps;

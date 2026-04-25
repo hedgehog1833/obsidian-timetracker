@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import { StopwatchState } from '../stopwatch/stopwatchState';
 import { TimetrackerSettings } from '../main';
+import { StopwatchState } from '../stopwatch/stopwatchState';
 import { StopwatchValueContainer } from './StopwatchValueContainer';
 
 export type StopwatchAreaProps = {

@@ -1,6 +1,6 @@
 import { App, ColorComponent, PluginSettingTab, Setting } from 'obsidian';
 import StopwatchPlugin from './main';
-import { rgbToHex } from './mainHelpers';
+import { rgbToHex } from './printHelpers';
 
 export class TimetrackerSettingTab extends PluginSettingTab {
 	static PRINT_FORMAT_MAX_LENGTH = 255;

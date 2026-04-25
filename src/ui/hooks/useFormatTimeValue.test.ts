@@ -1,6 +1,6 @@
 import { TimetrackerSettings } from '../../main';
-import useFormatTimeValue from './useFormatTimeValue';
 import { TimeUnit } from '../timeUnit';
+import useFormatTimeValue from './useFormatTimeValue';
 
 describe('useFormatTimeValue', () => {
 	const defaultSettings: TimetrackerSettings = {

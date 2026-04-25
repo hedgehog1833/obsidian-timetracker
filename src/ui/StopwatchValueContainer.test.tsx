@@ -1,6 +1,6 @@
-import { StopwatchValueContainer, StopwatchValueContainerProps } from './StopwatchValueContainer';
-import { fireEvent, getByTestId, render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { TimetrackerSettings } from '../main';
+import { StopwatchValueContainer, StopwatchValueContainerProps } from './StopwatchValueContainer';
 
 describe('StopwatchValueContainer', () => {
 	let defaultProps: StopwatchValueContainerProps;

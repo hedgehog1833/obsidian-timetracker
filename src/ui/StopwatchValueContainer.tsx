@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import TimeInput from './TimeInput';
 import { TimetrackerSettings } from '../main';
+import TimeInput from './TimeInput';
 import { TimeUnit } from './timeUnit';
 
 export type StopwatchValueContainerProps = {

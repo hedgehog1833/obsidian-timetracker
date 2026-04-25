@@ -1,9 +1,14 @@
-import { migrateFormat, rgbToHex } from './mainHelpers';
+import { migrate, migrateFormat } from './mainHelpers';
 
 describe('mainHelpers', () => {
 	it('migrateFormat moves flags and clears format', () => {
+		// given
 		const settings: any = { format: 'HMS', interval: 5 };
+
+		// when
 		const changed = migrateFormat(settings);
+
+		// then
 		expect(changed).toBe(true);
 		expect(settings.format).toBeNull();
 		expect(settings.interval).toBeNull();
@@ -13,30 +18,50 @@ describe('mainHelpers', () => {
 	});
 
 	it('migrateFormat returns false when no format', () => {
+		// given
 		const settings: any = {};
-		expect(migrateFormat(settings)).toBe(false);
+
+		// when
+		const result = migrateFormat(settings);
+
+		// then
+		expect(result).toBe(false);
 	});
 
-	it('rgbToHex converts rgb string to hex', () => {
-		expect(rgbToHex('rgb(10, 20, 30)')).toBe('#0a141e');
+	it('migrate returns true when format is migrated', () => {
+		// given
+		const settings: any = { format: 'HMS', interval: 5, textColor: '#ffffff' };
+
+		// when
+		const changed = migrate(settings as any);
+
+		// then
+		expect(changed).toBe(true);
+		expect(settings.format).toBeNull();
+		expect(settings.interval).toBeNull();
+		expect(settings.showHours).toBe(true);
 	});
 
-	it('rgbToHex fallback for empty', () => {
-		expect(rgbToHex('')).toBe('#dadada');
-	});
-
-	it('loadFirstTextColor sets default on empty string', () => {
+	it('migrate returns true when first text color is loaded', () => {
+		// given
 		const settings: any = { textColor: '' };
-		const changed = (require('./mainHelpers') as any).loadFirstTextColor(settings);
+
+		// when
+		const changed = migrate(settings as any);
+
+		// then
 		expect(changed).toBe(true);
 		expect(settings.textColor).toBe('#dadada');
 	});
 
-	it('getCurrentTimeValues returns trimmed values when requested', () => {
-		const helpers = require('./mainHelpers') as any;
-		const values = helpers.getCurrentTimeValues(1000 * 60 * 61, true); // 1h1m0s
-		expect(values.hours).toBe('1');
-		expect(values.minutes).toBe('1');
-		expect(values.seconds).toBe('0');
+	it('migrate returns false when nothing to migrate', () => {
+		// given
+		const settings: any = { textColor: '#abc' };
+
+		// when
+		const changed = migrate(settings as any);
+
+		// then
+		expect(changed).toBe(false);
 	});
 });

@@ -1,16 +1,8 @@
 import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
-import { TimetrackerView } from './ui/TimetrackerView';
+import { migrate } from './mainHelpers';
+import { applyTextColor, buildPrintValue } from './printHelpers';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
-import getFormat from './stopwatch/formatSettings';
-import replaceTokens, { TimeValues } from './stopwatch/printHelpers';
-import {
-	migrateFormat,
-	rgbToHex,
-	loadFirstTextColor,
-	getCurrentTimeValues,
-	buildPrintValue,
-	applyTextColor,
-} from './mainHelpers';
+import { TimetrackerView } from './ui/TimetrackerView';
 
 export const TIMETRACKER_VIEW_TYPE = 'timetracker-sidebar';
 
@@ -118,10 +110,9 @@ export default class Timetracker extends Plugin {
 
 	async loadSettings() {
 		const loadedSettings: TimetrackerSettings = await this.loadData();
-		const isFormatMigrated = migrateFormat(loadedSettings);
-		const isFirstTextColorLoaded = loadFirstTextColor(loadedSettings);
+		const migrated = migrate(loadedSettings);
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
-		if (isFormatMigrated || isFirstTextColorLoaded) {
+		if (migrated) {
 			await this.saveSettings();
 		}
 	}
@@ -144,8 +135,7 @@ export default class Timetracker extends Plugin {
 	}
 
 	formatPrintValue(view: TimetrackerView): string {
-		const stopwatchValues = getCurrentTimeValues(view.getElapsedTime(), this.settings.trimLeadingZeros);
-		const printValue = buildPrintValue(this.settings, stopwatchValues);
+		const printValue = buildPrintValue(this.settings, view.getElapsedTime());
 		return applyTextColor(printValue, this.settings.textColor, view.containerEl);
 	}
 }

@@ -54,6 +54,7 @@
 		"jest-environment-jsdom": "^30.3.0",
 		"jest-util": "^30.3.0",
 		"prettier": "^3.8.3",
+		"prettier-plugin-organize-imports": "^4.3.0",
 		"standard": "^17.1.2",
 		"ts-jest": "^29.4.9",
 		"ts-node": "^10.9.2",

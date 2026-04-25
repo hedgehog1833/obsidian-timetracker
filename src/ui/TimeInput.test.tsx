@@ -1,11 +1,11 @@
-import { render, fireEvent } from '@testing-library/react';
-import TimeInput, { TimeInputProps } from './TimeInput';
-import { TimeUnit } from './timeUnit';
+import { fireEvent, render } from '@testing-library/react';
 import { createRef, useState } from 'react';
+import { TimetrackerSettings } from '../main';
 import useAdjustTimeInputOnChange from './hooks/useAdjustTimeInputOnChange';
 import useAdjustTimeInputOnRemoval from './hooks/useAdjustTimeInputOnRemoval';
 import useSetStopwatchValue from './hooks/useSetStopwatchValue';
-import { TimetrackerSettings } from '../main';
+import TimeInput, { TimeInputProps } from './TimeInput';
+import { TimeUnit } from './timeUnit';
 
 jest.mock('./hooks/useAdjustTimeInputOnChange');
 jest.mock('./hooks/useAdjustTimeInputOnRemoval');

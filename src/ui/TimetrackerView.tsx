@@ -1,10 +1,10 @@
 import { ItemView, ViewStateResult, WorkspaceLeaf } from 'obsidian';
-import { StopwatchArea } from './StopwatchArea';
 import ReactDOM, { Root } from 'react-dom/client';
-import { StopwatchModel } from '../stopwatch/stopwatchModel';
 import { TIMETRACKER_VIEW_TYPE, TimetrackerSettings } from '../main';
-import { StopwatchState } from '../stopwatch/stopwatchState';
 import format from '../stopwatch/formatter';
+import { StopwatchModel } from '../stopwatch/stopwatchModel';
+import { StopwatchState } from '../stopwatch/stopwatchState';
+import { StopwatchArea } from './StopwatchArea';
 
 const VIEW_DISPLAY_TEXT = 'Timetracker';
 const VIEW_ICON = 'clock';
