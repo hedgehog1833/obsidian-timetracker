@@ -161,7 +161,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	private printFormatIsValid(printFormat: string): boolean {
 		return (
 			printFormat.length === 0 ||
-			((printFormat.contains('${hours}') || printFormat.contains('${minutes}') || printFormat.contains('${seconds}')) &&
+			((printFormat.includes('${hours}') || printFormat.includes('${minutes}') || printFormat.includes('${seconds}')) &&
 				printFormat.length <= TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH)
 		);
 	}
