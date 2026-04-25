@@ -26,21 +26,28 @@ export const replaceTokens = (format: string, values: TimeValues, patterns: Toke
 		.join(values.seconds);
 };
 
-export const buildPrintValue = (settings: TimetrackerSettings, elapsedTime: number): string => {
+export const buildPrintValue = (
+	settings: TimetrackerSettings,
+	elapsedTime: number,
+	containerEl: HTMLElement,
+): string => {
 	const timeValues: TimeValues = getCurrentTimeValues(elapsedTime, settings.trimLeadingZeros);
+	let printValue = '';
 	if (settings.printFormat.length > 0) {
-		return replaceTokens(settings.printFormat, timeValues, {
+		printValue = replaceTokens(settings.printFormat, timeValues, {
 			hours: '${hours}',
 			minutes: '${minutes}',
 			seconds: '${seconds}',
 		} as TokenPatterns);
+	} else {
+		printValue = replaceTokens(getFormat(settings), timeValues, {
+			hours: 'hh',
+			minutes: 'mm',
+			seconds: 'ss',
+		} as TokenPatterns);
 	}
-
-	return replaceTokens(getFormat(settings), timeValues, {
-		hours: 'hh',
-		minutes: 'mm',
-		seconds: 'ss',
-	} as TokenPatterns);
+	printValue = applyTextColor(printValue, settings.textColor, containerEl);
+	return appendSuffix(printValue, settings.lineBreakAfterInsert);
 };
 
 export const applyTextColor = (printValue: string, userTextColor: string, containerEl: HTMLElement): string => {
@@ -48,6 +55,11 @@ export const applyTextColor = (printValue: string, userTextColor: string, contai
 	return userTextColor !== rgbToHex(textColor)
 		? `<span style="color:${userTextColor};">${printValue}</span>`
 		: printValue;
+};
+
+export const appendSuffix = (printValue: string, lineBreakAfterInsert: boolean): string => {
+	const suffix = lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
+	return `${printValue}${suffix}`;
 };
 
 export const rgbToHex = (rgbColor: string): string => {

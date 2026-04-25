@@ -1,4 +1,12 @@
-import { applyTextColor, getCurrentTimeValues, loadFirstTextColor, replaceTokens, rgbToHex } from './printHelpers';
+import {
+	appendSuffix,
+	applyTextColor,
+	buildPrintValue,
+	getCurrentTimeValues,
+	loadFirstTextColor,
+	replaceTokens,
+	rgbToHex,
+} from './printHelpers';
 
 describe('printHelpers replaceTokens', () => {
 	it('replaces multiple occurrences of tokens', () => {
@@ -25,6 +33,71 @@ describe('printHelpers replaceTokens', () => {
 			{ hours: 'hh', minutes: 'mm', seconds: 'ss' },
 		);
 		expect(result).toBe('02:03:04');
+	});
+});
+
+describe('buildPrintValue', () => {
+	afterEach(() => {
+		jest.restoreAllMocks();
+	});
+
+	it('uses custom printFormat when provided and applies color/suffix', () => {
+		// given
+		const settings: any = {
+			printFormat: '${hours}:${minutes}:${seconds}',
+			textColor: '#00ff00',
+			lineBreakAfterInsert: false,
+			trimLeadingZeros: true,
+		};
+		const container = document.createElement('div');
+
+		const timeValues = { hours: '01', minutes: '02', seconds: '03' };
+		jest.spyOn(require('./printHelpers'), 'getCurrentTimeValues').mockReturnValue(timeValues as any);
+		const replaceSpy = jest.spyOn(require('./printHelpers'), 'replaceTokens').mockReturnValue('REPLACED');
+		const colorSpy = jest.spyOn(require('./printHelpers'), 'applyTextColor').mockReturnValue('COLORED');
+		const suffixSpy = jest.spyOn(require('./printHelpers'), 'appendSuffix').mockReturnValue('FINAL');
+
+		// when
+		const result = buildPrintValue(settings, 1234, container);
+
+		// then
+		expect(require('./printHelpers').getCurrentTimeValues).toHaveBeenCalledWith(1234, true);
+		expect(replaceSpy).toHaveBeenCalledWith(settings.printFormat, timeValues, {
+			hours: '${hours}',
+			minutes: '${minutes}',
+			seconds: '${seconds}',
+		});
+		expect(colorSpy).toHaveBeenCalledWith('REPLACED', settings.textColor, container);
+		expect(suffixSpy).toHaveBeenCalledWith('COLORED', settings.lineBreakAfterInsert);
+		expect(result).toBe('FINAL');
+	});
+
+	it('uses default format when printFormat is empty', () => {
+		// given
+		const settings: any = {
+			printFormat: '',
+			textColor: '#00ff00',
+			lineBreakAfterInsert: true,
+			trimLeadingZeros: false,
+		};
+		const container = document.createElement('div');
+
+		const timeValues = { hours: '12', minutes: '34', seconds: '56' };
+		jest.spyOn(require('./printHelpers'), 'getCurrentTimeValues').mockReturnValue(timeValues as any);
+		const replaceSpy = jest.spyOn(require('./printHelpers'), 'replaceTokens').mockReturnValue('REPLACED_DEFAULT');
+		jest.spyOn(require('./printHelpers'), 'applyTextColor').mockReturnValue('COLORED_DEFAULT');
+		jest.spyOn(require('./printHelpers'), 'appendSuffix').mockReturnValue('FINAL_DEFAULT');
+
+		// when
+		const result = buildPrintValue(settings, 9999, container);
+
+		// then
+		expect(replaceSpy).toHaveBeenCalledWith(expect.any(String), timeValues, {
+			hours: 'hh',
+			minutes: 'mm',
+			seconds: 'ss',
+		});
+		expect(result).toBe('FINAL_DEFAULT');
 	});
 });
 
@@ -56,5 +129,21 @@ describe('printHelpers other utilities', () => {
 		expect(values.hours).toBe('1');
 		expect(values.minutes).toBe('1');
 		expect(values.seconds).toBe('0');
+	});
+
+	it('appendSuffix adds zero-width space if lineBreakAfterInsert is false', () => {
+		// when
+		const withoutBreak = appendSuffix('value', false);
+
+		// then
+		expect(withoutBreak.endsWith('\u200B ')).toBe(true);
+	});
+
+	it('appendSuffix adds newline if lineBreakAfterInsert is true', () => {
+		// when
+		const withBreak = appendSuffix('value', true);
+
+		// then
+		expect(withBreak.endsWith('\n')).toBe(true);
 	});
 });

@@ -72,7 +72,6 @@ describe('TimetrackerSettingTab (unit tests)', () => {
 
 		// when
 		persistenceSetting.triggerToggle(true);
-		// wait for async handlers to complete
 		await Promise.resolve();
 
 		// then
@@ -132,7 +131,23 @@ describe('TimetrackerSettingTab (unit tests)', () => {
 		expect(tab.secondsSetting).toBeDefined();
 	});
 
-	it('prevents disabling all units and shows format error message', () => {
+	it('prevents disabling all units and shows format error message for hours', () => {
+		// given
+		pluginMock.settings.showMinutes = false;
+		pluginMock.settings.showSeconds = false;
+
+		// when
+		tab.display();
+		(tab.hoursSetting as any)!.triggerToggle(false);
+
+		// then
+		expect(tab.hoursSetting!.descEl.innerHTML).toContain(
+			'At least one of hours, minutes or seconds must be enabled.',
+		);
+		expect(pluginMock.saveSettings).not.toHaveBeenCalled();
+	});
+
+	it('prevents disabling all units and shows format error message for minutes', () => {
 		// given
 		pluginMock.settings.showHours = false;
 		pluginMock.settings.showSeconds = false;
@@ -143,6 +158,22 @@ describe('TimetrackerSettingTab (unit tests)', () => {
 
 		// then
 		expect(tab.minutesSetting!.descEl.innerHTML).toContain(
+			'At least one of hours, minutes or seconds must be enabled.',
+		);
+		expect(pluginMock.saveSettings).not.toHaveBeenCalled();
+	});
+
+	it('prevents disabling all units and shows format error message for seconds', () => {
+		// given
+		pluginMock.settings.showHours = false;
+		pluginMock.settings.showMinutes = false;
+
+		// when
+		tab.display();
+		(tab.secondsSetting as any)!.triggerToggle(false);
+
+		// then
+		expect(tab.secondsSetting!.descEl.innerHTML).toContain(
 			'At least one of hours, minutes or seconds must be enabled.',
 		);
 		expect(pluginMock.saveSettings).not.toHaveBeenCalled();

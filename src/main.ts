@@ -1,6 +1,6 @@
 import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { migrate } from './mainHelpers';
-import { applyTextColor, buildPrintValue } from './printHelpers';
+import { buildPrintValue } from './printHelpers';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import { TimetrackerView } from './ui/TimetrackerView';
 
@@ -60,9 +60,9 @@ export default class Timetracker extends Plugin {
 				}
 
 				if (this.timeTrackerView !== null && editor !== null) {
-					const formattedStopwatchTime = this.formatPrintValue(this.timeTrackerView);
-					const suffix = this.settings.lineBreakAfterInsert ? '\n' : ('\u200B ' as string);
-					editor.replaceSelection(`${formattedStopwatchTime}${suffix}`);
+					editor.replaceSelection(
+						buildPrintValue(this.settings, this.timeTrackerView.getElapsedTime(), this.timeTrackerView.containerEl),
+					);
 					return true;
 				}
 				return false;
@@ -132,10 +132,5 @@ export default class Timetracker extends Plugin {
 				type: TIMETRACKER_VIEW_TYPE,
 			});
 		}
-	}
-
-	formatPrintValue(view: TimetrackerView): string {
-		const printValue = buildPrintValue(this.settings, view.getElapsedTime());
-		return applyTextColor(printValue, this.settings.textColor, view.containerEl);
 	}
 }
