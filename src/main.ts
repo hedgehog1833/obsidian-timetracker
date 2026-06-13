@@ -36,14 +36,12 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings = DEFAULT_SETTINGS;
-	timeTrackerView: TimetrackerView | null = null;
 
 	async onload() {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			this.timeTrackerView = new TimetrackerView(leaf, this.settings);
-			return this.timeTrackerView;
+			return new TimetrackerView(leaf, this.settings);
 		});
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
@@ -55,13 +53,14 @@ export default class Timetracker extends Plugin {
 			checkCallback: (checking: boolean) => {
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 				const editor = markdownView?.editor ?? null;
+				const timeTrackerView = this.getView();
 				if (checking) {
-					return this.timeTrackerView !== null && editor !== null;
+					return timeTrackerView !== null && editor !== null;
 				}
 
-				if (this.timeTrackerView !== null && editor !== null) {
+				if (timeTrackerView !== null && editor !== null) {
 					editor.replaceSelection(
-						buildPrintValue(this.settings, this.timeTrackerView.getElapsedTime(), this.timeTrackerView.containerEl),
+						buildPrintValue(this.settings, timeTrackerView.getElapsedTime(), timeTrackerView.containerEl),
 					);
 					return true;
 				}
@@ -74,12 +73,13 @@ export default class Timetracker extends Plugin {
 			name: 'Start or stop the stopwatch',
 			icon: 'alarm-clock',
 			checkCallback: (checking: boolean) => {
+				const timeTrackerView = this.getView();
 				if (checking) {
-					return this.timeTrackerView !== null;
+					return timeTrackerView !== null;
 				}
 
-				if (this.timeTrackerView !== null) {
-					this.timeTrackerView.clickStartStop();
+				if (timeTrackerView !== null) {
+					timeTrackerView.clickStartStop();
 					return true;
 				}
 				return false;
@@ -91,12 +91,13 @@ export default class Timetracker extends Plugin {
 			name: 'Reset the stopwatch',
 			icon: 'alarm-clock-off',
 			checkCallback: (checking: boolean) => {
+				const timeTrackerView = this.getView();
 				if (checking) {
-					return this.timeTrackerView !== null;
+					return timeTrackerView !== null;
 				}
 
-				if (this.timeTrackerView !== null) {
-					this.timeTrackerView.clickReset();
+				if (timeTrackerView !== null) {
+					timeTrackerView.clickReset();
 					return true;
 				}
 				return false;
@@ -107,6 +108,15 @@ export default class Timetracker extends Plugin {
 	}
 
 	onunload() {}
+
+	getView(): TimetrackerView | null {
+		const leaf = this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).first();
+		if (leaf !== null && leaf !== undefined && leaf.view instanceof TimetrackerView) {
+			return leaf.view;
+		} else {
+			return null;
+		}
+	}
 
 	async loadSettings() {
 		const loadedSettings: TimetrackerSettings = await this.loadData();
@@ -119,7 +129,8 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		this.timeTrackerView?.clickReload();
+		const timeTrackerView = this.getView();
+		timeTrackerView?.clickReload();
 	}
 
 	initLeaf(): void {
@@ -128,9 +139,11 @@ export default class Timetracker extends Plugin {
 		}
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
 		if (rightLeaf != null) {
-			rightLeaf.setViewState({
-				type: TIMETRACKER_VIEW_TYPE,
-			});
+			rightLeaf
+				.setViewState({
+					type: TIMETRACKER_VIEW_TYPE,
+				})
+				.then();
 		}
 	}
 }

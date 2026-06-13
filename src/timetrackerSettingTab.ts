@@ -22,14 +22,14 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
-		this.containerEl.createEl('h2', { text: 'Formatting' });
+		new Setting(this.containerEl).setName('Formatting').setHeading();
 		this.createStopwatchFormatSetting();
 		this.createTrimmingSetting();
 		this.createLineBreakSetting();
 		this.createTextColorSetting();
 		this.createPrintFormatSetting();
 
-		this.containerEl.createEl('h2', { text: 'Miscellaneous' });
+		new Setting(this.containerEl).setName('Miscellaneous').setHeading();
 		this.createPersistenceSetting();
 	}
 
@@ -38,7 +38,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			component.setValue(this.plugin.settings.showHours).onChange(async (value) => {
 				if (!value && !this.plugin.settings.showMinutes && !this.plugin.settings.showSeconds) {
 					component.setValue(true);
-					hoursSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+					hoursSetting.setDesc(TimetrackerSettingTab.FORMAT_ERROR_MESSAGE);
 				} else {
 					this.clearFormatErrorMessages();
 					this.plugin.settings.showHours = value;
@@ -52,7 +52,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			component.setValue(this.plugin.settings.showMinutes).onChange(async (value) => {
 				if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showSeconds) {
 					component.setValue(true);
-					minutesSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+					minutesSetting.setDesc(TimetrackerSettingTab.FORMAT_ERROR_MESSAGE);
 				} else {
 					this.clearFormatErrorMessages();
 					this.plugin.settings.showMinutes = value;
@@ -66,7 +66,7 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 			component.setValue(this.plugin.settings.showSeconds).onChange(async (value) => {
 				if (!value && !this.plugin.settings.showHours && !this.plugin.settings.showMinutes) {
 					component.setValue(true);
-					secondsSetting.descEl.innerHTML = TimetrackerSettingTab.FORMAT_ERROR_MESSAGE;
+					secondsSetting.setDesc(TimetrackerSettingTab.FORMAT_ERROR_MESSAGE);
 				} else {
 					this.clearFormatErrorMessages();
 					this.plugin.settings.showSeconds = value;
@@ -132,14 +132,16 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					if (this.printFormatIsValid(value)) {
 						this.plugin.settings.printFormat = value.trim().length === 0 && value.length !== 0 ? '' : value;
-						setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
+						setting.setDesc(TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION);
 						await this.plugin.saveSettings();
 					} else {
-						setting.descEl.innerHTML = `Invalid print format! Max length is ${TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH} and at least one placeholder has to be in use.`;
+						setting.setDesc(
+							`Invalid print format! Max length is ${TimetrackerSettingTab.PRINT_FORMAT_MAX_LENGTH} and at least one placeholder has to be in use.`,
+						);
 					}
 				});
 		});
-		setting.descEl.innerHTML = TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION;
+		setting.setDesc(TimetrackerSettingTab.PRINT_FORMAT_DESCRIPTION);
 	}
 
 	private createPersistenceSetting(): void {
@@ -168,13 +170,13 @@ export class TimetrackerSettingTab extends PluginSettingTab {
 
 	private clearFormatErrorMessages(): void {
 		if (this.hoursSetting) {
-			this.hoursSetting.descEl.innerHTML = '';
+			this.hoursSetting.setDesc('');
 		}
 		if (this.minutesSetting) {
-			this.minutesSetting.descEl.innerHTML = '';
+			this.minutesSetting.setDesc('');
 		}
 		if (this.secondsSetting) {
-			this.secondsSetting.descEl.innerHTML = '';
+			this.secondsSetting.setDesc('');
 		}
 	}
 }

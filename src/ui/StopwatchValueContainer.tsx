@@ -19,11 +19,11 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 	const separatorElement = <p className={'separator'}>:</p>;
 
 	useEffect(() => {
-		document.addEventListener('mousedown', handleClickOutside);
-		document.addEventListener('keydown', handleEscapeKey);
+		activeDocument.addEventListener('mousedown', handleClickOutside);
+		activeDocument.addEventListener('keydown', handleEscapeKey);
 		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
-			document.removeEventListener('keydown', handleEscapeKey);
+			activeDocument.removeEventListener('mousedown', handleClickOutside);
+			activeDocument.removeEventListener('keydown', handleEscapeKey);
 		};
 	}, [stopwatchValueWrapperRef.current]);
 

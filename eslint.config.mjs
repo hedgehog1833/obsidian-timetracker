@@ -58,6 +58,8 @@ export default [
 		rules: {
 			'react/react-in-jsx-scope': 'off',
 
+			'no-undef': 'off',
+
 			'prettier/prettier': [
 				'warn',
 				{
