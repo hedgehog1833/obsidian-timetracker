@@ -1,1 +1,1 @@
-import '@testing-library/jest-dom'
+;(globalThis as any).activeDocument = document;

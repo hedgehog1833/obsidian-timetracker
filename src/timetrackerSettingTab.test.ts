@@ -141,9 +141,7 @@ describe('TimetrackerSettingTab (unit tests)', () => {
 		(tab.hoursSetting as any)!.triggerToggle(false);
 
 		// then
-		expect(tab.hoursSetting!.descEl.innerHTML).toContain(
-			'At least one of hours, minutes or seconds must be enabled.',
-		);
+		expect(tab.hoursSetting!.descEl.innerHTML).toContain('At least one of hours, minutes or seconds must be enabled.');
 		expect(pluginMock.saveSettings).not.toHaveBeenCalled();
 	});
 

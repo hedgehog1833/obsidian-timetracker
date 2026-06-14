@@ -71,7 +71,7 @@ describe('StopwatchValueContainer', () => {
 		expect(button.textContent).toBe('Return');
 
 		// when
-		fireEvent.mouseDown(document.body);
+		fireEvent.mouseDown(activeDocument.body);
 
 		// then
 		expect(button.textContent).toBe('Set');
@@ -108,7 +108,7 @@ describe('StopwatchValueContainer', () => {
 		expect(button.textContent).toBe('Return');
 
 		// when
-		fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+		fireEvent.keyDown(activeDocument, { key: 'Escape', code: 'Escape' });
 
 		// then
 		expect(button.textContent).toBe('Set');

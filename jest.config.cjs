@@ -4,4 +4,6 @@ module.exports = {
 	collectCoverage: false,
 	collectCoverageFrom: ['src/**/*.{ts,tsx,js,jsx}', '!src/**/*.test.{ts,tsx,js,jsx}'],
 	coverageDirectory: 'coverage',
+	setupFiles: ['<rootDir>/jest.setup.ts'],
+	setupFilesAfterEnv: ['<rootDir>/jest.setupAfterEnv.ts'],
 }

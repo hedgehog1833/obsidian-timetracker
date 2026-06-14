@@ -110,6 +110,29 @@ export class Setting {
 		return this;
 	}
 
+	setHeading(text?: string | DocumentFragment) {
+		if (text instanceof DocumentFragment) {
+			const frag = text;
+			const heading = document.createElement('h2');
+			heading.appendChild(frag);
+			this.containerEl.appendChild(heading);
+			return this;
+		}
+
+		let headingText = '';
+		if (typeof text === 'string') {
+			headingText = text;
+		} else {
+			const nameEl = this.element.querySelector('.setting-name') as HTMLElement | null;
+			headingText = nameEl?.textContent ?? '';
+		}
+
+		const h2 = document.createElement('h2');
+		h2.textContent = headingText;
+		this.containerEl.appendChild(h2);
+		return this;
+	}
+
 	addToggle(cb: (c: ToggleComponent) => void) {
 		const comp: ToggleComponent = {
 			setValue: (_v: boolean) => ({
