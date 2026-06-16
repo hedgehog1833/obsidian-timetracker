@@ -32,7 +32,7 @@ export const buildPrintValue = (
 	containerEl: HTMLElement,
 ): string => {
 	const timeValues: TimeValues = getCurrentTimeValues(elapsedTime, settings.trimLeadingZeros);
-	let printValue = '';
+	let printValue: string;
 	if (settings.printFormat.length > 0) {
 		printValue = replaceTokens(settings.printFormat, timeValues, {
 			hours: '${hours}',

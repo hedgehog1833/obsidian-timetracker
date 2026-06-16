@@ -13,18 +13,20 @@ const compat = new FlatCompat({
 	baseDirectory: __dirname,
 	recommendedConfig: js.configs.recommended,
 	allConfig: js.configs.all,
-	eslintReact: eslintReact.configs.recommended,
 })
 
 export default [
+	eslintReact.configs?.recommended ?? {},
+	eslintReact.configs?.['jsx-runtime'] ?? {},
+
 	...compat.extends(
 		'eslint:recommended',
-		'plugin:react/recommended',
-		'plugin:react/jsx-runtime',
 		'plugin:prettier/recommended',
 	),
+
 	{
 		plugins: {
+			react: eslintReact,
 			'@typescript-eslint': typescriptEslint,
 		},
 
@@ -41,9 +43,7 @@ export default [
 			sourceType: 'module',
 
 			parserOptions: {
-				ecmaFeatures: {
-					jsx: true,
-				},
+				ecmaFeatures: { jsx: true },
 			},
 		},
 
@@ -57,9 +57,7 @@ export default [
 
 		rules: {
 			'react/react-in-jsx-scope': 'off',
-
 			'no-undef': 'off',
-
 			'prettier/prettier': [
 				'warn',
 				{
@@ -73,7 +71,6 @@ export default [
 					trailingComma: 'all',
 				},
 			],
-
 			'no-unused-vars': 'off',
 		},
 	},

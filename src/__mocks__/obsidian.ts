@@ -8,7 +8,11 @@ export interface App {
 export class ItemView {
 	leaf: WorkspaceLeaf;
 	containerEl: HTMLElement = document.createElement('div');
-	app: App = { workspace: { requestSaveLayout: () => {} } };
+	app: App = {
+		workspace: {
+			requestSaveLayout: () => {},
+		},
+	};
 
 	constructor(leaf: WorkspaceLeaf) {
 		this.leaf = leaf;
@@ -64,6 +68,7 @@ export interface TextComponent {
 		setPlaceholder(p: string): { onChange(fn: (v: string) => void): void };
 		onChange(fn: (v: string) => void): void;
 	};
+
 	setPlaceholder(p: string): { onChange(fn: (v: string) => void): void };
 }
 
@@ -73,6 +78,7 @@ export interface ColorComponent {
 
 export interface ButtonComponent {
 	setButtonText(t: string): void;
+
 	onClick(fn: (e?: any) => void): void;
 }
 
@@ -119,7 +125,7 @@ export class Setting {
 			return this;
 		}
 
-		let headingText = '';
+		let headingText: string;
 		if (typeof text === 'string') {
 			headingText = text;
 		} else {
@@ -161,7 +167,9 @@ export class Setting {
 					this._textOnChange = fn;
 				},
 			}),
-			setPlaceholder: (_p: string) => ({ onChange: (_fn: any) => {} }),
+			setPlaceholder: (_p: string) => ({
+				onChange: (_fn: any) => {},
+			}),
 		} as unknown as TextComponent;
 		cb(comp);
 		return this;
