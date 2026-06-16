@@ -1,8 +1,8 @@
 {
 	"id": "timetracker",
 	"name": "Timetracker",
-	"version": "1.6.7",
-	"minAppVersion": "0.15.0",
+	"version": "1.7.0",
+	"minAppVersion": "1.0.0",
 	"description": "Adds a stopwatch whose value can be inserted in the editor per hotkey.",
 	"author": "Nils Dammenhayn",
 	"authorUrl": "https://codeberg.org/hedgehog1833",
