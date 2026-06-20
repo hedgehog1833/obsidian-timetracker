@@ -1,1 +1,1 @@
-;(globalThis as any).activeDocument = document;
+;window.activeDocument = document;
