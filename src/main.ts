@@ -139,11 +139,9 @@ export default class Timetracker extends Plugin {
 		}
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
 		if (rightLeaf != null) {
-			rightLeaf
-				.setViewState({
-					type: TIMETRACKER_VIEW_TYPE,
-				})
-				.then();
+			void rightLeaf.setViewState({
+				type: TIMETRACKER_VIEW_TYPE,
+			});
 		}
 	}
 }
