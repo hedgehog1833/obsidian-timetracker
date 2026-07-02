@@ -4,7 +4,9 @@ on: push
 
 jobs:
   lint:
-    runs-on: local-docker
+    runs-on:
+      - local-docker
+      - codeberg-tiny
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
