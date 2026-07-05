@@ -5,7 +5,6 @@ on: push
 jobs:
   ci:
     runs-on:
-      - local-docker
       - codeberg-tiny
     timeout-minutes: 5
     steps:
