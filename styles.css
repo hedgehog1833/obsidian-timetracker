@@ -14,10 +14,6 @@
 	display: flex;
 }
 
-.reload-button {
-	display: none;
-}
-
 .stopwatch-value-wrapper {
 	display: flex;
 	flex-direction: column;

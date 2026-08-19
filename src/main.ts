@@ -1,6 +1,8 @@
-import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { registerCommands } from './commands';
 import { migrate } from './mainHelpers';
-import { buildPrintValue } from './printHelpers';
+import { StopwatchController } from './stopwatch/stopwatchController';
+import { registerStopwatchRuntime } from './stopwatch/stopwatchRuntime';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
 import { TimetrackerView } from './ui/TimetrackerView';
 
@@ -36,87 +38,26 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings = DEFAULT_SETTINGS;
+	stopwatchController: StopwatchController = new StopwatchController();
 
 	async onload() {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			return new TimetrackerView(leaf, this.settings);
+			return new TimetrackerView(leaf, this.settings, this.stopwatchController);
 		});
 
-		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
-
-		this.addCommand({
-			id: 'insert-timestamp',
-			name: 'Insert timestamp based on current stopwatch value',
-			icon: 'alarm-clock-plus',
-			checkCallback: (checking: boolean) => {
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				const editor = markdownView?.editor ?? null;
-				const timeTrackerView = this.getView();
-				if (checking) {
-					return timeTrackerView !== null && editor !== null;
-				}
-
-				if (timeTrackerView !== null && editor !== null) {
-					editor.replaceSelection(
-						buildPrintValue(this.settings, timeTrackerView.getElapsedTime(), timeTrackerView.containerEl),
-					);
-					return true;
-				}
-				return false;
-			},
+		registerStopwatchRuntime(this, this.stopwatchController, {
+			requestSaveLayout: () => this.app.workspace.requestSaveLayout(),
+			isPersistenceEnabled: () => this.settings.persistTimerValue,
 		});
-
-		this.addCommand({
-			id: 'start-stop-stopwatch',
-			name: 'Start or stop the stopwatch',
-			icon: 'alarm-clock',
-			checkCallback: (checking: boolean) => {
-				const timeTrackerView = this.getView();
-				if (checking) {
-					return timeTrackerView !== null;
-				}
-
-				if (timeTrackerView !== null) {
-					timeTrackerView.clickStartStop();
-					return true;
-				}
-				return false;
-			},
-		});
-
-		this.addCommand({
-			id: 'reset-stopwatch',
-			name: 'Reset the stopwatch',
-			icon: 'alarm-clock-off',
-			checkCallback: (checking: boolean) => {
-				const timeTrackerView = this.getView();
-				if (checking) {
-					return timeTrackerView !== null;
-				}
-
-				if (timeTrackerView !== null) {
-					timeTrackerView.clickReset();
-					return true;
-				}
-				return false;
-			},
-		});
+		registerCommands(this, this.stopwatchController);
 
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
+		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
 	}
 
 	onunload() {}
-
-	getView(): TimetrackerView | null {
-		const leaf = this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).first();
-		if (leaf !== null && leaf !== undefined && leaf.view instanceof TimetrackerView) {
-			return leaf.view;
-		} else {
-			return null;
-		}
-	}
 
 	async loadSettings() {
 		const loadedSettings: TimetrackerSettings = await this.loadData();
@@ -129,19 +70,23 @@ export default class Timetracker extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		const timeTrackerView = this.getView();
-		timeTrackerView?.clickReload();
+		this.stopwatchController.notify();
 	}
 
-	initLeaf(): void {
-		if (this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).length > 0) {
-			return;
+	async initLeaf(): Promise<void> {
+		let leaf = this.app.workspace.getLeavesOfType(TIMETRACKER_VIEW_TYPE).first();
+
+		if (leaf === undefined) {
+			const rightLeaf = this.app.workspace.getRightLeaf(false);
+			if (rightLeaf == null) {
+				return;
+			}
+			await rightLeaf.setViewState({ type: TIMETRACKER_VIEW_TYPE });
+			leaf = rightLeaf;
 		}
-		const rightLeaf = this.app.workspace.getRightLeaf(false);
-		if (rightLeaf != null) {
-			void rightLeaf.setViewState({
-				type: TIMETRACKER_VIEW_TYPE,
-			});
+
+		if (this.settings.persistTimerValue) {
+			await leaf.loadIfDeferred();
 		}
 	}
 }

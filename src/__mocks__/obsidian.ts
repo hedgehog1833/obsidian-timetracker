@@ -25,6 +25,18 @@ export class ItemView {
 
 export class Plugin {}
 
+export type Editor = any;
+export type MarkdownFileInfo = any;
+
+export class MarkdownView {
+	leaf: WorkspaceLeaf;
+	containerEl: HTMLElement = document.createElement('div');
+
+	constructor(leaf?: WorkspaceLeaf) {
+		this.leaf = leaf;
+	}
+}
+
 export interface CreateElOpts {
 	text?: string;
 	cls?: string;
