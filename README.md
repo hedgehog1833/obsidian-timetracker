@@ -17,8 +17,8 @@ The stopwatch functionality is a completely rewritten clone of https://github.co
 
 ### Time format: hours, minutes, seconds
 
-The format for how to print the stopwatch's current value. Default is to display hours, minutes and seconds `00:00:00`. 
-Each can be turned on and off separately. 
+The format for how to print the stopwatch's current value. Default is to display hours, minutes and seconds `00:00:00`.
+Each can be turned on and off separately.
 
 ### Trimming
 
@@ -39,7 +39,7 @@ is shown in the sidebar. There are three placeholders available: `${hours}`, `${
 simply replaced with the respective value. The trimming parameter still applies to the printed time format. Maximum
 length for the printed time format is 256 characters.
 <br>
-The print format `Time: ${hours}h ${minutes}m ${seconds}s` will result in `Time: 1h 10m 1s` being pasted for a stopwatch 
+The print format `Time: ${hours}h ${minutes}m ${seconds}s` will result in `Time: 1h 10m 1s` being pasted for a stopwatch
 value of `01:10:01` with trimming parameter active.
 
 ### Persistence
@@ -47,3 +47,14 @@ value of `01:10:01` with trimming parameter active.
 When closing the app the stopwatch's value can be saved and restored on the next application start. When activated, saving the 
 value takes place once every 60 seconds while the timer is running or if stopped/resetted or the value is changed manually. 
 The values are saved in the workspace so they are shared between devices but not between mobile and desktop platform.
+A stopwatch that was still running when the app was closed is restored in a stopped state, so the time the app spent closed
+is not counted towards the value.
+
+## Commands
+
+All three commands work regardless of whether the sidebar panel is open, collapsed or has never been opened in the
+current workspace:
+
+- **Start or stop the stopwatch**
+- **Reset the stopwatch**
+- **Insert timestamp based on current stopwatch value** — only offered while an editor has focus.
