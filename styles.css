@@ -43,7 +43,7 @@ input.stopwatch-value-input {
 }
 
 input.stopwatch-value-input:disabled {
-	color: white
+	color: white;
 }
 
 input.stopwatch-value-input:focus,

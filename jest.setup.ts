@@ -1,1 +1,1 @@
-;window.activeDocument = document;
+window.activeDocument = document;

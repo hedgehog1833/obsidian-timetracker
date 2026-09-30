@@ -1,8 +1,17 @@
+import { Setting } from 'obsidian';
 import { TimetrackerSettingTab } from './timetrackerSettingTab';
+
+type TestSetting = Setting & {
+	triggerToggle(value: boolean): void;
+	triggerText(value: string): void;
+	triggerColor(value: string): void;
+	clickButton(): void;
+};
 
 describe('TimetrackerSettingTab (unit tests)', () => {
 	let pluginMock: any;
 	let tab: TimetrackerSettingTab;
+	let definitions: any;
 
 	beforeEach(() => {
 		pluginMock = {
@@ -21,171 +30,245 @@ describe('TimetrackerSettingTab (unit tests)', () => {
 
 		const appMock: any = { workspace: { requestSaveLayout: jest.fn() } };
 		tab = new TimetrackerSettingTab(appMock as any, pluginMock);
+		definitions = tab.getSettingDefinitions();
 	});
 
-	it('toggling show hours/minutes/seconds updates settings and calls saveSettings', () => {
-		// given
-		tab.display();
+	const formattingItem = (name: string): any => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
 
-		// when
-		(tab.hoursSetting as any)!.triggerToggle(false);
-		(tab.minutesSetting as any)!.triggerToggle(false);
-		(tab.secondsSetting as any)!.triggerToggle(true);
+		return formatting.items.find((item: any) => item.name === name);
+	};
 
-		// then
+	const createSetting = (): TestSetting => new Setting(tab.containerEl) as TestSetting;
+
+	it('defines and saves show hours changes', async () => {
+		const setting = createSetting();
+		const showHours = formattingItem('Show hours');
+
+		expect(showHours).toMatchObject({
+			name: 'Show hours',
+			desc: 'Show hours in the inserted timestamp.',
+		});
+
+		showHours.render(setting);
+		await setting.triggerToggle(false);
+
 		expect(pluginMock.settings.showHours).toBe(false);
-		expect(pluginMock.settings.showMinutes).toBe(false);
-		expect(pluginMock.settings.showSeconds).toBe(true);
-		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(3);
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
 	});
 
-	it('trimming and line break toggles update settings and call saveSettings', () => {
-		// when
-		tab.display();
+	it('defines and saves show minutes changes', async () => {
+		const setting = createSetting();
+		const showMinutes = formattingItem('Show minutes');
 
-		// find trimming setting instance via DOM
-		const trimmingName = Array.from(tab.containerEl.querySelectorAll('.setting-name')).find(
-			(n: any) => n.textContent === 'Trimming',
-		);
-		const trimmingSetting = (trimmingName as any)?.parentElement?._setting as any;
-		trimmingSetting.triggerToggle(true);
-		const lineBreakName = Array.from(tab.containerEl.querySelectorAll('.setting-name')).find(
-			(n: any) => n.textContent === 'Line break',
-		);
-		const lineBreakSetting = (lineBreakName as any)?.parentElement?._setting as any;
-		lineBreakSetting.triggerToggle(true);
+		expect(showMinutes).toMatchObject({
+			name: 'Show minutes',
+			desc: 'Show minutes in the inserted timestamp.',
+		});
 
-		// then
-		expect(pluginMock.settings.trimLeadingZeros).toBe(true);
-		expect(pluginMock.settings.lineBreakAfterInsert).toBe(true);
-		// two additional saveSettings calls
-		expect(pluginMock.saveSettings).toHaveBeenCalled();
+		showMinutes.render(setting);
+		await setting.triggerToggle(false);
+
+		expect(pluginMock.settings.showMinutes).toBe(false);
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
+	});
+
+	it('defines and saves show seconds changes', async () => {
+		const setting = createSetting();
+		const showSeconds = formattingItem('Show seconds');
+
+		expect(showSeconds).toMatchObject({
+			name: 'Show seconds',
+			desc: 'Show seconds in the inserted timestamp.',
+		});
+
+		showSeconds.render(setting);
+		await setting.triggerToggle(true);
+
+		expect(pluginMock.settings.showSeconds).toBe(true);
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
+	});
+
+	it('defines trimming toggle', () => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		);
+
+		expect(formatting).toBeDefined();
+
+		const items = formatting?.items ?? [];
+		const trimming = items.find((item: any) => item.name === 'Trimming');
+
+		expect(trimming).toMatchObject({
+			name: 'Trimming',
+			desc: 'Remove leading zeros.',
+			control: {
+				type: 'toggle',
+				key: 'trimLeadingZeros',
+				defaultValue: false,
+			},
+		});
+	});
+
+	it('defines line break toggle', () => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		);
+
+		expect(formatting).toBeDefined();
+
+		const items = formatting?.items ?? [];
+		const lineBreak = items.find((item: any) => item.name === 'Line break');
+
+		expect(lineBreak).toMatchObject({
+			name: 'Line break',
+			desc: 'Add a line break after the inserted timestamp.',
+			control: {
+				type: 'toggle',
+				key: 'lineBreakAfterInsert',
+				defaultValue: false,
+			},
+		});
 	});
 
 	it('persistence toggle updates settings and triggers save layout when enabled', async () => {
-		// given
-		tab.display();
-		const persistenceName = Array.from(tab.containerEl.querySelectorAll('.setting-name')).find(
-			(n: any) => n.textContent === 'Persistence',
-		);
-		const persistenceSetting = (persistenceName as any)?.parentElement?._setting as any;
+		const miscellaneous = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Miscellaneous',
+		) as any;
 
-		// when
-		persistenceSetting.triggerToggle(true);
+		const persistence = miscellaneous.items.find((item: any) => item.name === 'Persistence');
+		const setting = createSetting();
+
+		persistence.render(setting);
+		await setting.triggerToggle(true);
+
+		expect(pluginMock.settings.persistTimerValue).toBe(true);
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
+		expect(tab.app.workspace.requestSaveLayout).toHaveBeenCalledTimes(1);
+	});
+
+	it('handles valid and invalid printed time formats', async () => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
+
+		const printedTimeFormat = formatting.items.find((item: any) => item.name === 'Printed time format');
+		const setting = createSetting();
+
+		printedTimeFormat.render(setting);
+
+		setting.triggerText('${hours}h');
 		await Promise.resolve();
 
-		// then
-		expect(pluginMock.settings.persistTimerValue).toBe(true);
-		expect(pluginMock.saveSettings).toHaveBeenCalled();
-		expect((tab as any).app.workspace.requestSaveLayout).toHaveBeenCalled();
-	});
-
-	it('printed time format valid/invalid handling', () => {
-		// given
-		tab.display();
-		const printName = Array.from(tab.containerEl.querySelectorAll('.setting-name')).find(
-			(n: any) => n.textContent === 'Printed time format',
-		);
-		const printSetting = (printName as any)?.parentElement?._setting as any;
-
-		// when
-		printSetting.triggerText('${hours}h');
-
-		// then
 		expect(pluginMock.settings.printFormat).toBe('${hours}h');
-		expect(pluginMock.saveSettings).toHaveBeenCalled();
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
 
-		// when
-		printSetting.triggerText('no placeholders');
+		setting.triggerText('no placeholders');
+		await Promise.resolve();
 
-		// then
-		expect(printSetting.descEl.innerHTML).toContain('Invalid print format');
+		expect(pluginMock.settings.printFormat).toBe('${hours}h');
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
 	});
 
-	it('reset to default color button sets default color and saves', () => {
-		// given
-		tab.display();
-		tab.containerEl.style.color = 'rgb(1,2,3)';
+	it('reset to default color sets default color and saves', async () => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
 
-		const textColorName = Array.from(tab.containerEl.querySelectorAll('.setting-name')).find(
-			(n: any) => n.textContent === 'Text color',
-		);
-		const textColorSetting = (textColorName as any)?.parentElement?._setting as any;
+		const textColor = formatting.items.find((item: any) => item.name === 'Text color');
+		const setting = createSetting();
 
-		// when
-		textColorSetting.clickButton();
+		tab.containerEl.style.color = 'rgb(1, 2, 3)';
+		textColor.render(setting);
 
-		// then
+		setting.clickButton();
+		await Promise.resolve();
+
 		expect(pluginMock.settings.textColor).toBe('#010203');
-		expect(pluginMock.saveSettings).toHaveBeenCalled();
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
 	});
 
-	it('display builds settings and exposes hours/minutes/seconds settings', () => {
-		// when
-		tab.display();
+	it('defines the formatting toggles', () => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		);
 
-		// then
-		expect(tab.containerEl.querySelector('h2')?.textContent).toBe('Formatting');
-		expect(tab.hoursSetting).toBeDefined();
-		expect(tab.minutesSetting).toBeDefined();
-		expect(tab.secondsSetting).toBeDefined();
+		expect(formatting).toBeDefined();
+
+		const names = formatting?.items.map((item: any) => item.name) ?? [];
+
+		expect(names).toEqual(expect.arrayContaining(['Show hours', 'Show minutes', 'Show seconds']));
 	});
 
-	it('prevents disabling all units and shows format error message for hours', () => {
-		// given
+	it('prevents disabling all units and does not save when attempted for hours', async () => {
 		pluginMock.settings.showMinutes = false;
 		pluginMock.settings.showSeconds = false;
 
-		// when
-		tab.display();
-		(tab.hoursSetting as any)!.triggerToggle(false);
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
 
-		// then
-		expect(tab.hoursSetting!.descEl.innerHTML).toContain('At least one of hours, minutes or seconds must be enabled.');
+		const showHours = formatting.items.find((item: any) => item.name === 'Show hours');
+		const setting = createSetting();
+
+		showHours.render(setting);
+		await setting.triggerToggle(false);
+
+		expect(pluginMock.settings.showHours).toBe(true);
 		expect(pluginMock.saveSettings).not.toHaveBeenCalled();
 	});
 
-	it('prevents disabling all units and shows format error message for minutes', () => {
-		// given
+	it('prevents disabling all units and does not save when attempted for minutes', async () => {
 		pluginMock.settings.showHours = false;
 		pluginMock.settings.showSeconds = false;
 
-		// when
-		tab.display();
-		(tab.minutesSetting as any)!.triggerToggle(false);
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
 
-		// then
-		expect(tab.minutesSetting!.descEl.innerHTML).toContain(
-			'At least one of hours, minutes or seconds must be enabled.',
-		);
+		const showMinutes = formatting.items.find((item: any) => item.name === 'Show minutes');
+		const setting = createSetting();
+
+		showMinutes.render(setting);
+		await setting.triggerToggle(false);
+
+		expect(pluginMock.settings.showMinutes).toBe(true);
 		expect(pluginMock.saveSettings).not.toHaveBeenCalled();
 	});
 
-	it('prevents disabling all units and shows format error message for seconds', () => {
-		// given
+	it('prevents disabling all units and does not save when attempted for seconds', async () => {
 		pluginMock.settings.showHours = false;
 		pluginMock.settings.showMinutes = false;
 
-		// when
-		tab.display();
-		(tab.secondsSetting as any)!.triggerToggle(false);
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
 
-		// then
-		expect(tab.secondsSetting!.descEl.innerHTML).toContain(
-			'At least one of hours, minutes or seconds must be enabled.',
-		);
+		const showSeconds = formatting.items.find((item: any) => item.name === 'Show seconds');
+		const setting = createSetting();
+
+		showSeconds.render(setting);
+		await setting.triggerToggle(false);
+
+		expect(pluginMock.settings.showSeconds).toBe(true);
 		expect(pluginMock.saveSettings).not.toHaveBeenCalled();
 	});
 
-	it('color picker onChange updates plugin settings and calls saveSettings', () => {
-		// given
-		tab.display();
+	it('color setter updates plugin settings and calls saveSettings', async () => {
+		const formatting = definitions.find(
+			(definition: any) => definition.type === 'group' && definition.heading === 'Formatting',
+		) as any;
 
-		// when
-		(tab as any).colorPickerInstance?._set?.('#00ff00');
+		const textColor = formatting.items.find((item: any) => item.name === 'Text color');
+		const setting = createSetting();
 
-		// then
+		textColor.render(setting);
+		setting.triggerColor('#00ff00');
+		await Promise.resolve();
+
 		expect(pluginMock.settings.textColor).toBe('#00ff00');
-		expect(pluginMock.saveSettings).toHaveBeenCalled();
+		expect(pluginMock.saveSettings).toHaveBeenCalledTimes(1);
 	});
 });

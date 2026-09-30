@@ -26,7 +26,7 @@ const TimeInput = (props: TimeInputProps) => {
 		if (props.focusRef.current != null) {
 			props.focusRef.current.setSelectionRange(cursorPosition, cursorPosition);
 		}
-	}, [cursorPosition]);
+	}, [cursorPosition, props.focusRef]);
 
 	const handleFocus = () => {
 		props.focusRef.current?.setSelectionRange(0, 0);

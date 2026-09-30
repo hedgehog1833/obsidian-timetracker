@@ -30,7 +30,6 @@ describe('StopwatchValueContainer', () => {
 
 	it(`onClick 'stopwatch-edit-button': button text changes to 'Return'`, () => {
 		// given
-		// (defaultProps.start as jest.Mock).mockReturnValue(StopwatchState.STARTED);
 		const { getByTestId } = render(<StopwatchValueContainer {...defaultProps} />);
 		const button = getByTestId('stopwatch-edit-button') as HTMLButtonElement;
 
@@ -112,5 +111,30 @@ describe('StopwatchValueContainer', () => {
 
 		// then
 		expect(button.textContent).toBe('Set');
+	});
+
+	it('exits edit mode from the view document when it differs from activeDocument', () => {
+		const iframe = document.createElement('iframe');
+		document.body.appendChild(iframe);
+		const viewDocument = iframe.contentDocument as Document;
+		const container = viewDocument.createElement('div');
+		viewDocument.body.appendChild(container);
+		const { getByTestId, unmount } = render(<StopwatchValueContainer {...defaultProps} />, { container });
+		const button = getByTestId('stopwatch-edit-button') as HTMLButtonElement;
+
+		fireEvent.click(button);
+		expect(button.textContent).toBe('Return');
+
+		fireEvent.mouseDown(viewDocument.body);
+		expect(button.textContent).toBe('Set');
+
+		fireEvent.click(button);
+		expect(button.textContent).toBe('Return');
+
+		fireEvent.keyDown(viewDocument, { key: 'Escape', code: 'Escape' });
+		expect(button.textContent).toBe('Set');
+
+		unmount();
+		iframe.remove();
 	});
 });

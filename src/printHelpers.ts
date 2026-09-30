@@ -62,7 +62,7 @@ export const appendSuffix = (printValue: string, lineBreakAfterInsert: boolean):
 	return `${printValue}${suffix}`;
 };
 
-export const rgbToHex = (rgbColor: string): string => {
+export const rgbToHex = (rgbColor: string | undefined): string => {
 	if (rgbColor && rgbColor.length > 0) {
 		const rgbValues = rgbColor.slice(4, -1);
 		const [r, g, b] = rgbValues.split(',').map((value: string) => parseInt(value));

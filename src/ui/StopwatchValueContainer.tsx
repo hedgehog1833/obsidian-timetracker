@@ -12,20 +12,25 @@ export type StopwatchValueContainerProps = {
 
 export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const inputHoursRef = useRef<HTMLInputElement>(null);
-	const inputMinutesRef = useRef<HTMLInputElement>(null);
-	const inputSecondsRef = useRef<HTMLInputElement>(null);
-	const stopwatchValueWrapperRef = useRef<HTMLDivElement>(null);
+	const inputHoursRef = useRef<HTMLInputElement | null>(null);
+	const inputMinutesRef = useRef<HTMLInputElement | null>(null);
+	const inputSecondsRef = useRef<HTMLInputElement | null>(null);
+	const stopwatchValueWrapperRef = useRef<HTMLDivElement | null>(null);
 	const separatorElement = <p className={'separator'}>:</p>;
 
 	useEffect(() => {
-		activeDocument.addEventListener('mousedown', handleClickOutside);
-		activeDocument.addEventListener('keydown', handleEscapeKey);
+		const viewDocument = stopwatchValueWrapperRef.current?.ownerDocument;
+		if (viewDocument == null) {
+			return;
+		}
+
+		viewDocument.addEventListener('mousedown', handleClickOutside);
+		viewDocument.addEventListener('keydown', handleEscapeKey);
 		return () => {
-			activeDocument.removeEventListener('mousedown', handleClickOutside);
-			activeDocument.removeEventListener('keydown', handleEscapeKey);
+			viewDocument.removeEventListener('mousedown', handleClickOutside);
+			viewDocument.removeEventListener('keydown', handleEscapeKey);
 		};
-	}, [stopwatchValueWrapperRef.current]);
+	}, []);
 
 	useEffect(() => {
 		if (isEditing) {
@@ -37,7 +42,7 @@ export const StopwatchValueContainer = (props: StopwatchValueContainerProps) => 
 				inputHoursRef.current?.focus();
 			}
 		}
-	}, [isEditing]);
+	}, [isEditing, props.settings.showHours, props.settings.showMinutes, props.settings.showSeconds]);
 
 	const handleClickOutside = (event: MouseEvent) => {
 		if (stopwatchValueWrapperRef.current != null && !stopwatchValueWrapperRef.current.contains(event.target as Node)) {

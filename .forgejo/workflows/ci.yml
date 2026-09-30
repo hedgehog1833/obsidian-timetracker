@@ -18,6 +18,10 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Run linter
+        run: npm run lint
+      - name: Run formatter
+        run: npm run format:check
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
