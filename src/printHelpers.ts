@@ -2,17 +2,10 @@ import { TimetrackerSettings } from './main';
 import getFormat from './stopwatch/formatSettings';
 import format from './stopwatch/formatter';
 
-export interface TimeValues {
-	hours: string;
-	minutes: string;
-	seconds: string;
-}
+type TimePartMap = Record<'hours' | 'minutes' | 'seconds', string>;
 
-export interface TokenPatterns {
-	hours: string;
-	minutes: string;
-	seconds: string;
-}
+export type TimeValues = TimePartMap;
+export type TokenPatterns = TimePartMap;
 
 export const replaceTokens = (format: string, values: TimeValues, patterns: TokenPatterns): string => {
 	if (!format) return '';
@@ -38,13 +31,13 @@ export const buildPrintValue = (
 			hours: '${hours}',
 			minutes: '${minutes}',
 			seconds: '${seconds}',
-		} as TokenPatterns);
+		});
 	} else {
 		printValue = replaceTokens(getFormat(settings), timeValues, {
 			hours: 'hh',
 			minutes: 'mm',
 			seconds: 'ss',
-		} as TokenPatterns);
+		});
 	}
 	printValue = applyTextColor(printValue, settings.textColor, containerEl);
 	return appendSuffix(printValue, settings.lineBreakAfterInsert);
@@ -88,5 +81,5 @@ export const getCurrentTimeValues = (elapsedTime: number, trimLeadingZeros: bool
 	const [hours, minutes, seconds] = stopwatchValues.map((value: string) =>
 		trimLeadingZeros ? parseInt(value).toString() : value,
 	);
-	return { hours: hours, minutes: minutes, seconds: seconds } as TimeValues;
+	return { hours: hours, minutes: minutes, seconds: seconds };
 };
